@@ -1,0 +1,210 @@
+name: FreshRSS
+tagline: A free, self-hostable feed aggregator.
+url: https://freshrss.org/
+spdx_license: AGPL-3.0
+license_url: https://github.com/FreshRSS/FreshRSS/blob/edge/LICENSE.txt
+tags:
+  - rss
+  - news
+template: |-
+  version: "3.7"
+  services:
+    server:
+      image: {{.image}}
+      restart: unless-stopped
+      logging:
+        options:
+          max-size: 10m
+      environment:
+        TZ: {{.tz}}
+        {{- if .cron_min}}
+        CRON_MIN: {{.cron_min | quote}}
+        {{- end}}
+        FRESHRSS_ENV: {{.freshrss_env}}
+        {{- if not .enable_access_log}}
+        ENABLE_ACCESS_LOG: 0
+        {{- end}}
+        {{- if not .copy_log_to_syslog}}
+        COPY_LOG_TO_SYSLOG: "Off"
+        {{- end}}
+        {{- if not .copy_syslog_to_stderr}}
+        COPY_SYSLOG_TO_STDERR: "Off"
+        {{- end}}
+        {{- if .listen}}
+        LISTEN: {{.listen}}
+        {{- end}}
+        {{- if .internal_host_allowlist}}
+        INTERNAL_HOST_ALLOWLIST: {{.internal_host_allowlist | quote}}
+        {{- end}}
+        {{- if .trusted_proxy}}
+        TRUSTED_PROXY: {{.trusted_proxy | quote}}
+        {{- end}}
+        {{- if .oidc_enabled}}
+        OIDC_ENABLED: 1
+        {{- end}}
+        {{- if .admin_user}}
+        FRESHRSS_INSTALL: |-
+          --default-user {{.admin_user}}
+          {{- if .admin_api_password}}
+          --api-enabled
+          {{- end}}
+          {{- if .base_url}}
+          --base-url {{.base_url}}
+          {{- end}}
+          --language {{.language}}
+        FRESHRSS_USER: |-
+          --user {{.admin_user}}
+          --password {{.admin_password}}
+          {{- if .admin_email}}
+          --email {{.admin_email}}
+          {{- end}}
+          {{- if .admin_api_password}}
+          --api-password {{.admin_api_password}}
+          {{- end}}
+          --language {{.language}}
+        {{- end}}
+      volumes:
+        - ./freshrss_data:/var/www/FreshRSS/data
+        - ./freshrss_extensions:/var/www/FreshRSS/extensions
+      ports:
+        - "{{.port}}:80"
+      {{- if .healthcheck_enabled}}
+      healthcheck:
+        test: ["CMD", "cli/health.php"]
+        timeout: 10s
+        start_period: 60s
+        start_interval: 11s
+        interval: 75s
+        retries: 3
+      {{- end}}
+form:
+  - select:
+      keyname: image
+      label: Image
+      description: Container image to use.
+      help_text: |-
+        `latest` (Debian-based) is the default and generally recommended. The `alpine`
+        variant is smaller and much faster to build, with newer packages, but was slower
+        in official benchmarks.
+      default_value: freshrss/freshrss:latest
+      options:
+        - title: freshrss/freshrss:latest
+        - title: freshrss/freshrss:alpine
+  - string:
+      keyname: tz
+      label: Time Zone
+      description: The timezone the container should run in.
+      help_text: Uses tz database names, e.g. `US/Pacific`. Defaults to `UTC` if unset.
+      default_value: UTC
+  - string:
+      keyname: cron_min
+      label: Feed Refresh Schedule
+      description: Minutes past the hour when FreshRSS automatically checks for new articles.
+      help_text: |-
+        A comma-separated list such as `1,31` (recommended, about twice per hour), or a
+        step pattern such as `*/20`. Leave blank to disable the built-in cron job, e.g. if
+        refreshing feeds another way.
+      default_value: "1,31"
+  - number:
+      keyname: port
+      label: Port
+      description: The host port FreshRSS should be served on.
+      default_value: 3433
+      minimum: 1
+      maximum: 65535
+      step: 1
+  - warning:
+      content: |-
+        **Warning**: FreshRSS should be placed behind a reverse proxy with HTTPS in production.
+  - collapsible:
+      title: Advanced
+      form:
+        - select:
+            keyname: freshrss_env
+            label: Environment
+            description: Set to `development` for extra logs.
+            default_value: production
+            options:
+              - title: development
+              - title: production
+        - toggle:
+            keyname: enable_access_log
+            label: Enable Access Log
+            description: Log every HTTP request to the Apache access log.
+            default_value: true
+        - toggle:
+            keyname: copy_log_to_syslog
+            label: Copy Logs to Syslog
+            description: Copy all FreshRSS logs to syslog.
+            default_value: true
+        - toggle:
+            keyname: copy_syslog_to_stderr
+            label: Copy Syslog to Stderr
+            description: Makes syslog output visible via `docker logs`.
+            default_value: true
+        - string:
+            keyname: listen
+            label: Listen Address
+            description: Overrides the internal Apache listening address and port.
+            help_text: For advanced use, e.g. Docker host networking. Example `0.0.0.0:8080`.
+            placeholder: "0.0.0.0:80"
+        - string:
+            keyname: internal_host_allowlist
+            label: Internal Host Allowlist
+            description: Allow FreshRSS to fetch feeds from internal hosts, which are blocked by default.
+            help_text: |-
+              Space-separated `host:port` combinations, CIDR ranges (`0.0.0.0/0` for any IPv4,
+              `::/0` for any IPv6), or `*` to allow all hosts (unsafe).
+            placeholder: rss-bridge:80 rsshub:1200
+        - string:
+            keyname: trusted_proxy
+            label: Trusted Proxy Ranges
+            description: IP ranges of reverse proxies to trust for client-IP and X-Forwarded-* headers.
+            help_text: |-
+              Space-separated CIDR ranges, e.g. `172.16.0.0/12 192.168.0.0/16`. This also affects
+              external authentication methods. Leave blank for automatic detection.
+            placeholder: 172.16.0.0/12 192.168.0.0/16
+        - toggle:
+            keyname: oidc_enabled
+            label: Enable OpenID Connect
+            description: Enables OIDC login. Only available on the Debian-based image.
+            help_text: Requires additional environment variables not covered by this form — see the [OpenID Connect documentation](https://freshrss.github.io/FreshRSS/en/admins/16_OpenID-Connect.html).
+        - toggle:
+            keyname: healthcheck_enabled
+            label: Enable Healthcheck
+            description: Adds a Docker healthcheck using the built-in `cli/health.php` command.
+            default_value: true
+  - collapsible:
+      title: Automatic Installation (Optional)
+      form:
+        - warning:
+            content: |-
+              These parameters are only used the very first time the container runs. To
+              change them afterwards, delete the `freshrss` service and `freshrss_data`
+              volume, then run again.
+        - string:
+            keyname: base_url
+            label: Base URL
+            description: The public URL FreshRSS will be served at.
+            placeholder: https://freshrss.example.net
+        - string:
+            keyname: admin_user
+            label: Admin Username
+            description: Leave blank to complete setup via the Web interface instead.
+            placeholder: admin
+        - password:
+            keyname: admin_password
+            label: Admin Password
+            description: Required if an admin username is set above.
+        - string:
+            keyname: admin_email
+            label: Admin Email
+        - password:
+            keyname: admin_api_password
+            label: Admin API Password
+            description: Also enables API access (used by Google Reader-compatible apps) for this user.
+        - string:
+            keyname: language
+            label: Language
+            description: FreshRSS interface language code.
+            default_value: en
