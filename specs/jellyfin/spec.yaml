@@ -9,19 +9,19 @@ tags:
 template: |-
   services:
     jellyfin:
-      image: {{.image}}
+      image: {{ .Values.image | quote }}
       container_name: jellyfin
-      {{- if .user_id}}
-      user: {{.user_id | quote}}
+      {{- if .Values.user_id}}
+      user: {{.Values.user_id | quote}}
       {{- end}}
       ports:
-        - "{{.http_port}}:8096/tcp"
+        - "{{.Values.http_port}}:8096/tcp"
         {{- if .enable_autodiscovery}}
         - 7359:7359/udp
         {{- end}}
       volumes:
-        - {{.config_path}}:/config
-        - {{.cache_path}}:/cache
+        - {{.Values.config_path}}:/config
+        - {{.Values.cache_path}}:/cache
         - type: tmpfs
           target: /media
         {{- $media := trim (default "" .media_paths) }}
@@ -32,18 +32,18 @@ template: |-
           target: /media/{{$i}}
         {{- end}}
         {{- end}}
-        {{- if .fonts_path}}
+        {{- if .Values.fonts_path}}
         - type: bind
-          source: {{.fonts_path}}
+          source: {{.Values.fonts_path}}
           target: /usr/local/share/fonts/custom
           read_only: true
         {{- end}}
       restart: unless-stopped
-      {{- if .published_server_url}}
+      {{- if .Values.published_server_url}}
       environment:
-        - JELLYFIN_PublishedServerUrl={{.published_server_url}}
+        - JELLYFIN_PublishedServerUrl={{.Values.published_server_url}}
       {{- end}}
-      {{- if .enable_extra_hosts}}
+      {{- if .Values.enable_extra_hosts}}
       extra_hosts:
         - 'host.docker.internal:host-gateway'
       {{- end}}

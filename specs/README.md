@@ -43,7 +43,7 @@ tags:
 template: |-
   services:
     hello_world:
-      image: {{.image}}
+      image: {{.Values.image}}
 
 # Form fields, see below for examples
 form:
@@ -67,6 +67,8 @@ catalog.
 ## Template language
 
 The template language is Go's: https://pkg.go.dev/text/template
+
+At runtime, values from the fields are injected under the `.Values` key.
 
 ## Template functions
 

@@ -10,65 +10,59 @@ template: |-
   version: "3.7"
   services:
     server:
-      image: {{.image}}
+      image: {{ .Values.image | quote }}
       restart: unless-stopped
       logging:
         options:
           max-size: 10m
       environment:
-        TZ: {{.tz}}
-        {{- if .cron_min}}
-        CRON_MIN: {{.cron_min | quote}}
-        {{- end}}
-        FRESHRSS_ENV: {{.freshrss_env}}
-        {{- if not .enable_access_log}}
+        TZ: {{ .Values.tz | quote }}
+        CRON_MIN: {{.Values.cron_min | default "1,31" | quote}}
+        FRESHRSS_ENV: {{.Values.freshrss_env | quote }}
+        {{- if not .Values.enable_access_log}}
         ENABLE_ACCESS_LOG: 0
         {{- end}}
-        {{- if not .copy_log_to_syslog}}
-        COPY_LOG_TO_SYSLOG: "Off"
+        COPY_LOG_TO_SYSLOG: {{ .Values.copy_log_to_syslog | default true | ternary "On" "Off" }}
+        COPY_SYSLOG_TO_STDERR: {{ .Values.copy_syslog_to_stderr | default true | ternary "On" "Off" }}
+        {{- if .Values.listen}}
+        LISTEN: {{.Values.listen}}
         {{- end}}
-        {{- if not .copy_syslog_to_stderr}}
-        COPY_SYSLOG_TO_STDERR: "Off"
+        {{- if .Values.internal_host_allowlist}}
+        INTERNAL_HOST_ALLOWLIST: {{.Values.internal_host_allowlist | quote}}
         {{- end}}
-        {{- if .listen}}
-        LISTEN: {{.listen}}
+        {{- if .Values.trusted_proxy}}
+        TRUSTED_PROXY: {{.Values.trusted_proxy | quote}}
         {{- end}}
-        {{- if .internal_host_allowlist}}
-        INTERNAL_HOST_ALLOWLIST: {{.internal_host_allowlist | quote}}
-        {{- end}}
-        {{- if .trusted_proxy}}
-        TRUSTED_PROXY: {{.trusted_proxy | quote}}
-        {{- end}}
-        {{- if .oidc_enabled}}
+        {{- if .Values.oidc_enabled}}
         OIDC_ENABLED: 1
         {{- end}}
-        {{- if .admin_user}}
+        {{- if .Values.admin_user}}
         FRESHRSS_INSTALL: |-
-          --default-user {{.admin_user}}
-          {{- if .admin_api_password}}
+          --default-user {{.Values.admin_user}}
+          {{- if .Values.admin_api_password}}
           --api-enabled
           {{- end}}
-          {{- if .base_url}}
-          --base-url {{.base_url}}
+          {{- if .Values.base_url}}
+          --base-url {{.Values.base_url}}
           {{- end}}
-          --language {{.language}}
+          --language {{.Values.language}}
         FRESHRSS_USER: |-
-          --user {{.admin_user}}
-          --password {{.admin_password}}
-          {{- if .admin_email}}
-          --email {{.admin_email}}
+          --user {{.Values.admin_user}}
+          --password {{.Values.admin_password}}
+          {{- if .Values.admin_email}}
+          --email {{.Values.admin_email}}
           {{- end}}
-          {{- if .admin_api_password}}
-          --api-password {{.admin_api_password}}
+          {{- if .Values.admin_api_password}}
+          --api-password {{.Values.admin_api_password}}
           {{- end}}
-          --language {{.language}}
+          --language {{.Values.language}}
         {{- end}}
       volumes:
         - ./freshrss_data:/var/www/FreshRSS/data
         - ./freshrss_extensions:/var/www/FreshRSS/extensions
       ports:
-        - "{{.port}}:80"
-      {{- if .healthcheck_enabled}}
+        - "{{.Values.port}}:80"
+      {{- if .Values.healthcheck_enabled}}
       healthcheck:
         test: ["CMD", "cli/health.php"]
         timeout: 10s
