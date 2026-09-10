@@ -12,26 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package specs loads the on-disk spec format described in specs/README.md
+// (schema defined in proto/composeeditor/v1/spec.proto) into the generated
+// composeeditorv1.Application type used by the template engine and
+// frontend.
 package specs
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 
+	composeeditorv1 "github.com/josephlewis42/compose-editor/pkg/proto/composeeditor/v1"
 	"gopkg.in/yaml.v3"
 )
 
 // LoadDir reads every application spec under dir (expected to follow the
 // specs/<slug>/spec.yaml layout) and returns them sorted by slug.
-func LoadDir(dir string) ([]Application, error) {
+func LoadDir(dir string) ([]*composeeditorv1.Application, error) {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't read specs directory %s: %w", dir, err)
 	}
 
-	var apps []Application
+	var apps []*composeeditorv1.Application
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -41,17 +47,17 @@ func LoadDir(dir string) ([]Application, error) {
 		if err != nil {
 			return nil, fmt.Errorf("couldn't load spec %q: %w", entry.Name(), err)
 		}
-		apps = append(apps, *app)
+		apps = append(apps, app)
 	}
 
 	sort.Slice(apps, func(i, j int) bool {
-		return apps[i].Slug < apps[j].Slug
+		return apps[i].GetSlug() < apps[j].GetSlug()
 	})
 
 	return apps, nil
 }
 
-func loadApplication(dir, slug string) (*Application, error) {
+func loadApplication(dir, slug string) (*composeeditorv1.Application, error) {
 	appDir := filepath.Join(dir, slug)
 
 	specBytes, err := os.ReadFile(filepath.Join(appDir, "spec.yaml"))
@@ -59,8 +65,18 @@ func loadApplication(dir, slug string) (*Application, error) {
 		return nil, fmt.Errorf("couldn't read spec.yaml: %w", err)
 	}
 
-	var application Application
-	if err := yaml.Unmarshal(specBytes, &application); err != nil {
+	var generic any
+	if err := yaml.Unmarshal(specBytes, &generic); err != nil {
+		return nil, fmt.Errorf("couldn't parse spec.yaml: %w", err)
+	}
+
+	jsonBytes, err := json.Marshal(generic)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't convert spec.yaml to JSON: %w", err)
+	}
+
+	var application composeeditorv1.Application
+	if err := application.UnmarshalJSON(jsonBytes); err != nil {
 		return nil, fmt.Errorf("couldn't parse spec.yaml: %w", err)
 	}
 

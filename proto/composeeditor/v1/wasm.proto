@@ -1,0 +1,51 @@
+// Copyright 2026 Joseph Lewis III
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Messages exchanged with pkg/templateengine.Convert, both from the CLI and
+// across the JS<->WASM boundary (design/template_engine.md,
+// design/frontend.md#template-engine). The WASM build exchanges these
+// binary-encoded (proto.Marshal / toBinary), not as JSON.
+syntax = "proto3";
+
+package composeeditor.v1;
+
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/josephlewis42/compose-editor/pkg/proto/composeeditor/v1;composeeditorv1";
+
+message ConvertInput {
+  // Golang template to render.
+  string template = 1;
+  // Key/value parameters taken from the input form, injected into the
+  // template under the `.Values` key.
+  map<string, google.protobuf.Value> values = 2;
+}
+
+// Message is a single error or warning to surface to the user, optionally
+// tied to a specific form field.
+message Message {
+  // Message to show to the user.
+  string message = 1;
+  // Optional. The key of the field this message applies to, if any.
+  string field = 2;
+}
+
+message ConvertOutput {
+  // The rendered compose output, if rendering succeeded.
+  string compose_output = 1;
+  // Errors that MUST be fixed by the user.
+  repeated Message errors = 2;
+  // Non-fatal warnings.
+  repeated Message warnings = 3;
+}

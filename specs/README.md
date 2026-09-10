@@ -57,7 +57,6 @@ form:
       value: hello-world:latest
 ```
 
-
 `composeeditor build specs/ out.json` renders template with no
 values as a sanity check and fails the build if any template fails to parse
 or execute, so a spec with a broken template can't reach the published
@@ -76,16 +75,17 @@ Templates provide the following sprig functions: https://masterminds.github.io/s
 
 ## Form Fields
 
-### Layout Elements
+Every entry in a spec's `form` list (or a `collapsible`/`oneof` tab's
+nested `form`) is one of the elements below, written as a single-key YAML
+map, e.g. `- select: {...}`. See [spec.proto](../proto/composeeditor/v1/spec.proto)
+for the source of truth this file is generated from.
 
-Layout elements help structure a form so it's easy for a human to understand.
+## `info`
 
-#### Alerts
-
-Alerts come in four variants `info`, `warning`, `danger`, `success` and have the following common fields:
+Renders markdown in an info box.
 
 | Property Name | Required? | Notes |
-|--- | --- | --- |
+| --- | --- | --- |
 | `content` | yes | A markdown description to be shown in the alert. |
 
 Example:
@@ -96,12 +96,60 @@ info:
     **Information**: You should ALWAYS use :latest.
 ```
 
-#### `heading`
+## `warning`
 
-Headings insert a heading text into a form:
+Renders markdown in an warning box.
 
 | Property Name | Required? | Notes |
-|--- | --- | --- |
+| --- | --- | --- |
+| `content` | yes | A markdown description to be shown in the alert. |
+
+Example:
+
+```yaml
+warning:
+  content: |-
+    **Warning**: This service should be placed behind a reverse proxy with HTTPS in production.
+```
+
+## `danger`
+
+Renders markdown in an danger box.
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `content` | yes | A markdown description to be shown in the alert. |
+
+Example:
+
+```yaml
+danger:
+  content: |-
+    **Danger**: Deleting this volume will permanently erase all data.
+```
+
+## `success`
+
+Renders markdown in an success box.
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `content` | yes | A markdown description to be shown in the alert. |
+
+Example:
+
+```yaml
+success:
+  content: |-
+    **Success**: Setup complete — you can now log in with the admin account.
+```
+
+## `heading`
+
+Heading inserts a heading into a form.
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
 | `title` | yes | The title of the heading. |
 | `content` | no | Markdown content to be shown below the heading. |
 
@@ -114,157 +162,289 @@ heading:
     See [official documentation](http://example.com) for recommended setup.
 ```
 
-#### `markdown`
+## `markdown`
 
-Markdown inserts a block of markdown into a form, e.g. for prose that doesn't fit
-an alert or heading:
+Inserts a block of markdown into a form, e.g. for prose that doesn't fit an alert or heading.
 
 | Property Name | Required? | Notes |
-|--- | --- | --- |
+| --- | --- | --- |
 | `content` | yes | Markdown content to be shown in the block. |
 
 Example:
 
 ```yaml
-text:
+markdown:
   content: |-
     See [official documentation](http://example.com) for recommended setup.
 ```
 
-#### `collapsible`
+## `collapsible`
 
-Collapsible insert a collapsible section into a form. These are usually used to hide
-advanced elements.
+Collapsible inserts a collapsible section into a form. Usually used to hide advanced elements.
 
 | Property Name | Required? | Notes |
-|--- | --- | --- |
+| --- | --- | --- |
 | `title` | yes | Title for the collapsible content. |
 | `form` | yes | List of form elements shown when expanded. |
 
-#### `oneof`
+Example:
 
-The `oneof` is a special type of layout element. It presents the user with a set of 
-options as tabs that contain additional form content.
+```yaml
+collapsible:
+  title: Advanced
+  form:
+    - toggle:
+        keyname: enable_access_log
+        label: Enable Access Log
+```
 
-Each entry in a oneof must have a unique name, and the currently selected tab is injected
-as a variable.
+## `oneof`
 
-`oneof` properties:
-
-| Property Name | Required? | Notes |
-|--- | --- | --- |
-| `tabs` | yes | Repeated `tab` (see below). |
-| `keyname` | yes | Variable the currently selected tab will be injected as into the template. |
-
-`tab` properties:
+OneOf presents the user with a set of options as tabs that contain additional form content. The currently selected tab's value is injected into the template as a variable.
 
 | Property Name | Required? | Notes |
-|--- | --- | --- |
+| --- | --- | --- |
+| `keyname` | yes | Variable the currently selected tab's value will be injected as into the template. |
+| `tabs` | yes | The tabs to present, list of `OneOfTab` objects (see below). |
+
+**`OneOfTab`**
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
 | `title` | yes | Title for the tab. |
-| `value` | yes | Unique value for this tab to be stored in `keyname` when selected. |
-| `form` | yes | List of form elements. |
+| `value` | yes | Unique value for this tab, stored in the parent OneOf's keyname when selected. |
+| `form` | yes | List of form elements shown while this tab is selected. |
 
-### Input elements
+Example:
 
-Input elements are used to create variables for the user.
+```yaml
+oneof:
+  keyname: backend
+  tabs:
+    - title: SQLite
+      value: sqlite
+      form: []
+    - title: PostgreSQL
+      value: postgres
+      form:
+        - string:
+            keyname: postgres_host
+            label: PostgreSQL Host
+```
 
-They are generally built around HTML elements. All input elements
-share the following common properties:
+## `url`
+
+Lets a user input a URL in an input box.
 
 | Property Name | Required? | Notes |
-|--- | --- | --- |
-| `keyname` | yes | Variable the value of this field will be injected as into the template. Must be `[a-zA-Z0-9_]+` |
+| --- | --- | --- |
+| `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
+| `label` | yes | Label for the field. |
+| `description` | no | Markdown description for the field. |
+| `help_text` | no | Markdown help text shown under the field. |
+| `default_value` | no | Default value. |
+| `placeholder` | no | Placeholder for the URL input. |
+
+Example:
+
+```yaml
+url:
+  keyname: base_url
+  label: Base URL
+  placeholder: https://example.com
+```
+
+## `string`
+
+Lets a user input a single line text string in an input box.
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
+| `label` | yes | Label for the field. |
+| `description` | no | Markdown description for the field. |
+| `help_text` | no | Markdown help text shown under the field. |
+| `default_value` | no | Default value. |
+| `placeholder` | no | Placeholder for the string input. |
+| `regex` | no | Regex used to validate the input. |
+
+Example:
+
+```yaml
+string:
+  keyname: tz
+  label: Time Zone
+  description: The timezone the container should run in.
+  default_value: UTC
+```
+
+## `text`
+
+Lets a user input a multi-line text string in a textarea box.
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
+| `label` | yes | Label for the field. |
+| `description` | no | Markdown description for the field. |
+| `help_text` | no | Markdown help text shown under the field. |
+| `default_value` | no | Default value. |
+| `placeholder` | no | Placeholder for the textarea. |
+
+Example:
+
+```yaml
+text:
+  keyname: media_paths
+  label: Media Paths
+  description: Host directories containing your media libraries, one per line.
+  placeholder: |-
+    /path/to/movies
+    /path/to/tv
+```
+
+## `code`
+
+Lets a user input a multi-line text string in a textarea box formatted with a monospace font and line numbers.
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
+| `label` | yes | Label for the field. |
+| `description` | no | Markdown description for the field. |
+| `help_text` | no | Markdown help text shown under the field. |
+| `default_value` | no | Default value. |
+| `placeholder` | no | Placeholder for the textarea. |
+
+Example:
+
+```yaml
+code:
+  keyname: extra_config
+  label: Extra Configuration
+  placeholder: |-
+    # additional config, one directive per line
+```
+
+## `password`
+
+Lets a user input a single line text string in an input box with masked input.
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
+| `label` | yes | Label for the field. |
+| `description` | no | Markdown description for the field. |
+| `help_text` | no | Markdown help text shown under the field. |
+| `default_value` | no | Default value. |
+| `placeholder` | no | Placeholder for the input. |
+
+Example:
+
+```yaml
+password:
+  keyname: admin_password
+  label: Admin Password
+  description: Required if an admin username is set above.
+```
+
+## `toggle`
+
+Displays a toggle so the user can enable/disable something. The value is true or false.
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
 | `label` | yes | Label for the field. |
 | `description` | no | Markdown description for the field. |
 | `help_text` | no | Markdown help text shown under the field. |
 | `default_value` | no | Default value. |
 
+Example:
 
-#### `url`
+```yaml
+toggle:
+  keyname: enable_healthcheck
+  label: Enable Healthcheck
+  default_value: true
+```
 
-Allows a user to input a URL in an input box.
+## `number`
 
-Additional properties:
-
-| Property Name | Required? | Notes |
-|--- | --- | --- |
-| `placeholder` | no | Placeholder for the URL |
-
-#### `string`
-
-Allows a user to input a single line text string in an input box.
-
-Additional properties:
+Lets the user enter a number using a numeric input.
 
 | Property Name | Required? | Notes |
-|--- | --- | --- |
-| `placeholder` | no | Placeholder for the string. |
-| `regex` | no | Regex used to validate the input. |
-
-#### `text`
-
-Allows a user to input a multi-line text string in a textarea box. Compiles
-to `"type": "textarea"` in the output JSON — see the naming-collision note
-under the layout `text` element above.
-
-Additional properties:
-
-| Property Name | Required? | Notes |
-|--- | --- | --- |
-| `placeholder` | no | Placeholder for the textarea. |
-
-#### `code`
-
-Allows a user to input a multi-line text string in a textarea box formatted with
-a monospace font and line numbers.
-
-Additional properties:
-
-| Property Name | Required? | Notes |
-|--- | --- | --- |
-| `placeholder` | no | Placeholder for the textarea. |
-
-#### `password`
-
-Allows a user to input a single line text string in a input box with masked input.
-
-Additional properties:
-
-| Property Name | Required? | Notes |
-|--- | --- | --- |
-| `placeholder` | no | Placeholder for the input. |
-
-#### `toggle`
-
-Displays a toggle so the user can enable/disable something. The value is true or false.
-
-
-#### `number`
-
-Allows the user to enter a number using a numeric input
-
-| Property Name | Required? | Notes |
-|--- | --- | --- |
+| --- | --- | --- |
+| `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
+| `label` | yes | Label for the field. |
+| `description` | no | Markdown description for the field. |
+| `help_text` | no | Markdown help text shown under the field. |
+| `default_value` | no | Default value. |
 | `minimum` | yes | Minimum value. |
 | `maximum` | yes | Maximum value. |
 | `step` | yes | Step value. |
 
-#### `date`
+Example:
 
-Allows the user to enter a date using a date picker.
+```yaml
+number:
+  keyname: port
+  label: Port
+  default_value: 3433
+  minimum: 1
+  maximum: 65535
+  step: 1
+```
 
-#### `select`
+## `date`
 
-Allows the user to pick a value from a dropdown.
+Lets the user enter a date using a date picker.
 
 | Property Name | Required? | Notes |
-|--- | --- | --- |
-| `options` | yes | An array of `option` to be shown in order, see below. |
+| --- | --- | --- |
+| `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
+| `label` | yes | Label for the field. |
+| `description` | no | Markdown description for the field. |
+| `help_text` | no | Markdown help text shown under the field. |
+| `default_value` | no | Default value. |
 
-`option`
+Example:
 
-| Property Name | Required ? | Notes |
+```yaml
+date:
+  keyname: start_date
+  label: Start Date
+```
+
+## `select`
+
+Lets the user pick a value from a dropdown.
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
+| `label` | yes | Label for the field. |
+| `description` | no | Markdown description for the field. |
+| `help_text` | no | Markdown help text shown under the field. |
+| `default_value` | no | Default value. |
+| `options` | yes | Options to be shown in order. |
+
+**`SelectOption`**
+
+| Property Name | Required? | Notes |
 | --- | --- | --- |
 | `title` | yes | Title to show the user for the option. |
-| `value` | no | Value associated with the option, if unset, the title is used. |
-| `optgroup` | no | If set, this `option` is created as an optgroup instead of a selectable value. Subsequent options are grouped into it until another optgroup is encountered. |
+| `value` | no | Value associated with the option; if unset, the title is used. |
+| `optgroup` | no | If set, this option is created as an optgroup instead of a selectable value. Subsequent options are grouped into it until another optgroup is encountered. |
+
+Example:
+
+```yaml
+select:
+  keyname: image
+  label: Image
+  default_value: hello-world:latest
+  options:
+    - title: hello-world:latest
+      value: hello-world:latest
+```

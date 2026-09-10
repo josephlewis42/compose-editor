@@ -1,0 +1,325 @@
+// Copyright 2026 Joseph Lewis III
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Schema for the on-disk spec format described in specs/README.md. This is
+// the single source of truth for both the Go and TypeScript spec types
+// (see proto/README.md for how to regenerate them) and for the generated
+// per-field reference in specs/form_fields.md.
+syntax = "proto3";
+
+package composeeditor.v1;
+
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/josephlewis42/compose-editor/pkg/proto/composeeditor/v1;composeeditorv1";
+
+// Catalog is the compiled output of `composeeditor build` (see
+// design/spec_format.md), served to the frontend as templates.binpb.
+message Catalog {
+  repeated Application applications = 1;
+}
+
+// Application combines an application's metadata with its form for use by
+// the frontend catalog/editor. The slug comes from the spec directory name,
+// not the YAML content.
+message Application {
+  // Required. Directory name the spec was loaded from.
+  string slug = 1;
+  // Required. Human readable name of the application.
+  string name = 2;
+  // Required. Tagline for the application.
+  string tagline = 3;
+  // Required. URL to the application's main website or source code
+  // repository. MUST be HTTP/HTTPS.
+  string url = 4;
+  // Required. License code from https://spdx.org/licenses/. If the license
+  // isn't listed, use "Other".
+  string spdx_license = 5;
+  // Required. License URL.
+  string license_url = 6;
+  // Optional. Freeform tags to help users search for the application.
+  // Ideally, one word and lowercase.
+  repeated string tags = 7;
+  // Required. Go template, see template_engine.md for the template
+  // language and available functions.
+  string template = 8;
+  // Optional. Form fields shown to the user, see FormElement.
+  repeated FormElement form = 9;
+}
+
+// FormElement is a single entry in a form. It's a tagged union: YAML specs
+// author it as a single-key map, e.g. `- select: {...}` — that's also
+// protobuf's canonical JSON/YAML encoding for a populated oneof field, so
+// loading a spec is a direct YAML->JSON->protojson conversion with no
+// hand-written unmarshaling.
+message FormElement {
+  oneof element {
+    Alert info = 1;
+    Alert warning = 2;
+    Alert danger = 3;
+    Alert success = 4;
+    Heading heading = 5;
+    TextBlock markdown = 6;
+    Collapsible collapsible = 7;
+
+    // "one_of" avoids the `oneof` keyword; json_name keeps the wire/YAML
+    // key "oneof".
+    OneOf one_of = 8 [json_name = "oneof"];
+    URLInput url = 9;
+    // "str" sidesteps the `string` scalar type keyword; json_name keeps
+    // the wire/YAML key "string".
+    StringInput str = 10 [json_name = "string"];
+    // The multi-line "text" input element. Renders as a textarea.
+    TextAreaInput text = 11;
+    CodeInput code = 12;
+    PasswordInput password = 13;
+    ToggleInput toggle = 14;
+    NumberInput number = 15;
+    DateInput date = 16;
+    SelectInput select = 17;
+  }
+}
+
+// Layout elements help structure a form so it's easy for a human to
+// understand.
+
+// Alert is shared by the four alert variants (info/warning/danger/success
+// in FormElement.element); which variant it is comes from which oneof
+// field is set.
+message Alert {
+  // Required. A markdown description to be shown in the alert.
+  string content = 1;
+}
+
+// Heading inserts a heading into a form.
+message Heading {
+  // Required. The title of the heading.
+  string title = 1;
+  // Optional. Markdown content to be shown below the heading.
+  string content = 2;
+}
+
+// TextBlock (YAML key "markdown") inserts a block of markdown into a form,
+// e.g. for prose that doesn't fit an alert or heading.
+message TextBlock {
+  // Required. Markdown content to be shown in the block.
+  string content = 1;
+}
+
+// Collapsible inserts a collapsible section into a form. Usually used to
+// hide advanced elements.
+message Collapsible {
+  // Required. Title for the collapsible content.
+  string title = 1;
+  // Required. List of form elements shown when expanded.
+  repeated FormElement form = 2;
+}
+
+// OneOf presents the user with a set of options as tabs that contain
+// additional form content. The currently selected tab's value is injected
+// into the template as a variable.
+message OneOf {
+  // Required. Variable the currently selected tab's value will be
+  // injected as into the template.
+  string keyname = 1;
+  // Required. The tabs to present.
+  repeated OneOfTab tabs = 2;
+}
+
+message OneOfTab {
+  // Required. Title for the tab.
+  string title = 1;
+  // Required. Unique value for this tab, stored in the parent OneOf's
+  // keyname when selected.
+  string value = 2;
+  // Required. List of form elements shown while this tab is selected.
+  repeated FormElement form = 3;
+}
+
+// Input elements are used to create variables for the user. They are
+// generally built around HTML elements, and all share a common set of
+// fields (repeated on each input message below, since protobuf has no
+// struct embedding): keyname, label, description, help_text, default_value.
+
+// URLInput lets a user input a URL in an input box.
+message URLInput {
+  // Required. Variable this field's value is injected as into the
+  // template. Must be [a-zA-Z0-9_]+.
+  string keyname = 1;
+  // Required. Label for the field.
+  string label = 2;
+  // Optional. Markdown description for the field.
+  string description = 3;
+  // Optional. Markdown help text shown under the field.
+  string help_text = 4;
+  // Optional. Default value.
+  string default_value = 5;
+  // Optional. Placeholder for the URL input.
+  string placeholder = 6;
+}
+
+// StringInput (YAML key "string") lets a user input a single line text
+// string in an input box.
+message StringInput {
+  // Required. Variable this field's value is injected as into the
+  // template. Must be [a-zA-Z0-9_]+.
+  string keyname = 1;
+  // Required. Label for the field.
+  string label = 2;
+  // Optional. Markdown description for the field.
+  string description = 3;
+  // Optional. Markdown help text shown under the field.
+  string help_text = 4;
+  // Optional. Default value.
+  string default_value = 5;
+  // Optional. Placeholder for the string input.
+  string placeholder = 6;
+  // Optional. Regex used to validate the input.
+  string regex = 7;
+}
+
+// TextAreaInput (YAML key "text") lets a user input a multi-line text
+// string in a textarea box.
+message TextAreaInput {
+  // Required. Variable this field's value is injected as into the
+  // template. Must be [a-zA-Z0-9_]+.
+  string keyname = 1;
+  // Required. Label for the field.
+  string label = 2;
+  // Optional. Markdown description for the field.
+  string description = 3;
+  // Optional. Markdown help text shown under the field.
+  string help_text = 4;
+  // Optional. Default value.
+  string default_value = 5;
+  // Optional. Placeholder for the textarea.
+  string placeholder = 6;
+}
+
+// CodeInput lets a user input a multi-line text string in a textarea box
+// formatted with a monospace font and line numbers.
+message CodeInput {
+  // Required. Variable this field's value is injected as into the
+  // template. Must be [a-zA-Z0-9_]+.
+  string keyname = 1;
+  // Required. Label for the field.
+  string label = 2;
+  // Optional. Markdown description for the field.
+  string description = 3;
+  // Optional. Markdown help text shown under the field.
+  string help_text = 4;
+  // Optional. Default value.
+  string default_value = 5;
+  // Optional. Placeholder for the textarea.
+  string placeholder = 6;
+}
+
+// PasswordInput lets a user input a single line text string in an input
+// box with masked input.
+message PasswordInput {
+  // Required. Variable this field's value is injected as into the
+  // template. Must be [a-zA-Z0-9_]+.
+  string keyname = 1;
+  // Required. Label for the field.
+  string label = 2;
+  // Optional. Markdown description for the field.
+  string description = 3;
+  // Optional. Markdown help text shown under the field.
+  string help_text = 4;
+  // Optional. Default value.
+  string default_value = 5;
+  // Optional. Placeholder for the input.
+  string placeholder = 6;
+}
+
+// ToggleInput displays a toggle so the user can enable/disable something.
+// The value is true or false.
+message ToggleInput {
+  // Required. Variable this field's value is injected as into the
+  // template. Must be [a-zA-Z0-9_]+.
+  string keyname = 1;
+  // Required. Label for the field.
+  string label = 2;
+  // Optional. Markdown description for the field.
+  string description = 3;
+  // Optional. Markdown help text shown under the field.
+  string help_text = 4;
+  // Optional. Default value.
+  bool default_value = 5;
+}
+
+// NumberInput lets the user enter a number using a numeric input.
+message NumberInput {
+  // Required. Variable this field's value is injected as into the
+  // template. Must be [a-zA-Z0-9_]+.
+  string keyname = 1;
+  // Required. Label for the field.
+  string label = 2;
+  // Optional. Markdown description for the field.
+  string description = 3;
+  // Optional. Markdown help text shown under the field.
+  string help_text = 4;
+  // Optional. Default value.
+  double default_value = 5;
+  // Required. Minimum value.
+  double minimum = 6;
+  // Required. Maximum value.
+  double maximum = 7;
+  // Required. Step value.
+  double step = 8;
+}
+
+// DateInput lets the user enter a date using a date picker.
+message DateInput {
+  // Required. Variable this field's value is injected as into the
+  // template. Must be [a-zA-Z0-9_]+.
+  string keyname = 1;
+  // Required. Label for the field.
+  string label = 2;
+  // Optional. Markdown description for the field.
+  string description = 3;
+  // Optional. Markdown help text shown under the field.
+  string help_text = 4;
+  // Optional. Default value in YYYY-MM-DD.
+  string default_value = 5;
+}
+
+// SelectInput lets the user pick a value from a dropdown.
+message SelectInput {
+  // Required. Variable this field's value is injected as into the
+  // template. Must be [a-zA-Z0-9_]+.
+  string keyname = 1;
+  // Required. Label for the field.
+  string label = 2;
+  // Optional. Markdown description for the field.
+  string description = 3;
+  // Optional. Markdown help text shown under the field.
+  string help_text = 4;
+  // Optional. Default value.
+  string default_value = 5;
+  // Required. Options to be shown in order.
+  repeated SelectOption options = 6;
+}
+
+message SelectOption {
+  // Required. Title to show the user for the option.
+  string title = 1;
+  // Optional. Value associated with the option; if unset, the title is
+  // used.
+  string value = 2;
+  // Optional. If set, this option is created as an optgroup instead of a
+  // selectable value. Subsequent options are grouped into it until
+  // another optgroup is encountered.
+  string optgroup = 3;
+}

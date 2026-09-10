@@ -23,48 +23,35 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
+	composeeditorv1 "github.com/josephlewis42/compose-editor/pkg/proto/composeeditor/v1"
 	"gopkg.in/yaml.v3"
 )
 
-type Input struct {
-	Template string         `json:"template"`
-	Values   map[string]any `json:"values"`
-}
-
-// Message is a single error or warning to surface to the user, optionally
-// tied to a specific form field.
-type Message struct {
-	Message string `json:"message"`
-	Field   string `json:"field,omitempty"`
-}
-
-type Output struct {
-	ComposeOutput string    `json:"compose_output"`
-	Errors        []Message `json:"errors"`
-	Warnings      []Message `json:"warnings"`
-}
-
 // Convert renders input.Template with input.Values using Go templates with
 // Sprig functions.
-func Convert(input *Input) Output {
-	out := Output{
-		Errors:   []Message{},
-		Warnings: []Message{},
+func Convert(input *composeeditorv1.ConvertInput) *composeeditorv1.ConvertOutput {
+	out := &composeeditorv1.ConvertOutput{
+		Errors:   []*composeeditorv1.Message{},
+		Warnings: []*composeeditorv1.Message{},
 	}
 
-	tmpl, err := template.New("variant").Funcs(funcMap()).Parse(input.Template)
+	tmpl, err := template.New("variant").Funcs(funcMap()).Parse(input.GetTemplate())
 	if err != nil {
-		out.Errors = append(out.Errors, Message{Message: "couldn't parse template: " + err.Error()})
+		out.Errors = append(out.Errors, &composeeditorv1.Message{Message: "couldn't parse template: " + err.Error()})
 		return out
 	}
 
+	values := make(map[string]any, len(input.GetValues()))
+	for key, value := range input.GetValues() {
+		values[key] = value.AsInterface()
+	}
 	valuesMap := map[string]any{
-		"Values": input.Values,
+		"Values": values,
 	}
 
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, valuesMap); err != nil {
-		out.Errors = append(out.Errors, Message{Message: "couldn't render template: " + err.Error()})
+		out.Errors = append(out.Errors, &composeeditorv1.Message{Message: "couldn't render template: " + err.Error()})
 		return out
 	}
 
@@ -72,7 +59,7 @@ func Convert(input *Input) Output {
 
 	var probe any
 	if err := yaml.Unmarshal(buf.Bytes(), &probe); err != nil {
-		out.Warnings = append(out.Warnings, Message{Message: "output is not valid YAML: " + err.Error()})
+		out.Warnings = append(out.Warnings, &composeeditorv1.Message{Message: "output is not valid YAML: " + err.Error()})
 	}
 
 	return out

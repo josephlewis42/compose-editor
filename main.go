@@ -16,11 +16,11 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 
+	composeeditorv1 "github.com/josephlewis42/compose-editor/pkg/proto/composeeditor/v1"
 	"github.com/josephlewis42/compose-editor/pkg/specs"
 	"github.com/josephlewis42/compose-editor/pkg/templateengine"
 	"github.com/urfave/cli/v3"
@@ -47,19 +47,16 @@ func build() *cli.Command {
 			}
 
 			for _, app := range apps {
-				out := templateengine.Convert(&templateengine.Input{Template: app.Template})
-				if len(out.Errors) > 0 {
-					return fmt.Errorf("spec %s/spec.yaml has an invalid template: %s", app.Slug, out.Errors[0].Message)
+				out := templateengine.Convert(&composeeditorv1.ConvertInput{Template: app.GetTemplate()})
+				if len(out.GetErrors()) > 0 {
+					return fmt.Errorf("spec %s/spec.yaml has an invalid template: %s", app.GetSlug(), out.GetErrors()[0].GetMessage())
 				}
 			}
 
-			catalog := struct {
-				Applications []specs.Application `json:"applications"`
-			}{Applications: apps}
-
-			data, err := json.MarshalIndent(&catalog, "", "  ")
+			catalog := &composeeditorv1.Catalog{Applications: apps}
+			data, err := catalog.MarshalVT()
 			if err != nil {
-				return fmt.Errorf("couldn't encode catalog as JSON: %w", err)
+				return fmt.Errorf("couldn't encode catalog: %w", err)
 			}
 
 			if err := os.WriteFile(outputFile, data, 0o644); err != nil {

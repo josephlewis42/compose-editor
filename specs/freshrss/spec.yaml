@@ -80,7 +80,7 @@ form:
         `latest` (Debian-based) is the default and generally recommended. The `alpine`
         variant is smaller and much faster to build, with newer packages, but was slower
         in official benchmarks.
-      default_value: freshrss/freshrss:latest
+      default_value: "freshrss/freshrss:latest"
       options:
         - title: freshrss/freshrss:latest
         - title: freshrss/freshrss:alpine

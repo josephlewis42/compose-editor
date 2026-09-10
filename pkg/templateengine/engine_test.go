@@ -14,67 +14,75 @@
 
 package templateengine
 
-import "testing"
+import (
+	"testing"
+
+	structpb "github.com/aperturerobotics/protobuf-go-lite/types/known/structpb"
+
+	composeeditorv1 "github.com/josephlewis42/compose-editor/pkg/proto/composeeditor/v1"
+)
 
 func TestConvert_Success(t *testing.T) {
-	out := Convert(&Input{
+	out := Convert(&composeeditorv1.ConvertInput{
 		Template: "image: {{.Values.image | quote }}\nport: {{.Values.port}}",
-		Values: map[string]any{
-			"image": "freshrss/freshrss:latest",
-			"port":  3433,
+		Values: map[string]*structpb.Value{
+			"image": structpb.NewStringValue("freshrss/freshrss:latest"),
+			"port":  structpb.NewNumberValue(3433),
 		},
 	})
 
-	if len(out.Errors) != 0 {
-		t.Fatalf("unexpected errors: %+v", out.Errors)
+	if len(out.GetErrors()) != 0 {
+		t.Fatalf("unexpected errors: %+v", out.GetErrors())
 	}
-	if len(out.Warnings) != 0 {
-		t.Fatalf("unexpected warnings: %+v", out.Warnings)
+	if len(out.GetWarnings()) != 0 {
+		t.Fatalf("unexpected warnings: %+v", out.GetWarnings())
 	}
 
 	want := "image: \"freshrss/freshrss:latest\"\nport: 3433"
-	if out.ComposeOutput != want {
-		t.Errorf("got %q, want %q", out.ComposeOutput, want)
+	if out.GetComposeOutput() != want {
+		t.Errorf("got %q, want %q", out.GetComposeOutput(), want)
 	}
 }
 
 func TestConvert_SprigFunctions(t *testing.T) {
-	out := Convert(&Input{
+	out := Convert(&composeeditorv1.ConvertInput{
 		Template: "name: {{.Values.name | upper}}",
-		Values:   map[string]any{"name": "freshrss"},
+		Values: map[string]*structpb.Value{
+			"name": structpb.NewStringValue("freshrss"),
+		},
 	})
 
-	if len(out.Errors) != 0 {
-		t.Fatalf("unexpected errors: %+v", out.Errors)
+	if len(out.GetErrors()) != 0 {
+		t.Fatalf("unexpected errors: %+v", out.GetErrors())
 	}
-	if out.ComposeOutput != "name: FRESHRSS" {
-		t.Errorf("got %q", out.ComposeOutput)
+	if out.GetComposeOutput() != "name: FRESHRSS" {
+		t.Errorf("got %q", out.GetComposeOutput())
 	}
 }
 
 func TestConvert_ParseError(t *testing.T) {
-	out := Convert(&Input{Template: "{{ .Values.broken "})
+	out := Convert(&composeeditorv1.ConvertInput{Template: "{{ .Values.broken "})
 
-	if len(out.Errors) == 0 {
+	if len(out.GetErrors()) == 0 {
 		t.Fatal("expected a parse error")
 	}
 }
 
 func TestConvert_ExecuteError(t *testing.T) {
-	out := Convert(&Input{Template: `{{ fail "boom" }}`})
+	out := Convert(&composeeditorv1.ConvertInput{Template: `{{ fail "boom" }}`})
 
-	if len(out.Errors) == 0 {
+	if len(out.GetErrors()) == 0 {
 		t.Fatal("expected an execution error")
 	}
 }
 
 func TestConvert_InvalidYAMLWarning(t *testing.T) {
-	out := Convert(&Input{Template: "key: [unterminated"})
+	out := Convert(&composeeditorv1.ConvertInput{Template: "key: [unterminated"})
 
-	if len(out.Errors) != 0 {
-		t.Fatalf("unexpected errors: %+v", out.Errors)
+	if len(out.GetErrors()) != 0 {
+		t.Fatalf("unexpected errors: %+v", out.GetErrors())
 	}
-	if len(out.Warnings) == 0 {
+	if len(out.GetWarnings()) == 0 {
 		t.Fatal("expected a warning about invalid YAML output")
 	}
 }
