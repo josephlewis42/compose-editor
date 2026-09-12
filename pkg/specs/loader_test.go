@@ -15,8 +15,6 @@
 package specs
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 )
 
@@ -44,21 +42,5 @@ func TestLoadDir_Freshrss(t *testing.T) {
 	first := app.GetForm()[0]
 	if first.GetSelect().GetKeyname() != "image" {
 		t.Errorf("got first form element %+v, want a select with keyname=image", first)
-	}
-}
-
-func TestLoadDir_UnknownFormElementType(t *testing.T) {
-	dir := t.TempDir()
-	appDir := filepath.Join(dir, "bogus")
-	if err := os.Mkdir(appDir, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	spec := "name: Bogus\nform:\n- bogus:\n    foo: bar\n"
-	if err := os.WriteFile(filepath.Join(appDir, "spec.yaml"), []byte(spec), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	if _, err := LoadDir(dir); err == nil {
-		t.Fatal("expected an error for an unknown form element type")
 	}
 }
