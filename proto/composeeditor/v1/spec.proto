@@ -20,8 +20,6 @@ syntax = "proto3";
 
 package composeeditor.v1;
 
-import "google/protobuf/struct.proto";
-
 option go_package = "github.com/josephlewis42/compose-editor/pkg/proto/composeeditor/v1;composeeditorv1";
 
 // Catalog is the compiled output of `composeeditor build` (see
