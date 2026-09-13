@@ -448,3 +448,49 @@ select:
     - title: hello-world:latest
       value: hello-world:latest
 ```
+
+
+## `port`
+
+Lets the user pick a port.
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
+| `label` | yes | Label for the field. |
+| `description` | no | Markdown description for the field. |
+| `default_value` | no | Default value. |
+
+
+## `select`
+
+Lets the user pick a value from a dropdown.
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
+| `label` | yes | Label for the field. |
+| `description` | no | Markdown description for the field. |
+| `help_text` | no | Markdown help text shown under the field. |
+| `default_value` | no | Default value. |
+| `options` | yes | Options to be shown in order. |
+
+**`SelectOption`**
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `title` | yes | Title to show the user for the option. |
+| `value` | no | Value associated with the option; if unset, the title is used. |
+| `optgroup` | no | If set, this option is created as an optgroup instead of a selectable value. Subsequent options are grouped into it until another optgroup is encountered. |
+
+Example:
+
+```yaml
+select:
+  keyname: image
+  label: Image
+  default_value: hello-world:latest
+  options:
+    - title: hello-world:latest
+      value: hello-world:latest
+```

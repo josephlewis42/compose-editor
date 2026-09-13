@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { CheckIcon, CodeIcon, CopyIcon, DownloadIcon } from 'lucide-react'
-import type { Message } from '@/gen/composeeditor/v1/engine_pb'
+import type { Message } from '@/gen/composeeditor/v1/wasm_pb'
 import type { FormValues } from './FormRenderer'
 
 interface OutputPanelProps {

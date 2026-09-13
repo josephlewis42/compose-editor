@@ -20,6 +20,9 @@ function collect(elements: FormElement[] | undefined, values: FormValues) {
           collect(tab.form, values)
         }
         break
+      case 'toggleSection':
+        collect(el.value.form, values)
+        break
       case 'info':
       case 'warning':
       case 'danger':

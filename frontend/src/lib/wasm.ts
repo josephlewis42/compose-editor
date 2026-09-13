@@ -6,7 +6,7 @@
 
 import { create, fromBinary, fromJson, toBinary, type JsonValue } from '@bufbuild/protobuf'
 import { ValueSchema } from '@bufbuild/protobuf/wkt'
-import { ConvertInputSchema, ConvertOutputSchema, type Message } from '@/gen/composeeditor/v1/engine_pb'
+import { ConvertInputSchema, ConvertOutputSchema, type Message } from '@/gen/composeeditor/v1/wasm_pb'
 
 declare global {
   interface Window {

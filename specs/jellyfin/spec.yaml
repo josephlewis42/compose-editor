@@ -84,6 +84,16 @@ form:
       placeholder: |-
         /path/to/movies
         /path/to/tv
+  - toggle_section:
+      keyname: enable_autodiscovery
+      label: Enable Autodiscovery
+      description: Allow clients on the local network to automatically find this server?
+      form:
+      - port:
+        keyname: autodiscovery_port
+        label: Autodiscovery port (UDP)
+        description: This should usually be left at the default.
+        default_value: 8096
   - collapsible:
       title: Advanced
       form:
@@ -98,11 +108,6 @@ form:
             label: Custom Fonts Path
             description: Extra fonts to be used during transcoding with subtitle burn-in, mounted read-only at `/usr/local/share/fonts/custom`.
             placeholder: /path/to/fonts
-        - toggle:
-            keyname: enable_autodiscovery
-            label: Enable Autodiscovery
-            description: Publish UDP port 7359 so clients on the local network can automatically find this server.
-            default_value: true
         - string:
             keyname: published_server_url
             label: Published Server URL

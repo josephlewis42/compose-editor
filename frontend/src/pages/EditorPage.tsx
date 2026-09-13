@@ -6,7 +6,7 @@ import { OutputPanel } from '@/components/OutputPanel'
 import { defaultFormValues } from '@/lib/form'
 import { convertComposeSpec } from '@/lib/wasm'
 import { type Application } from '@/gen/composeeditor/v1/spec_pb'
-import { MessageSchema, type Message } from '@/gen/composeeditor/v1/engine_pb'
+import { MessageSchema, type Message } from '@/gen/composeeditor/v1/wasm_pb'
 
 const DEBOUNCE_MS = 100
 

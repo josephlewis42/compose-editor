@@ -1,11 +1,13 @@
 import { CheckCircle2Icon, InfoIcon, TriangleAlertIcon, XCircleIcon } from 'lucide-react'
 import { Markdown } from '@/components/Markdown'
 import type { FormElement } from '@/lib/catalog'
+import { useState } from 'react'
+import type { ToggleInput } from '@/gen/composeeditor/v1/spec_pb'
 
 export type FormValues = Record<string, string | number | boolean | null>
 
 type ElementUnion = FormElement['element']
-type InputUnion = Extract<ElementUnion, { case: 'url' | 'str' | 'text' | 'code' | 'password' | 'toggle' | 'number' | 'date' | 'select' }>
+type InputUnion = Extract<ElementUnion, { case: 'url' | 'str' | 'text' | 'code' | 'password' | 'toggle' | 'number' | 'date' | 'select' | 'port' }>
 
 interface FormRendererProps {
   elements: FormElement[]
@@ -45,7 +47,7 @@ function FormElementView({
       return (
         <div>
           <h3 className="text-base font-semibold">{el.value.title}</h3>
-          {el.value.content && <Markdown className="mt-1 text-base-content/60">{el.value.content}</Markdown>}
+          {el.value.content && <Markdown className="text-base-content/60">{el.value.content}</Markdown>}
         </div>
       )
 
@@ -90,6 +92,22 @@ function FormElementView({
       )
     }
 
+    case 'toggleSection': {
+      return (
+        <details className="collapse collapse-arrow border border-base-300 bg-base-100">
+          <summary className="collapse-title ">
+            <p><span className="text-sm font-medium">{el.value.label}</span></p>
+
+            {el.value.description ?? <Markdown className="mt-1 text-base-content/60">{el.value.description}</Markdown>}
+
+          </summary>
+          <div className="collapse-content">
+            <FormRenderer elements={el.value.form} values={values} onChange={onChange} />
+          </div>
+        </details>
+      )
+    }
+
     case undefined:
       return null
 
@@ -127,6 +145,30 @@ function AlertView({
   )
 }
 
+function FieldToggle({
+  field, onChange
+}:{
+  field: ToggleInput, 
+  onChange: (keyname: string, value: string | number | boolean | null) => void
+}) {
+  return (
+      <div className="flex items-center gap-2">
+        <input
+          id={field.keyname}
+          type="checkbox"
+          className="toggle"
+          checked={field.defaultValue}
+          onChange={(e) => onChange(field.keyname, e.target.checked)}
+        />
+        <label className="label" htmlFor={field.keyname}>
+          {field.label}
+        </label>
+        {field.description && <Markdown className="text-base-content/60">{field.description}</Markdown>}
+      </div>
+  );
+}
+
+
 function InputView({
   el,
   value,
@@ -136,28 +178,37 @@ function InputView({
   value: unknown
   onChange: (keyname: string, value: string | number | boolean | null) => void
 }) {
-  const { keyname, label, description, helpText } = el.value
+  const { keyname, label, description } = el.value
   const stringValue = value === undefined || value === null ? '' : String(value)
+
+  const [isInvalid, setInvalid] = useState<boolean>(false);
 
   return (
     <div className="flex flex-col gap-1.5">
       {el.case !== 'toggle' && (
-        <label className="label" htmlFor={keyname}>
-          {label}
-        </label>
+        <>
+          <label className="label" htmlFor={keyname}>
+            {label}
+          </label>
+          {description && <Markdown className="text-base-content/60">{description}</Markdown>}
+        </>
       )}
-      {description && <Markdown className="text-base-content/60">{description}</Markdown>}
 
       {(el.case === 'url' || el.case === 'str' || el.case === 'password') && (
-        <input
-          id={keyname}
-          type={el.case === 'url' ? 'url' : el.case === 'password' ? 'password' : 'text'}
-          className="input w-full"
-          placeholder={el.value.placeholder}
-          pattern={el.case === 'str' ? el.value.regex : undefined}
-          value={stringValue}
-          onChange={(e) => onChange(keyname, e.target.value)}
-        />
+        <>
+          <input
+            id={keyname}
+            type={el.case === 'url' ? 'url' : el.case === 'password' ? 'password' : 'text'}
+            className="input w-full"
+            placeholder={el.value.placeholder}
+            pattern={el.value.validation?.regex}
+            value={stringValue}
+            onChange={(e) => onChange(keyname, e.target.value)}
+            onInvalid={() => setInvalid(true)}
+          />
+
+          {isInvalid && el.value.validation?.helpText && <Markdown className="text-xs text-base-content/60">{el.value.validation?.helpText}</Markdown>}
+        </>
       )}
 
       {(el.case === 'text' || el.case === 'code') && (
@@ -183,6 +234,19 @@ function InputView({
         />
       )}
 
+      {el.case === 'port' && (
+          <input
+            id={keyname}
+            type="number"
+            className="input w-full"
+            min={1}
+            max={65536}
+            step={1}
+            value={el.value.defaultValue}
+            onChange={(e) => onChange(keyname, e.target.valueAsNumber)}
+          />
+      )}
+
       {el.case === 'date' && (
         <input
           id={keyname}
@@ -193,20 +257,7 @@ function InputView({
         />
       )}
 
-      {el.case === 'toggle' && (
-        <div className="flex items-center gap-2">
-          <input
-            id={keyname}
-            type="checkbox"
-            className="toggle"
-            checked={Boolean(value)}
-            onChange={(e) => onChange(keyname, e.target.checked)}
-          />
-          <label className="label" htmlFor={keyname}>
-            {label}
-          </label>
-        </div>
-      )}
+      {el.case === 'toggle' && (<FieldToggle field={el.value} onChange={onChange} />)}
 
       {el.case === 'select' && (
         <select
@@ -226,7 +277,6 @@ function InputView({
         </select>
       )}
 
-      {helpText && <Markdown className="text-xs text-base-content/60">{helpText}</Markdown>}
     </div>
   )
 }

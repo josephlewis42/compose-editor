@@ -22,8 +22,8 @@ template: |-
         {{- if not .Values.enable_access_log}}
         ENABLE_ACCESS_LOG: 0
         {{- end}}
-        COPY_LOG_TO_SYSLOG: {{ .Values.copy_log_to_syslog | default true | ternary "On" "Off" }}
-        COPY_SYSLOG_TO_STDERR: {{ .Values.copy_syslog_to_stderr | default true | ternary "On" "Off" }}
+        COPY_LOG_TO_SYSLOG: {{ .Values.copy_log_to_syslog | ternary "On" "Off" }}
+        COPY_SYSLOG_TO_STDERR: {{ .Values.copy_syslog_to_stderr | ternary "On" "Off" }}
         {{- if .Values.listen}}
         LISTEN: {{.Values.listen}}
         {{- end}}

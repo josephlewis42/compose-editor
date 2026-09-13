@@ -21,6 +21,11 @@ wasm: frontend/public/gen proto
 templates: composeeditor
 	./build/composeeditor build specs frontend/public/gen/templates.binpb
 
+.PHONY: proto
+proto:
+	buf generate proto
+	buf build proto -o build/buf-image.binpb
+
 .PHONY: frontend
 frontend: build-dir frontend/public/gen wasm templates proto
 	cd frontend; pnpm install

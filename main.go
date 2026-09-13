@@ -20,6 +20,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/aperturerobotics/protobuf-go-lite/types/known/structpb"
 	composeeditorv1 "github.com/josephlewis42/compose-editor/pkg/proto/composeeditor/v1"
 	"github.com/josephlewis42/compose-editor/pkg/specs"
 	"github.com/josephlewis42/compose-editor/pkg/templateengine"
@@ -47,7 +48,13 @@ func build() *cli.Command {
 			}
 
 			for _, app := range apps {
-				out := templateengine.Convert(&composeeditorv1.ConvertInput{Template: app.GetTemplate()})
+				defaultValues := make(map[string]*structpb.Value)
+				collectDefaultValues(app.GetForm(), defaultValues)
+
+				out := templateengine.Convert(&composeeditorv1.ConvertInput{
+					Template: app.GetTemplate(),
+					Values:   defaultValues,
+				})
 				if len(out.GetErrors()) > 0 {
 					return fmt.Errorf("spec %s/spec.yaml has an invalid template: %s", app.GetSlug(), out.GetErrors()[0].GetMessage())
 				}
@@ -66,6 +73,40 @@ func build() *cli.Command {
 			fmt.Fprintf(cmd.Writer, "wrote %d application(s) to %s\n", len(apps), outputFile)
 			return nil
 		},
+	}
+}
+
+// collectDefaultValues walks a form tree, recursing into layout elements
+// that nest their own forms, and records each input's default value under
+// its keyname.
+func collectDefaultValues(form []*composeeditorv1.FormElement, out map[string]*structpb.Value) {
+	for _, el := range form {
+		switch field := el.GetElement().(type) {
+		case *composeeditorv1.FormElement_Collapsible:
+			collectDefaultValues(field.Collapsible.GetForm(), out)
+		case *composeeditorv1.FormElement_OneOf:
+			for _, tab := range field.OneOf.GetTabs() {
+				collectDefaultValues(tab.GetForm(), out)
+			}
+		case *composeeditorv1.FormElement_Url:
+			out[field.Url.GetKeyname()] = structpb.NewStringValue(field.Url.GetDefaultValue())
+		case *composeeditorv1.FormElement_Str:
+			out[field.Str.GetKeyname()] = structpb.NewStringValue(field.Str.GetDefaultValue())
+		case *composeeditorv1.FormElement_Text:
+			out[field.Text.GetKeyname()] = structpb.NewStringValue(field.Text.GetDefaultValue())
+		case *composeeditorv1.FormElement_Code:
+			out[field.Code.GetKeyname()] = structpb.NewStringValue(field.Code.GetDefaultValue())
+		case *composeeditorv1.FormElement_Password:
+			out[field.Password.GetKeyname()] = structpb.NewStringValue(field.Password.GetDefaultValue())
+		case *composeeditorv1.FormElement_Toggle:
+			out[field.Toggle.GetKeyname()] = structpb.NewBoolValue(field.Toggle.GetDefaultValue())
+		case *composeeditorv1.FormElement_Number:
+			out[field.Number.GetKeyname()] = structpb.NewNumberValue(field.Number.GetDefaultValue())
+		case *composeeditorv1.FormElement_Date:
+			out[field.Date.GetKeyname()] = structpb.NewStringValue(field.Date.GetDefaultValue())
+		case *composeeditorv1.FormElement_Select:
+			out[field.Select.GetKeyname()] = structpb.NewStringValue(field.Select.GetDefaultValue())
+		}
 	}
 }
 

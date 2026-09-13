@@ -29,7 +29,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file composeeditor/v1/spec.proto.
  */
 export const file_composeeditor_v1_spec: GenFile = /*@__PURE__*/
-  fileDesc("Chtjb21wb3NlZWRpdG9yL3YxL3NwZWMucHJvdG8SEGNvbXBvc2VlZGl0b3IudjEiPgoHQ2F0YWxvZxIzCgxhcHBsaWNhdGlvbnMYASADKAsyHS5jb21wb3NlZWRpdG9yLnYxLkFwcGxpY2F0aW9uIr8BCgtBcHBsaWNhdGlvbhIMCgRzbHVnGAEgASgJEgwKBG5hbWUYAiABKAkSDwoHdGFnbGluZRgDIAEoCRILCgN1cmwYBCABKAkSFAoMc3BkeF9saWNlbnNlGAUgASgJEhMKC2xpY2Vuc2VfdXJsGAYgASgJEgwKBHRhZ3MYByADKAkSEAoIdGVtcGxhdGUYCCABKAkSKwoEZm9ybRgJIAMoCzIdLmNvbXBvc2VlZGl0b3IudjEuRm9ybUVsZW1lbnQivwYKC0Zvcm1FbGVtZW50EicKBGluZm8YASABKAsyFy5jb21wb3NlZWRpdG9yLnYxLkFsZXJ0SAASKgoHd2FybmluZxgCIAEoCzIXLmNvbXBvc2VlZGl0b3IudjEuQWxlcnRIABIpCgZkYW5nZXIYAyABKAsyFy5jb21wb3NlZWRpdG9yLnYxLkFsZXJ0SAASKgoHc3VjY2VzcxgEIAEoCzIXLmNvbXBvc2VlZGl0b3IudjEuQWxlcnRIABIsCgdoZWFkaW5nGAUgASgLMhkuY29tcG9zZWVkaXRvci52MS5IZWFkaW5nSAASLwoIbWFya2Rvd24YBiABKAsyGy5jb21wb3NlZWRpdG9yLnYxLlRleHRCbG9ja0gAEjQKC2NvbGxhcHNpYmxlGAcgASgLMh0uY29tcG9zZWVkaXRvci52MS5Db2xsYXBzaWJsZUgAEjAKBm9uZV9vZhgIIAEoCzIXLmNvbXBvc2VlZGl0b3IudjEuT25lT2ZIAFIFb25lb2YSKQoDdXJsGAkgASgLMhouY29tcG9zZWVkaXRvci52MS5VUkxJbnB1dEgAEjQKA3N0chgKIAEoCzIdLmNvbXBvc2VlZGl0b3IudjEuU3RyaW5nSW5wdXRIAFIGc3RyaW5nEi8KBHRleHQYCyABKAsyHy5jb21wb3NlZWRpdG9yLnYxLlRleHRBcmVhSW5wdXRIABIrCgRjb2RlGAwgASgLMhsuY29tcG9zZWVkaXRvci52MS5Db2RlSW5wdXRIABIzCghwYXNzd29yZBgNIAEoCzIfLmNvbXBvc2VlZGl0b3IudjEuUGFzc3dvcmRJbnB1dEgAEi8KBnRvZ2dsZRgOIAEoCzIdLmNvbXBvc2VlZGl0b3IudjEuVG9nZ2xlSW5wdXRIABIvCgZudW1iZXIYDyABKAsyHS5jb21wb3NlZWRpdG9yLnYxLk51bWJlcklucHV0SAASKwoEZGF0ZRgQIAEoCzIbLmNvbXBvc2VlZGl0b3IudjEuRGF0ZUlucHV0SAASLwoGc2VsZWN0GBEgASgLMh0uY29tcG9zZWVkaXRvci52MS5TZWxlY3RJbnB1dEgAQgkKB2VsZW1lbnQiGAoFQWxlcnQSDwoHY29udGVudBgBIAEoCSIpCgdIZWFkaW5nEg0KBXRpdGxlGAEgASgJEg8KB2NvbnRlbnQYAiABKAkiHAoJVGV4dEJsb2NrEg8KB2NvbnRlbnQYASABKAkiSQoLQ29sbGFwc2libGUSDQoFdGl0bGUYASABKAkSKwoEZm9ybRgCIAMoCzIdLmNvbXBvc2VlZGl0b3IudjEuRm9ybUVsZW1lbnQiQgoFT25lT2YSDwoHa2V5bmFtZRgBIAEoCRIoCgR0YWJzGAIgAygLMhouY29tcG9zZWVkaXRvci52MS5PbmVPZlRhYiJVCghPbmVPZlRhYhINCgV0aXRsZRgBIAEoCRINCgV2YWx1ZRgCIAEoCRIrCgRmb3JtGAMgAygLMh0uY29tcG9zZWVkaXRvci52MS5Gb3JtRWxlbWVudCJ+CghVUkxJbnB1dBIPCgdrZXluYW1lGAEgASgJEg0KBWxhYmVsGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEhEKCWhlbHBfdGV4dBgEIAEoCRIVCg1kZWZhdWx0X3ZhbHVlGAUgASgJEhMKC3BsYWNlaG9sZGVyGAYgASgJIpABCgtTdHJpbmdJbnB1dBIPCgdrZXluYW1lGAEgASgJEg0KBWxhYmVsGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEhEKCWhlbHBfdGV4dBgEIAEoCRIVCg1kZWZhdWx0X3ZhbHVlGAUgASgJEhMKC3BsYWNlaG9sZGVyGAYgASgJEg0KBXJlZ2V4GAcgASgJIoMBCg1UZXh0QXJlYUlucHV0Eg8KB2tleW5hbWUYASABKAkSDQoFbGFiZWwYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSEQoJaGVscF90ZXh0GAQgASgJEhUKDWRlZmF1bHRfdmFsdWUYBSABKAkSEwoLcGxhY2Vob2xkZXIYBiABKAkifwoJQ29kZUlucHV0Eg8KB2tleW5hbWUYASABKAkSDQoFbGFiZWwYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSEQoJaGVscF90ZXh0GAQgASgJEhUKDWRlZmF1bHRfdmFsdWUYBSABKAkSEwoLcGxhY2Vob2xkZXIYBiABKAkigwEKDVBhc3N3b3JkSW5wdXQSDwoHa2V5bmFtZRgBIAEoCRINCgVsYWJlbBgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIRCgloZWxwX3RleHQYBCABKAkSFQoNZGVmYXVsdF92YWx1ZRgFIAEoCRITCgtwbGFjZWhvbGRlchgGIAEoCSJsCgtUb2dnbGVJbnB1dBIPCgdrZXluYW1lGAEgASgJEg0KBWxhYmVsGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEhEKCWhlbHBfdGV4dBgEIAEoCRIVCg1kZWZhdWx0X3ZhbHVlGAUgASgIIpwBCgtOdW1iZXJJbnB1dBIPCgdrZXluYW1lGAEgASgJEg0KBWxhYmVsGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEhEKCWhlbHBfdGV4dBgEIAEoCRIVCg1kZWZhdWx0X3ZhbHVlGAUgASgBEg8KB21pbmltdW0YBiABKAESDwoHbWF4aW11bRgHIAEoARIMCgRzdGVwGAggASgBImoKCURhdGVJbnB1dBIPCgdrZXluYW1lGAEgASgJEg0KBWxhYmVsGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEhEKCWhlbHBfdGV4dBgEIAEoCRIVCg1kZWZhdWx0X3ZhbHVlGAUgASgJIp0BCgtTZWxlY3RJbnB1dBIPCgdrZXluYW1lGAEgASgJEg0KBWxhYmVsGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEhEKCWhlbHBfdGV4dBgEIAEoCRIVCg1kZWZhdWx0X3ZhbHVlGAUgASgJEi8KB29wdGlvbnMYBiADKAsyHi5jb21wb3NlZWRpdG9yLnYxLlNlbGVjdE9wdGlvbiI+CgxTZWxlY3RPcHRpb24SDQoFdGl0bGUYASABKAkSDQoFdmFsdWUYAiABKAkSEAoIb3B0Z3JvdXAYAyABKAlCVFpSZ2l0aHViLmNvbS9qb3NlcGhsZXdpczQyL2NvbXBvc2UtZWRpdG9yL3BrZy9wcm90by9jb21wb3NlZWRpdG9yL3YxO2NvbXBvc2VlZGl0b3J2MWIGcHJvdG8z");
+  fileDesc("Chtjb21wb3NlZWRpdG9yL3YxL3NwZWMucHJvdG8SEGNvbXBvc2VlZGl0b3IudjEiPgoHQ2F0YWxvZxIzCgxhcHBsaWNhdGlvbnMYASADKAsyHS5jb21wb3NlZWRpdG9yLnYxLkFwcGxpY2F0aW9uIr8BCgtBcHBsaWNhdGlvbhIMCgRzbHVnGAEgASgJEgwKBG5hbWUYAiABKAkSDwoHdGFnbGluZRgDIAEoCRILCgN1cmwYBCABKAkSFAoMc3BkeF9saWNlbnNlGAUgASgJEhMKC2xpY2Vuc2VfdXJsGAYgASgJEgwKBHRhZ3MYByADKAkSEAoIdGVtcGxhdGUYCCABKAkSKwoEZm9ybRgJIAMoCzIdLmNvbXBvc2VlZGl0b3IudjEuRm9ybUVsZW1lbnQipwcKC0Zvcm1FbGVtZW50EicKBGluZm8YASABKAsyFy5jb21wb3NlZWRpdG9yLnYxLkFsZXJ0SAASKgoHd2FybmluZxgCIAEoCzIXLmNvbXBvc2VlZGl0b3IudjEuQWxlcnRIABIpCgZkYW5nZXIYAyABKAsyFy5jb21wb3NlZWRpdG9yLnYxLkFsZXJ0SAASKgoHc3VjY2VzcxgEIAEoCzIXLmNvbXBvc2VlZGl0b3IudjEuQWxlcnRIABIsCgdoZWFkaW5nGAUgASgLMhkuY29tcG9zZWVkaXRvci52MS5IZWFkaW5nSAASLwoIbWFya2Rvd24YBiABKAsyGy5jb21wb3NlZWRpdG9yLnYxLlRleHRCbG9ja0gAEjQKC2NvbGxhcHNpYmxlGAcgASgLMh0uY29tcG9zZWVkaXRvci52MS5Db2xsYXBzaWJsZUgAEjAKBm9uZV9vZhgIIAEoCzIXLmNvbXBvc2VlZGl0b3IudjEuT25lT2ZIAFIFb25lb2YSKQoDdXJsGAkgASgLMhouY29tcG9zZWVkaXRvci52MS5VUkxJbnB1dEgAEjQKA3N0chgKIAEoCzIdLmNvbXBvc2VlZGl0b3IudjEuU3RyaW5nSW5wdXRIAFIGc3RyaW5nEi8KBHRleHQYCyABKAsyHy5jb21wb3NlZWRpdG9yLnYxLlRleHRBcmVhSW5wdXRIABIrCgRjb2RlGAwgASgLMhsuY29tcG9zZWVkaXRvci52MS5Db2RlSW5wdXRIABIzCghwYXNzd29yZBgNIAEoCzIfLmNvbXBvc2VlZGl0b3IudjEuUGFzc3dvcmRJbnB1dEgAEi8KBnRvZ2dsZRgOIAEoCzIdLmNvbXBvc2VlZGl0b3IudjEuVG9nZ2xlSW5wdXRIABIvCgZudW1iZXIYDyABKAsyHS5jb21wb3NlZWRpdG9yLnYxLk51bWJlcklucHV0SAASKwoEZGF0ZRgQIAEoCzIbLmNvbXBvc2VlZGl0b3IudjEuRGF0ZUlucHV0SAASLwoGc2VsZWN0GBEgASgLMh0uY29tcG9zZWVkaXRvci52MS5TZWxlY3RJbnB1dEgAEisKBHBvcnQYEiABKAsyGy5jb21wb3NlZWRpdG9yLnYxLlBvcnRJbnB1dEgAEjkKDnRvZ2dsZV9zZWN0aW9uGBMgASgLMh8uY29tcG9zZWVkaXRvci52MS5Ub2dnbGVTZWN0aW9uSABCCQoHZWxlbWVudCIYCgVBbGVydBIPCgdjb250ZW50GAEgASgJIikKB0hlYWRpbmcSDQoFdGl0bGUYASABKAkSDwoHY29udGVudBgCIAEoCSIcCglUZXh0QmxvY2sSDwoHY29udGVudBgBIAEoCSJJCgtDb2xsYXBzaWJsZRINCgV0aXRsZRgBIAEoCRIrCgRmb3JtGAIgAygLMh0uY29tcG9zZWVkaXRvci52MS5Gb3JtRWxlbWVudCJCCgVPbmVPZhIPCgdrZXluYW1lGAEgASgJEigKBHRhYnMYAiADKAsyGi5jb21wb3NlZWRpdG9yLnYxLk9uZU9mVGFiIlUKCE9uZU9mVGFiEg0KBXRpdGxlGAEgASgJEg0KBXZhbHVlGAIgASgJEisKBGZvcm0YAyADKAsyHS5jb21wb3NlZWRpdG9yLnYxLkZvcm1FbGVtZW50IogBCg1Ub2dnbGVTZWN0aW9uEg8KB2tleW5hbWUYASABKAkSDQoFbGFiZWwYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSFQoNZGVmYXVsdF92YWx1ZRgEIAEoCRIrCgRmb3JtGAUgAygLMh0uY29tcG9zZWVkaXRvci52MS5Gb3JtRWxlbWVudCI0ChBTdHJpbmdWYWxpZGF0aW9uEhEKCWhlbHBfdGV4dBgBIAEoCRINCgVyZWdleBgCIAEoCSKjAQoIVVJMSW5wdXQSDwoHa2V5bmFtZRgBIAEoCRINCgVsYWJlbBgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIVCg1kZWZhdWx0X3ZhbHVlGAQgASgJEhMKC3BsYWNlaG9sZGVyGAUgASgJEjYKCnZhbGlkYXRpb24YBiABKAsyIi5jb21wb3NlZWRpdG9yLnYxLlN0cmluZ1ZhbGlkYXRpb24ipgEKC1N0cmluZ0lucHV0Eg8KB2tleW5hbWUYASABKAkSDQoFbGFiZWwYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSFQoNZGVmYXVsdF92YWx1ZRgEIAEoCRITCgtwbGFjZWhvbGRlchgFIAEoCRI2Cgp2YWxpZGF0aW9uGAYgASgLMiIuY29tcG9zZWVkaXRvci52MS5TdHJpbmdWYWxpZGF0aW9uIqgBCg1UZXh0QXJlYUlucHV0Eg8KB2tleW5hbWUYASABKAkSDQoFbGFiZWwYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSFQoNZGVmYXVsdF92YWx1ZRgEIAEoCRITCgtwbGFjZWhvbGRlchgFIAEoCRI2Cgp2YWxpZGF0aW9uGAYgASgLMiIuY29tcG9zZWVkaXRvci52MS5TdHJpbmdWYWxpZGF0aW9uIqQBCglDb2RlSW5wdXQSDwoHa2V5bmFtZRgBIAEoCRINCgVsYWJlbBgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIVCg1kZWZhdWx0X3ZhbHVlGAQgASgJEhMKC3BsYWNlaG9sZGVyGAUgASgJEjYKCnZhbGlkYXRpb24YBiABKAsyIi5jb21wb3NlZWRpdG9yLnYxLlN0cmluZ1ZhbGlkYXRpb24iqAEKDVBhc3N3b3JkSW5wdXQSDwoHa2V5bmFtZRgBIAEoCRINCgVsYWJlbBgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIVCg1kZWZhdWx0X3ZhbHVlGAQgASgJEhMKC3BsYWNlaG9sZGVyGAUgASgJEjYKCnZhbGlkYXRpb24YBiABKAsyIi5jb21wb3NlZWRpdG9yLnYxLlN0cmluZ1ZhbGlkYXRpb24iWQoLVG9nZ2xlSW5wdXQSDwoHa2V5bmFtZRgBIAEoCRINCgVsYWJlbBgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIVCg1kZWZhdWx0X3ZhbHVlGAUgASgIIokBCgtOdW1iZXJJbnB1dBIPCgdrZXluYW1lGAEgASgJEg0KBWxhYmVsGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEhUKDWRlZmF1bHRfdmFsdWUYBCABKAESDwoHbWluaW11bRgFIAEoARIPCgdtYXhpbXVtGAYgASgBEgwKBHN0ZXAYByABKAEiVwoJRGF0ZUlucHV0Eg8KB2tleW5hbWUYASABKAkSDQoFbGFiZWwYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSFQoNZGVmYXVsdF92YWx1ZRgEIAEoCSKKAQoLU2VsZWN0SW5wdXQSDwoHa2V5bmFtZRgBIAEoCRINCgVsYWJlbBgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIVCg1kZWZhdWx0X3ZhbHVlGAQgASgJEi8KB29wdGlvbnMYBSADKAsyHi5jb21wb3NlZWRpdG9yLnYxLlNlbGVjdE9wdGlvbiI+CgxTZWxlY3RPcHRpb24SDQoFdGl0bGUYASABKAkSDQoFdmFsdWUYAiABKAkSEAoIb3B0Z3JvdXAYAyABKAkiVwoJUG9ydElucHV0Eg8KB2tleW5hbWUYASABKAkSDQoFbGFiZWwYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSFQoNZGVmYXVsdF92YWx1ZRgEIAEoBUJUWlJnaXRodWIuY29tL2pvc2VwaGxld2lzNDIvY29tcG9zZS1lZGl0b3IvcGtnL3Byb3RvL2NvbXBvc2VlZGl0b3IvdjE7Y29tcG9zZWVkaXRvcnYxYgZwcm90bzM");
 
 /**
  * Catalog is the compiled output of `composeeditor build` (see
@@ -257,6 +257,18 @@ export type FormElement = Message<"composeeditor.v1.FormElement"> & {
      */
     value: SelectInput;
     case: "select";
+  } | {
+    /**
+     * @generated from field: composeeditor.v1.PortInput port = 18;
+     */
+    value: PortInput;
+    case: "port";
+  } | {
+    /**
+     * @generated from field: composeeditor.v1.ToggleSection toggle_section = 19;
+     */
+    value: ToggleSection;
+    case: "toggleSection";
   } | { case: undefined; value?: undefined };
 };
 
@@ -435,6 +447,82 @@ export const OneOfTabSchema: GenMessage<OneOfTab> = /*@__PURE__*/
   messageDesc(file_composeeditor_v1_spec, 8);
 
 /**
+ * ToggleSection presents the user with a single toggle that 
+ * progressively shows more if selected.
+ *
+ * @generated from message composeeditor.v1.ToggleSection
+ */
+export type ToggleSection = Message<"composeeditor.v1.ToggleSection"> & {
+  /**
+   * Required. Variable the optional will take on.
+   *
+   * @generated from field: string keyname = 1;
+   */
+  keyname: string;
+
+  /**
+   * Required. Title for the tab.
+   *
+   * @generated from field: string label = 2;
+   */
+  label: string;
+
+  /**
+   * Required. Description shown under the title.
+   *
+   * @generated from field: string description = 3;
+   */
+  description: string;
+
+  /**
+   * Optional. Default value.
+   *
+   * @generated from field: string default_value = 4;
+   */
+  defaultValue: string;
+
+  /**
+   * Required. List of form elements shown if the option is selected.
+   *
+   * @generated from field: repeated composeeditor.v1.FormElement form = 5;
+   */
+  form: FormElement[];
+};
+
+/**
+ * Describes the message composeeditor.v1.ToggleSection.
+ * Use `create(ToggleSectionSchema)` to create a new message.
+ */
+export const ToggleSectionSchema: GenMessage<ToggleSection> = /*@__PURE__*/
+  messageDesc(file_composeeditor_v1_spec, 9);
+
+/**
+ * @generated from message composeeditor.v1.StringValidation
+ */
+export type StringValidation = Message<"composeeditor.v1.StringValidation"> & {
+  /**
+   * Optional. Markdown help text to show if validation fails.
+   *
+   * @generated from field: string help_text = 1;
+   */
+  helpText: string;
+
+  /**
+   * Regex to validate the text against.
+   *
+   * @generated from field: string regex = 2;
+   */
+  regex: string;
+};
+
+/**
+ * Describes the message composeeditor.v1.StringValidation.
+ * Use `create(StringValidationSchema)` to create a new message.
+ */
+export const StringValidationSchema: GenMessage<StringValidation> = /*@__PURE__*/
+  messageDesc(file_composeeditor_v1_spec, 10);
+
+/**
  * URLInput lets a user input a URL in an input box.
  *
  * @generated from message composeeditor.v1.URLInput
@@ -463,25 +551,25 @@ export type URLInput = Message<"composeeditor.v1.URLInput"> & {
   description: string;
 
   /**
-   * Optional. Markdown help text shown under the field.
-   *
-   * @generated from field: string help_text = 4;
-   */
-  helpText: string;
-
-  /**
    * Optional. Default value.
    *
-   * @generated from field: string default_value = 5;
+   * @generated from field: string default_value = 4;
    */
   defaultValue: string;
 
   /**
    * Optional. Placeholder for the URL input.
    *
-   * @generated from field: string placeholder = 6;
+   * @generated from field: string placeholder = 5;
    */
   placeholder: string;
+
+  /**
+   * Optional. Validation for the input.
+   *
+   * @generated from field: composeeditor.v1.StringValidation validation = 6;
+   */
+  validation?: StringValidation | undefined;
 };
 
 /**
@@ -489,7 +577,7 @@ export type URLInput = Message<"composeeditor.v1.URLInput"> & {
  * Use `create(URLInputSchema)` to create a new message.
  */
 export const URLInputSchema: GenMessage<URLInput> = /*@__PURE__*/
-  messageDesc(file_composeeditor_v1_spec, 9);
+  messageDesc(file_composeeditor_v1_spec, 11);
 
 /**
  * StringInput (YAML key "string") lets a user input a single line text
@@ -521,32 +609,25 @@ export type StringInput = Message<"composeeditor.v1.StringInput"> & {
   description: string;
 
   /**
-   * Optional. Markdown help text shown under the field.
-   *
-   * @generated from field: string help_text = 4;
-   */
-  helpText: string;
-
-  /**
    * Optional. Default value.
    *
-   * @generated from field: string default_value = 5;
+   * @generated from field: string default_value = 4;
    */
   defaultValue: string;
 
   /**
    * Optional. Placeholder for the string input.
    *
-   * @generated from field: string placeholder = 6;
+   * @generated from field: string placeholder = 5;
    */
   placeholder: string;
 
   /**
-   * Optional. Regex used to validate the input.
+   * Optional. Validation for the input.
    *
-   * @generated from field: string regex = 7;
+   * @generated from field: composeeditor.v1.StringValidation validation = 6;
    */
-  regex: string;
+  validation?: StringValidation | undefined;
 };
 
 /**
@@ -554,7 +635,7 @@ export type StringInput = Message<"composeeditor.v1.StringInput"> & {
  * Use `create(StringInputSchema)` to create a new message.
  */
 export const StringInputSchema: GenMessage<StringInput> = /*@__PURE__*/
-  messageDesc(file_composeeditor_v1_spec, 10);
+  messageDesc(file_composeeditor_v1_spec, 12);
 
 /**
  * TextAreaInput (YAML key "text") lets a user input a multi-line text
@@ -586,25 +667,25 @@ export type TextAreaInput = Message<"composeeditor.v1.TextAreaInput"> & {
   description: string;
 
   /**
-   * Optional. Markdown help text shown under the field.
-   *
-   * @generated from field: string help_text = 4;
-   */
-  helpText: string;
-
-  /**
    * Optional. Default value.
    *
-   * @generated from field: string default_value = 5;
+   * @generated from field: string default_value = 4;
    */
   defaultValue: string;
 
   /**
    * Optional. Placeholder for the textarea.
    *
-   * @generated from field: string placeholder = 6;
+   * @generated from field: string placeholder = 5;
    */
   placeholder: string;
+
+  /**
+   * Optional. Validation for the input.
+   *
+   * @generated from field: composeeditor.v1.StringValidation validation = 6;
+   */
+  validation?: StringValidation | undefined;
 };
 
 /**
@@ -612,7 +693,7 @@ export type TextAreaInput = Message<"composeeditor.v1.TextAreaInput"> & {
  * Use `create(TextAreaInputSchema)` to create a new message.
  */
 export const TextAreaInputSchema: GenMessage<TextAreaInput> = /*@__PURE__*/
-  messageDesc(file_composeeditor_v1_spec, 11);
+  messageDesc(file_composeeditor_v1_spec, 13);
 
 /**
  * CodeInput lets a user input a multi-line text string in a textarea box
@@ -644,25 +725,25 @@ export type CodeInput = Message<"composeeditor.v1.CodeInput"> & {
   description: string;
 
   /**
-   * Optional. Markdown help text shown under the field.
-   *
-   * @generated from field: string help_text = 4;
-   */
-  helpText: string;
-
-  /**
    * Optional. Default value.
    *
-   * @generated from field: string default_value = 5;
+   * @generated from field: string default_value = 4;
    */
   defaultValue: string;
 
   /**
    * Optional. Placeholder for the textarea.
    *
-   * @generated from field: string placeholder = 6;
+   * @generated from field: string placeholder = 5;
    */
   placeholder: string;
+
+  /**
+   * Optional. Validation for the input.
+   *
+   * @generated from field: composeeditor.v1.StringValidation validation = 6;
+   */
+  validation?: StringValidation | undefined;
 };
 
 /**
@@ -670,7 +751,7 @@ export type CodeInput = Message<"composeeditor.v1.CodeInput"> & {
  * Use `create(CodeInputSchema)` to create a new message.
  */
 export const CodeInputSchema: GenMessage<CodeInput> = /*@__PURE__*/
-  messageDesc(file_composeeditor_v1_spec, 12);
+  messageDesc(file_composeeditor_v1_spec, 14);
 
 /**
  * PasswordInput lets a user input a single line text string in an input
@@ -702,25 +783,25 @@ export type PasswordInput = Message<"composeeditor.v1.PasswordInput"> & {
   description: string;
 
   /**
-   * Optional. Markdown help text shown under the field.
-   *
-   * @generated from field: string help_text = 4;
-   */
-  helpText: string;
-
-  /**
    * Optional. Default value.
    *
-   * @generated from field: string default_value = 5;
+   * @generated from field: string default_value = 4;
    */
   defaultValue: string;
 
   /**
    * Optional. Placeholder for the input.
    *
-   * @generated from field: string placeholder = 6;
+   * @generated from field: string placeholder = 5;
    */
   placeholder: string;
+
+  /**
+   * Optional. Validation for the input.
+   *
+   * @generated from field: composeeditor.v1.StringValidation validation = 6;
+   */
+  validation?: StringValidation | undefined;
 };
 
 /**
@@ -728,7 +809,7 @@ export type PasswordInput = Message<"composeeditor.v1.PasswordInput"> & {
  * Use `create(PasswordInputSchema)` to create a new message.
  */
 export const PasswordInputSchema: GenMessage<PasswordInput> = /*@__PURE__*/
-  messageDesc(file_composeeditor_v1_spec, 13);
+  messageDesc(file_composeeditor_v1_spec, 15);
 
 /**
  * ToggleInput displays a toggle so the user can enable/disable something.
@@ -760,13 +841,6 @@ export type ToggleInput = Message<"composeeditor.v1.ToggleInput"> & {
   description: string;
 
   /**
-   * Optional. Markdown help text shown under the field.
-   *
-   * @generated from field: string help_text = 4;
-   */
-  helpText: string;
-
-  /**
    * Optional. Default value.
    *
    * @generated from field: bool default_value = 5;
@@ -779,7 +853,7 @@ export type ToggleInput = Message<"composeeditor.v1.ToggleInput"> & {
  * Use `create(ToggleInputSchema)` to create a new message.
  */
 export const ToggleInputSchema: GenMessage<ToggleInput> = /*@__PURE__*/
-  messageDesc(file_composeeditor_v1_spec, 14);
+  messageDesc(file_composeeditor_v1_spec, 16);
 
 /**
  * NumberInput lets the user enter a number using a numeric input.
@@ -810,37 +884,30 @@ export type NumberInput = Message<"composeeditor.v1.NumberInput"> & {
   description: string;
 
   /**
-   * Optional. Markdown help text shown under the field.
-   *
-   * @generated from field: string help_text = 4;
-   */
-  helpText: string;
-
-  /**
    * Optional. Default value.
    *
-   * @generated from field: double default_value = 5;
+   * @generated from field: double default_value = 4;
    */
   defaultValue: number;
 
   /**
    * Required. Minimum value.
    *
-   * @generated from field: double minimum = 6;
+   * @generated from field: double minimum = 5;
    */
   minimum: number;
 
   /**
    * Required. Maximum value.
    *
-   * @generated from field: double maximum = 7;
+   * @generated from field: double maximum = 6;
    */
   maximum: number;
 
   /**
    * Required. Step value.
    *
-   * @generated from field: double step = 8;
+   * @generated from field: double step = 7;
    */
   step: number;
 };
@@ -850,7 +917,7 @@ export type NumberInput = Message<"composeeditor.v1.NumberInput"> & {
  * Use `create(NumberInputSchema)` to create a new message.
  */
 export const NumberInputSchema: GenMessage<NumberInput> = /*@__PURE__*/
-  messageDesc(file_composeeditor_v1_spec, 15);
+  messageDesc(file_composeeditor_v1_spec, 17);
 
 /**
  * DateInput lets the user enter a date using a date picker.
@@ -881,16 +948,9 @@ export type DateInput = Message<"composeeditor.v1.DateInput"> & {
   description: string;
 
   /**
-   * Optional. Markdown help text shown under the field.
-   *
-   * @generated from field: string help_text = 4;
-   */
-  helpText: string;
-
-  /**
    * Optional. Default value in YYYY-MM-DD.
    *
-   * @generated from field: string default_value = 5;
+   * @generated from field: string default_value = 4;
    */
   defaultValue: string;
 };
@@ -900,7 +960,7 @@ export type DateInput = Message<"composeeditor.v1.DateInput"> & {
  * Use `create(DateInputSchema)` to create a new message.
  */
 export const DateInputSchema: GenMessage<DateInput> = /*@__PURE__*/
-  messageDesc(file_composeeditor_v1_spec, 16);
+  messageDesc(file_composeeditor_v1_spec, 18);
 
 /**
  * SelectInput lets the user pick a value from a dropdown.
@@ -931,23 +991,16 @@ export type SelectInput = Message<"composeeditor.v1.SelectInput"> & {
   description: string;
 
   /**
-   * Optional. Markdown help text shown under the field.
-   *
-   * @generated from field: string help_text = 4;
-   */
-  helpText: string;
-
-  /**
    * Optional. Default value.
    *
-   * @generated from field: string default_value = 5;
+   * @generated from field: string default_value = 4;
    */
   defaultValue: string;
 
   /**
    * Required. Options to be shown in order.
    *
-   * @generated from field: repeated composeeditor.v1.SelectOption options = 6;
+   * @generated from field: repeated composeeditor.v1.SelectOption options = 5;
    */
   options: SelectOption[];
 };
@@ -957,7 +1010,7 @@ export type SelectInput = Message<"composeeditor.v1.SelectInput"> & {
  * Use `create(SelectInputSchema)` to create a new message.
  */
 export const SelectInputSchema: GenMessage<SelectInput> = /*@__PURE__*/
-  messageDesc(file_composeeditor_v1_spec, 17);
+  messageDesc(file_composeeditor_v1_spec, 19);
 
 /**
  * @generated from message composeeditor.v1.SelectOption
@@ -993,5 +1046,46 @@ export type SelectOption = Message<"composeeditor.v1.SelectOption"> & {
  * Use `create(SelectOptionSchema)` to create a new message.
  */
 export const SelectOptionSchema: GenMessage<SelectOption> = /*@__PURE__*/
-  messageDesc(file_composeeditor_v1_spec, 18);
+  messageDesc(file_composeeditor_v1_spec, 20);
+
+/**
+ * @generated from message composeeditor.v1.PortInput
+ */
+export type PortInput = Message<"composeeditor.v1.PortInput"> & {
+  /**
+   * Required. Variable this field's value is injected as into the
+   * template. Must be [a-zA-Z0-9_]+.
+   *
+   * @generated from field: string keyname = 1;
+   */
+  keyname: string;
+
+  /**
+   * Required. Label for the field.
+   *
+   * @generated from field: string label = 2;
+   */
+  label: string;
+
+  /**
+   * Optional. Markdown description for the field.
+   *
+   * @generated from field: string description = 3;
+   */
+  description: string;
+
+  /**
+   * Required. Default value assigned to the port.
+   *
+   * @generated from field: int32 default_value = 4;
+   */
+  defaultValue: number;
+};
+
+/**
+ * Describes the message composeeditor.v1.PortInput.
+ * Use `create(PortInputSchema)` to create a new message.
+ */
+export const PortInputSchema: GenMessage<PortInput> = /*@__PURE__*/
+  messageDesc(file_composeeditor_v1_spec, 21);
 

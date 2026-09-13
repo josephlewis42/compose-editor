@@ -86,6 +86,8 @@ message FormElement {
     NumberInput number = 15;
     DateInput date = 16;
     SelectInput select = 17;
+    PortInput port = 18;
+    ToggleSection toggle_section = 19;
   }
 }
 
@@ -145,10 +147,33 @@ message OneOfTab {
   repeated FormElement form = 3;
 }
 
+// ToggleSection presents the user with a single toggle that 
+// progressively shows more if selected.
+message ToggleSection {
+  // Required. Variable the optional will take on.
+  string keyname = 1;
+  // Required. Title for the tab.
+  string label = 2;
+  // Required. Description shown under the title.
+  string description = 3;
+  // Optional. Default value.
+  string default_value = 4;
+  // Required. List of form elements shown if the option is selected.
+  repeated FormElement form = 5;
+}
+
 // Input elements are used to create variables for the user. They are
 // generally built around HTML elements, and all share a common set of
 // fields (repeated on each input message below, since protobuf has no
 // struct embedding): keyname, label, description, help_text, default_value.
+
+message StringValidation {
+  // Optional. Markdown help text to show if validation fails.
+  string help_text = 1;
+
+  // Regex to validate the text against.
+  string regex = 2;
+}
 
 // URLInput lets a user input a URL in an input box.
 message URLInput {
@@ -159,12 +184,12 @@ message URLInput {
   string label = 2;
   // Optional. Markdown description for the field.
   string description = 3;
-  // Optional. Markdown help text shown under the field.
-  string help_text = 4;
   // Optional. Default value.
-  string default_value = 5;
+  string default_value = 4;
   // Optional. Placeholder for the URL input.
-  string placeholder = 6;
+  string placeholder = 5;
+  // Optional. Validation for the input.
+  StringValidation validation = 6;
 }
 
 // StringInput (YAML key "string") lets a user input a single line text
@@ -177,14 +202,12 @@ message StringInput {
   string label = 2;
   // Optional. Markdown description for the field.
   string description = 3;
-  // Optional. Markdown help text shown under the field.
-  string help_text = 4;
   // Optional. Default value.
-  string default_value = 5;
+  string default_value = 4;
   // Optional. Placeholder for the string input.
-  string placeholder = 6;
-  // Optional. Regex used to validate the input.
-  string regex = 7;
+  string placeholder = 5;
+  // Optional. Validation for the input.
+  StringValidation validation = 6;
 }
 
 // TextAreaInput (YAML key "text") lets a user input a multi-line text
@@ -197,12 +220,12 @@ message TextAreaInput {
   string label = 2;
   // Optional. Markdown description for the field.
   string description = 3;
-  // Optional. Markdown help text shown under the field.
-  string help_text = 4;
   // Optional. Default value.
-  string default_value = 5;
+  string default_value = 4;
   // Optional. Placeholder for the textarea.
-  string placeholder = 6;
+  string placeholder = 5;
+  // Optional. Validation for the input.
+  StringValidation validation = 6;
 }
 
 // CodeInput lets a user input a multi-line text string in a textarea box
@@ -215,12 +238,12 @@ message CodeInput {
   string label = 2;
   // Optional. Markdown description for the field.
   string description = 3;
-  // Optional. Markdown help text shown under the field.
-  string help_text = 4;
   // Optional. Default value.
-  string default_value = 5;
+  string default_value = 4;
   // Optional. Placeholder for the textarea.
-  string placeholder = 6;
+  string placeholder = 5;
+  // Optional. Validation for the input.
+  StringValidation validation = 6;
 }
 
 // PasswordInput lets a user input a single line text string in an input
@@ -233,12 +256,12 @@ message PasswordInput {
   string label = 2;
   // Optional. Markdown description for the field.
   string description = 3;
-  // Optional. Markdown help text shown under the field.
-  string help_text = 4;
   // Optional. Default value.
-  string default_value = 5;
+  string default_value = 4;
   // Optional. Placeholder for the input.
-  string placeholder = 6;
+  string placeholder = 5;
+  // Optional. Validation for the input.
+  StringValidation validation = 6;
 }
 
 // ToggleInput displays a toggle so the user can enable/disable something.
@@ -251,8 +274,6 @@ message ToggleInput {
   string label = 2;
   // Optional. Markdown description for the field.
   string description = 3;
-  // Optional. Markdown help text shown under the field.
-  string help_text = 4;
   // Optional. Default value.
   bool default_value = 5;
 }
@@ -266,16 +287,14 @@ message NumberInput {
   string label = 2;
   // Optional. Markdown description for the field.
   string description = 3;
-  // Optional. Markdown help text shown under the field.
-  string help_text = 4;
   // Optional. Default value.
-  double default_value = 5;
+  double default_value = 4;
   // Required. Minimum value.
-  double minimum = 6;
+  double minimum = 5;
   // Required. Maximum value.
-  double maximum = 7;
+  double maximum = 6;
   // Required. Step value.
-  double step = 8;
+  double step = 7;
 }
 
 // DateInput lets the user enter a date using a date picker.
@@ -287,10 +306,8 @@ message DateInput {
   string label = 2;
   // Optional. Markdown description for the field.
   string description = 3;
-  // Optional. Markdown help text shown under the field.
-  string help_text = 4;
   // Optional. Default value in YYYY-MM-DD.
-  string default_value = 5;
+  string default_value = 4;
 }
 
 // SelectInput lets the user pick a value from a dropdown.
@@ -302,12 +319,10 @@ message SelectInput {
   string label = 2;
   // Optional. Markdown description for the field.
   string description = 3;
-  // Optional. Markdown help text shown under the field.
-  string help_text = 4;
   // Optional. Default value.
-  string default_value = 5;
+  string default_value = 4;
   // Required. Options to be shown in order.
-  repeated SelectOption options = 6;
+  repeated SelectOption options = 5;
 }
 
 message SelectOption {
@@ -320,4 +335,19 @@ message SelectOption {
   // selectable value. Subsequent options are grouped into it until
   // another optgroup is encountered.
   string optgroup = 3;
+}
+
+message PortInput {
+  // Required. Variable this field's value is injected as into the
+  // template. Must be [a-zA-Z0-9_]+.
+  string keyname = 1;
+
+  // Required. Label for the field.
+  string label = 2;
+
+  // Optional. Markdown description for the field.
+  string description = 3;
+
+  // Required. Default value assigned to the port.
+  int32 default_value = 4;
 }
