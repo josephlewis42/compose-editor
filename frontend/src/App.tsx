@@ -3,6 +3,7 @@ import { Route, Routes, useParams } from 'react-router-dom'
 import { NavBar } from '@/components/NavBar'
 import { EditorPage } from '@/pages/EditorPage'
 import { CatalogPage } from '@/pages/CatalogPage'
+import { BuilderPage } from '@/pages/BuilderPage'
 import { loadCatalog } from '@/lib/catalog'
 import { type Catalog } from '@/gen/composeeditor/v1/spec_pb'
 
@@ -28,6 +29,8 @@ function App() {
           <Routes>
             <Route path="/" element={<CatalogPage catalog={catalog} />} />
             <Route path="/edit/:slug" element={<EditorRoute catalog={catalog} />} />
+            <Route path="/build" element={<BuilderPage catalog={catalog} />} />
+            <Route path="/build/:data" element={<BuilderRoute catalog={catalog} />} />
           </Routes>
         )}
       </div>
@@ -44,6 +47,14 @@ function EditorRoute({ catalog }: { catalog: Catalog }) {
   }
 
   return <EditorPage app={app} />
+}
+
+// Keyed on the encoded data so navigating between two different share links
+// remounts BuilderPage and its decode effect from scratch, instead of
+// needing an effect to reset state for the new link.
+function BuilderRoute({ catalog }: { catalog: Catalog }) {
+  const { data } = useParams<{ data: string }>()
+  return <BuilderPage key={data} catalog={catalog} />
 }
 
 export default App

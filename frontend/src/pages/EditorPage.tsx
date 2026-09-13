@@ -1,14 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { create } from '@bufbuild/protobuf'
 import { SlidersHorizontalIcon, TerminalIcon } from 'lucide-react'
 import { FormRenderer, type FormValues } from '@/components/FormRenderer'
 import { OutputPanel } from '@/components/OutputPanel'
-import { convertComposeSpec } from '@/lib/wasm'
+import { useComposePreview } from '@/lib/useComposePreview'
 import { type Application } from '@/gen/composeeditor/v1/spec_pb'
-import { MessageSchema, type Message } from '@/gen/composeeditor/v1/wasm_pb'
-
-const DEBOUNCE_MS = 100
 
 interface EditorPageProps {
   app: Application
@@ -57,28 +53,8 @@ export function EditorPage({ app }: EditorPageProps) {
 
 function EditorForm({ app }: { app: Application }) {
   const [values, setValues] = useState<FormValues>({})
-  const [composeOutput, setComposeOutput] = useState('')
-  const [errors, setErrors] = useState<Message[]>([])
-  const [warnings, setWarnings] = useState<Message[]>([])
   const [mobileTab, setMobileTab] = useState<'form' | 'output'>('form')
-
-  useEffect(() => {
-    const handle = setTimeout(() => {
-      convertComposeSpec({ template: app.template, values })
-        .then((out) => {
-          setComposeOutput(out.compose_output)
-          setErrors(out.errors)
-          setWarnings(out.warnings)
-        })
-        .catch((err: unknown) => {
-          setComposeOutput('')
-          setErrors([create(MessageSchema, { message: err instanceof Error ? err.message : String(err) })])
-          setWarnings([])
-        })
-    }, DEBOUNCE_MS)
-
-    return () => clearTimeout(handle)
-  }, [app, values])
+  const { composeOutput, errors, warnings } = useComposePreview(app.template, values)
 
   const onUpdate = (patch: FormValues) => {
     setValues((prev) => ({ ...prev, ...patch }))

@@ -50,6 +50,12 @@ export function NavBar() {
       </div>
       <div className="flex-none">
         <ul className="menu menu-horizontal px-1">
+          <li>
+            <Link to="/">Catalog</Link>
+          </li>
+          <li>
+            <Link to="/build">Builder</Link>
+          </li>
           <li className="w-8"><ThemeToggle /></li>
           <li className="w-8">
             <GitHubLink />
