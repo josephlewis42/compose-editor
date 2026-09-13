@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sort"
 
 	composeeditorv1 "github.com/josephlewis42/compose-editor/pkg/proto/composeeditor/v1"
@@ -68,6 +69,10 @@ func loadApplication(dir, slug string) (*composeeditorv1.Application, error) {
 	var generic any
 	if err := yaml.Unmarshal(specBytes, &generic); err != nil {
 		return nil, fmt.Errorf("couldn't parse spec.yaml: %w", err)
+	}
+
+	if err := validateKnownFields(reflect.TypeOf(composeeditorv1.Application{}), generic, "spec.yaml"); err != nil {
+		return nil, err
 	}
 
 	jsonBytes, err := json.Marshal(generic)

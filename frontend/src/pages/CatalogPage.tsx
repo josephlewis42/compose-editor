@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { type Catalog, type Application } from '@/gen/composeeditor/v1/spec_pb'
+import { ExternalLink } from '@/components/ExternalLink'
 
 const MIN_APPS_FOR_TAG_CHIP = 3
 
@@ -47,52 +48,60 @@ export function CatalogPage({ catalog }: CatalogPageProps) {
   }, [applications, search, activeTag])
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
-      <h1 className="text-3xl font-semibold tracking-tight">Catalog</h1>
-      <p className="mt-2 max-w-2xl text-base-content/60">
-        Browse self-hostable applications and generate a ready-to-run Docker Compose file
-        through a guided form, no YAML required.
-      </p>
-
-      <input
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search applications..."
-        className="input mt-6 w-full max-w-md"
-        aria-label="Search applications"
-      />
-
-      {visibleTags.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button
-            type="button"
-            className={`badge cursor-pointer select-none ${activeTag === null ? 'badge-primary' : 'badge-outline'}`}
-            onClick={() => setActiveTag(null)}
-          >
-            All
-          </button>
-          {visibleTags.map(([tag, count]) => (
-            <button
-              key={tag}
-              type="button"
-              className={`badge cursor-pointer select-none ${activeTag === tag ? 'badge-primary' : 'badge-outline'}`}
-              onClick={() => setActiveTag(activeTag === tag ? null : tag)}
-            >
-              {tag} ({count})
-            </button>
-          ))}
+    <div>
+      <div className="w-full bg-primary/50">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <h1 className="text-3xl font-semibold tracking-tight text-base-content">Catalog</h1>
+          <p className="mt-2 max-w-2xl text-base-content/80">
+            Browse self-hostable applications and generate a ready-to-run Docker Compose file
+            through a guided form, no YAML required.
+          </p>
         </div>
-      )}
-
-      <p className="mt-6 text-sm text-base-content/60">
-        {filtered.length} application{filtered.length === 1 ? '' : 's'}
-      </p>
-
-      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((app) => (
-          <ApplicationCard key={app.slug} app={app} />
-        ))}
       </div>
+
+      <main role="main" className="mx-auto max-w-6xl px-6 py-10">
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search applications..."
+          className="input w-full max-w-md"
+          aria-label="Search applications"
+        />
+
+        {visibleTags.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              className={`badge cursor-pointer select-none ${activeTag === null ? 'badge-primary' : 'badge-outline'}`}
+              onClick={() => setActiveTag(null)}
+            >
+              All
+            </button>
+            {visibleTags.map(([tag, count]) => (
+              <button
+                key={tag}
+                type="button"
+                className={`badge cursor-pointer select-none ${activeTag === tag ? 'badge-primary' : 'badge-outline'}`}
+                onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+              >
+                {tag} ({count})
+              </button>
+            ))}
+          </div>
+        )}
+
+        <p className="mt-6 text-sm text-base-content/60">
+          {filtered.length} application{filtered.length === 1 ? '' : 's'}
+        </p>
+
+        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((app) => (
+            <ApplicationCard key={app.slug} app={app} />
+          ))}
+
+          <RequestCard />
+        </div>
+      </main>
     </div>
   )
 }
@@ -109,3 +118,19 @@ function ApplicationCard({ app }: { app: Application }) {
     </Link>
   )
 }
+
+function RequestCard() {
+  return (
+    <a >
+      <div className="card h-full card-border card-dash border-neutral transition-colors hover:border-neutral/80">
+        <div className="card-body">
+          <h2 className="card-title">Missing an application?</h2>
+          <p className="text-base-content/60">
+            <ExternalLink href="https://github.com/josephlewis42/compose-editor/issues/new?template=new-app-request.md" text="Request one on GitHub" />
+          </p>
+        </div>
+      </div>
+    </a>
+  )
+}
+

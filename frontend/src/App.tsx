@@ -19,7 +19,7 @@ function App() {
   return (
     <div className="flex h-screen min-h-0 flex-col">
       <NavBar />
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto bg-base-200">
         {error ? (
           <p className="p-6 text-error">Couldn't load the application catalog: {error}</p>
         ) : !catalog ? (

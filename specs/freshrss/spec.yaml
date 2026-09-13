@@ -75,11 +75,10 @@ form:
   - select:
       keyname: image
       label: Image
-      description: Container image to use.
-      help_text: |-
-        `latest` (Debian-based) is the default and generally recommended. The `alpine`
-        variant is smaller and much faster to build, with newer packages, but was slower
-        in official benchmarks.
+      description: |-
+        Container image to use. `latest` (Debian-based) is the default and generally
+        recommended. The `alpine` variant is smaller and much faster to build, with newer
+        packages, but was slower in official benchmarks.
       default_value: "freshrss/freshrss:latest"
       options:
         - title: freshrss/freshrss:latest
@@ -87,18 +86,18 @@ form:
   - string:
       keyname: tz
       label: Time Zone
-      description: The timezone the container should run in.
-      help_text: Uses tz database names, e.g. `US/Pacific`. Defaults to `UTC` if unset.
+      description: The timezone the container should run in. Uses tz database names, e.g. `US/Pacific`. Defaults to `UTC` if unset.
       default_value: UTC
   - string:
       keyname: cron_min
       label: Feed Refresh Schedule
-      description: Minutes past the hour when FreshRSS automatically checks for new articles.
-      help_text: |-
-        A comma-separated list such as `1,31` (recommended, about twice per hour), or a
-        step pattern such as `*/20`. Leave blank to disable the built-in cron job, e.g. if
-        refreshing feeds another way.
+      description: |-
+        Minutes past the hour when FreshRSS automatically checks for new articles. Leave
+        blank to disable the built-in cron job, e.g. if refreshing feeds another way.
       default_value: "1,31"
+      validation:
+        regex: '^(\*/[0-9]+|([0-9]|[1-5][0-9])(,([0-9]|[1-5][0-9]))*)$'
+        help_text: Use a comma-separated list such as `1,31` (recommended, about twice per hour), or a step pattern such as `*/20`.
   - number:
       keyname: port
       label: Port
@@ -139,30 +138,33 @@ form:
         - string:
             keyname: listen
             label: Listen Address
-            description: Overrides the internal Apache listening address and port.
-            help_text: For advanced use, e.g. Docker host networking. Example `0.0.0.0:8080`.
+            description: |-
+              Overrides the internal Apache listening address and port. For advanced use,
+              e.g. Docker host networking. Example `0.0.0.0:8080`.
             placeholder: "0.0.0.0:80"
         - string:
             keyname: internal_host_allowlist
             label: Internal Host Allowlist
-            description: Allow FreshRSS to fetch feeds from internal hosts, which are blocked by default.
-            help_text: |-
+            description: |-
+              Allow FreshRSS to fetch feeds from internal hosts, which are blocked by default.
               Space-separated `host:port` combinations, CIDR ranges (`0.0.0.0/0` for any IPv4,
               `::/0` for any IPv6), or `*` to allow all hosts (unsafe).
             placeholder: rss-bridge:80 rsshub:1200
         - string:
             keyname: trusted_proxy
             label: Trusted Proxy Ranges
-            description: IP ranges of reverse proxies to trust for client-IP and X-Forwarded-* headers.
-            help_text: |-
-              Space-separated CIDR ranges, e.g. `172.16.0.0/12 192.168.0.0/16`. This also affects
-              external authentication methods. Leave blank for automatic detection.
+            description: |-
+              IP ranges of reverse proxies to trust for client-IP and X-Forwarded-* headers.
+              Space-separated CIDR ranges, e.g. `172.16.0.0/12 192.168.0.0/16`. This also
+              affects external authentication methods. Leave blank for automatic detection.
             placeholder: 172.16.0.0/12 192.168.0.0/16
         - toggle:
             keyname: oidc_enabled
             label: Enable OpenID Connect
-            description: Enables OIDC login. Only available on the Debian-based image.
-            help_text: Requires additional environment variables not covered by this form — see the [OpenID Connect documentation](https://freshrss.github.io/FreshRSS/en/admins/16_OpenID-Connect.html).
+            description: |-
+              Enables OIDC login. Only available on the Debian-based image. Requires
+              additional environment variables not covered by this form — see the
+              [OpenID Connect documentation](https://freshrss.github.io/FreshRSS/en/admins/16_OpenID-Connect.html).
         - toggle:
             keyname: healthcheck_enabled
             label: Enable Healthcheck

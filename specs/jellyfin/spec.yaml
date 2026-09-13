@@ -16,8 +16,8 @@ template: |-
       {{- end}}
       ports:
         - "{{.Values.http_port}}:8096/tcp"
-        {{- if .enable_autodiscovery}}
-        - 7359:7359/udp
+        {{- if .Values.enable_autodiscovery}}
+        - {{.Values.autodiscovery_port}}:7359/udp
         {{- end}}
       volumes:
         - {{.Values.config_path}}:/config
@@ -77,10 +77,10 @@ form:
   - text:
       keyname: media_paths
       label: Media Paths
-      description: Host directories containing your media libraries, one per line.
-      help_text: |-
-        Each line is mounted read-write inside the container at `/media/0`,
-        `/media/1`, and so on in the order listed.
+      description: |-
+        Host directories containing your media libraries, one per line. Each line is
+        mounted read-write inside the container at `/media/0`, `/media/1`, and so on in
+        the order listed.
       placeholder: |-
         /path/to/movies
         /path/to/tv
@@ -90,19 +90,21 @@ form:
       description: Allow clients on the local network to automatically find this server?
       form:
       - port:
-        keyname: autodiscovery_port
-        label: Autodiscovery port (UDP)
-        description: This should usually be left at the default.
-        default_value: 8096
+          keyname: autodiscovery_port
+          label: Autodiscovery port (UDP)
+          description: This should usually be left at the default.
+          default_value: 7359 
   - collapsible:
       title: Advanced
       form:
         - string:
             keyname: user_id
             label: User/Group ID
-            description: Run Jellyfin as this uid:gid instead of root.
-            help_text: For example `1000:1000`. Leave blank to run as root.
+            description: Run Jellyfin as this uid:gid instead of root. Leave blank to run as root.
             placeholder: "1000:1000"
+            validation:
+              regex: '^[0-9]+:[0-9]+$'
+              help_text: Use the numeric `uid:gid` format, for example `1000:1000`.
         - string:
             keyname: fonts_path
             label: Custom Fonts Path
@@ -111,11 +113,14 @@ form:
         - string:
             keyname: published_server_url
             label: Published Server URL
-            description: Alternative address advertised to clients during autodiscovery.
-            help_text: Useful when Jellyfin is reachable through a reverse proxy or a different hostname/port than the LAN address.
+            description: |-
+              Alternative address advertised to clients during autodiscovery. Useful when
+              Jellyfin is reachable through a reverse proxy or a different hostname/port
+              than the LAN address.
             placeholder: http://example.com
         - toggle:
             keyname: enable_extra_hosts
             label: Add host-gateway Extra Host
-            description: Adds a `host.docker.internal` entry pointing at the Docker host.
-            help_text: May be necessary for the Docker healthcheck to pass when running in host network mode.
+            description: |-
+              Adds a `host.docker.internal` entry pointing at the Docker host. May be
+              necessary for the Docker healthcheck to pass when running in host network mode.

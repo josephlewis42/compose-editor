@@ -241,9 +241,17 @@ Lets a user input a URL in an input box.
 | `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
 | `label` | yes | Label for the field. |
 | `description` | no | Markdown description for the field. |
-| `help_text` | no | Markdown help text shown under the field. |
+| `validation` | no | Validation for the input; see **StringValidation** below. |
 | `default_value` | no | Default value. |
 | `placeholder` | no | Placeholder for the URL input. |
+
+**StringValidation**
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `help_text` | no | Markdown help text shown under the field if validation fails. |
+| `regex` | no | Regex used to validate the input. |
+
 
 Example:
 
@@ -263,9 +271,15 @@ Lets a user input a single line text string in an input box.
 | `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
 | `label` | yes | Label for the field. |
 | `description` | no | Markdown description for the field. |
-| `help_text` | no | Markdown help text shown under the field. |
+| `validation` | no | Validation for the input; see **StringValidation** below. |
 | `default_value` | no | Default value. |
 | `placeholder` | no | Placeholder for the string input. |
+
+**StringValidation**
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `help_text` | no | Markdown help text shown under the field if validation fails. |
 | `regex` | no | Regex used to validate the input. |
 
 Example:
@@ -287,9 +301,17 @@ Lets a user input a multi-line text string in a textarea box.
 | `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
 | `label` | yes | Label for the field. |
 | `description` | no | Markdown description for the field. |
-| `help_text` | no | Markdown help text shown under the field. |
+| `validation` | no | Validation for the input; see **StringValidation** below. |
 | `default_value` | no | Default value. |
 | `placeholder` | no | Placeholder for the textarea. |
+
+**StringValidation**
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `help_text` | no | Markdown help text shown under the field if validation fails. |
+| `regex` | no | Regex used to validate the input. |
+
 
 Example:
 
@@ -312,9 +334,17 @@ Lets a user input a multi-line text string in a textarea box formatted with a mo
 | `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
 | `label` | yes | Label for the field. |
 | `description` | no | Markdown description for the field. |
-| `help_text` | no | Markdown help text shown under the field. |
+| `validation` | no | Validation for the input; see **StringValidation** below. |
 | `default_value` | no | Default value. |
 | `placeholder` | no | Placeholder for the textarea. |
+
+**StringValidation**
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `help_text` | no | Markdown help text shown under the field if validation fails. |
+| `regex` | no | Regex used to validate the input. |
+
 
 Example:
 
@@ -335,9 +365,17 @@ Lets a user input a single line text string in an input box with masked input.
 | `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
 | `label` | yes | Label for the field. |
 | `description` | no | Markdown description for the field. |
-| `help_text` | no | Markdown help text shown under the field. |
+| `validation` | no | Validation for the input; see **StringValidation** below. |
 | `default_value` | no | Default value. |
 | `placeholder` | no | Placeholder for the input. |
+
+**StringValidation**
+
+| Property Name | Required? | Notes |
+| --- | --- | --- |
+| `help_text` | no | Markdown help text shown under the field if validation fails. |
+| `regex` | no | Regex used to validate the input. |
+
 
 Example:
 
@@ -357,7 +395,6 @@ Displays a toggle so the user can enable/disable something. The value is true or
 | `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
 | `label` | yes | Label for the field. |
 | `description` | no | Markdown description for the field. |
-| `help_text` | no | Markdown help text shown under the field. |
 | `default_value` | no | Default value. |
 
 Example:
@@ -378,7 +415,6 @@ Lets the user enter a number using a numeric input.
 | `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
 | `label` | yes | Label for the field. |
 | `description` | no | Markdown description for the field. |
-| `help_text` | no | Markdown help text shown under the field. |
 | `default_value` | no | Default value. |
 | `minimum` | yes | Minimum value. |
 | `maximum` | yes | Maximum value. |
@@ -405,7 +441,6 @@ Lets the user enter a date using a date picker.
 | `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
 | `label` | yes | Label for the field. |
 | `description` | no | Markdown description for the field. |
-| `help_text` | no | Markdown help text shown under the field. |
 | `default_value` | no | Default value. |
 
 Example:
@@ -425,7 +460,6 @@ Lets the user pick a value from a dropdown.
 | `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
 | `label` | yes | Label for the field. |
 | `description` | no | Markdown description for the field. |
-| `help_text` | no | Markdown help text shown under the field. |
 | `default_value` | no | Default value. |
 | `options` | yes | Options to be shown in order. |
 
@@ -471,7 +505,6 @@ Lets the user pick a value from a dropdown.
 | `keyname` | yes | Variable this field's value is injected as into the template. Must be [a-zA-Z0-9_]+. |
 | `label` | yes | Label for the field. |
 | `description` | no | Markdown description for the field. |
-| `help_text` | no | Markdown help text shown under the field. |
 | `default_value` | no | Default value. |
 | `options` | yes | Options to be shown in order. |
 
