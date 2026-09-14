@@ -52,10 +52,15 @@ export function CatalogPage({ catalog }: CatalogPageProps) {
       <div className="w-full bg-primary/50">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <h1 className="text-3xl font-semibold tracking-tight text-base-content">Catalog</h1>
-          <p className="mt-2 max-w-2xl text-base-content/80">
-            Browse self-hostable applications and generate a ready-to-run Docker Compose file
-            through a guided form, no YAML required.
-          </p>
+
+          <div className="mt-2 max-w-2xl text-base-content/90">
+            <p>
+              Browse self-hostable applications and generate a ready-to-run Docker Compose file
+              through a guided form, no YAML required.
+            </p>
+
+            <p className="pt-4">Select an application below to get started.</p>
+          </div>
         </div>
       </div>
 
