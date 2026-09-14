@@ -126,7 +126,8 @@ function RequestCard() {
         <div className="card-body">
           <h2 className="card-title">Missing an application?</h2>
           <p className="text-base-content/60">
-            <ExternalLink href="https://github.com/josephlewis42/compose-editor/issues/new?template=new-app-request.md" text="Request one on GitHub" />
+            <ExternalLink href="https://github.com/josephlewis42/compose-editor/issues/new?template=new-app-request.md" text="Request one on GitHub " />
+            or <Link className="link" to="/build">build your own</Link>.
           </p>
         </div>
       </div>
