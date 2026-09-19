@@ -25,6 +25,7 @@ jobs:
 
     - uses: pnpm/setup@v2
       with:
+        version: '^12.0.0'
         runtime: 'node'
         cache: true
         cache-dependency-path: frontend/pnpm-lock.yaml
