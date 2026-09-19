@@ -1,6 +1,9 @@
-# Compose Editor
+# <img src="frontend/public/favicon.svg" align="left" height="40" width="40" > Compose Editor
 
 An interactive editor to build Docker Compose/[Compose Specs](https://compose-spec.io/) for self-hosting.
+
+> [!TIP]
+> <a href="https://josephlewis42.github.io/compose-editor/" target="_blank" class="btn">Try it in your browser!</a>
 
 ## Why?
 
