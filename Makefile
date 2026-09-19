@@ -1,13 +1,13 @@
 VERSION?=v0.0.0
-OUTPUT_DIRS=build frontend/src/gen pkg/proto
-PROTOC_GEN_GO_LITE=build/protoc-gen-go-lite
+BUILD_DIR=out
+OUTPUT_DIRS=$(BUILD_DIR) frontend/src/gen pkg/proto
 
 .PHONY: all
 all: composeeditor test frontend
 
 .PHONY: composeeditor
 composeeditor: $(OUTPUT_DIRS) proto
-	go build -ldflags "-X main.version=$(VERSION)" -o build/composeeditor main.go
+	go build -ldflags "-X main.version=$(VERSION)" -o out/composeeditor main.go
 
 .PHONY: test
 test:
@@ -20,7 +20,7 @@ wasm: frontend/public/gen proto
 
 .PHONY: templates
 templates: composeeditor
-	./build/composeeditor build specs frontend/public/gen/templates.binpb
+	./$(BUILD_DIR)/composeeditor build specs frontend/public/gen/templates.binpb
 
 .PHONY: proto
 proto: $(OUTPUT_DIRS)
@@ -32,28 +32,21 @@ proto: $(OUTPUT_DIRS)
 		--plugin=protoc-gen-es=frontend/node_modules/.bin/protoc-gen-es \
 		--es_out=frontend/src/gen \
 		--es_opt=target=ts \
-		--descriptor_set_out=build/proto-image.binpb \
+		--descriptor_set_out=$(BUILD_DIR)/proto-image.binpb \
 		--include_imports \
 		--include_source_info \
 		proto/composeeditor/v1/*.proto
 
 .PHONY: frontend
-frontend: build-dir frontend/public/gen wasm templates proto
+frontend: $(BUILD_DIR) frontend/public/gen wasm templates proto
 	cd frontend; pnpm install
 	cd frontend; pnpm build
-	rm -rf build/frontend
-	mv frontend/dist build/frontend
-
-.PHONY: build-dir
-build-dir:
-	mkdir -p build
-
+	rm -rf $(BUILD_DIR)/frontend
+	mv frontend/dist $(BUILD_DIR)/frontend
 
 $(OUTPUT_DIRS):
 	mkdir -p $@
 
 .PHONY: clean
 clean:
-	rm -rf build
-	rm -rf pkg/proto
 	rm -rf $(OUTPUT_DIRS) 
