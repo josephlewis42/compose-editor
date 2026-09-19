@@ -75,14 +75,3 @@ func TestConvert_ExecuteError(t *testing.T) {
 		t.Fatal("expected an execution error")
 	}
 }
-
-func TestConvert_InvalidYAMLWarning(t *testing.T) {
-	out := Convert(&composeeditorv1.ConvertInput{Template: "key: [unterminated"})
-
-	if len(out.GetErrors()) != 0 {
-		t.Fatalf("unexpected errors: %+v", out.GetErrors())
-	}
-	if len(out.GetWarnings()) == 0 {
-		t.Fatal("expected a warning about invalid YAML output")
-	}
-}

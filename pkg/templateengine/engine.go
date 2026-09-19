@@ -20,11 +20,12 @@ package templateengine
 
 import (
 	"bytes"
-	"text/template"
+
+	template "github.com/DataDog/datadog-agent/pkg/template/text"
 
 	"github.com/Masterminds/sprig/v3"
+
 	composeeditorv1 "github.com/josephlewis42/compose-editor/pkg/proto/composeeditor/v1"
-	"gopkg.in/yaml.v3"
 )
 
 // Convert renders input.Template with input.Values using Go templates with
@@ -35,7 +36,7 @@ func Convert(input *composeeditorv1.ConvertInput) *composeeditorv1.ConvertOutput
 		Warnings: []*composeeditorv1.Message{},
 	}
 
-	tmpl, err := template.New("variant").Funcs(funcMap()).Parse(input.GetTemplate())
+	tmpl, err := template.New("variant").Funcs(funcMap()).Parse(input.Template)
 	if err != nil {
 		out.Errors = append(out.Errors, &composeeditorv1.Message{Message: "couldn't parse template: " + err.Error()})
 		return out
@@ -56,11 +57,6 @@ func Convert(input *composeeditorv1.ConvertInput) *composeeditorv1.ConvertOutput
 	}
 
 	out.ComposeOutput = buf.String()
-
-	var probe any
-	if err := yaml.Unmarshal(buf.Bytes(), &probe); err != nil {
-		out.Warnings = append(out.Warnings, &composeeditorv1.Message{Message: "output is not valid YAML: " + err.Error()})
-	}
 
 	return out
 }
