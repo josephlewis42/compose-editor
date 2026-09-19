@@ -1,6 +1,6 @@
 VERSION?=v0.0.0
 BUILD_DIR=out
-OUTPUT_DIRS=$(BUILD_DIR) frontend/src/gen pkg/proto
+OUTPUT_DIRS=$(BUILD_DIR) frontend/src/gen pkg/proto frontend/public/gen
 
 .PHONY: all
 all: build test
