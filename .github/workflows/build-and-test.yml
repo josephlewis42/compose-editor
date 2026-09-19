@@ -20,14 +20,13 @@ jobs:
       with:
         go-version: '1.27'
 
-    - uses: pnpm/action-setup@v4
-      with:
-        version: 10
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v3
 
-    - uses: actions/setup-node@v4
+    - uses: pnpm/setup@v2
       with:
-        node-version: '23.9.0'
-        cache: 'pnpm'
+        runtime: 'node'
+        cache: true
         cache-dependency-path: frontend/pnpm-lock.yaml
 
     - name: Build
