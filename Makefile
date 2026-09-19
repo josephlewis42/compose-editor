@@ -25,8 +25,11 @@ wasm: frontend/public/gen proto
 templates: composeeditor
 	./$(BUILD_DIR)/composeeditor build specs frontend/public/gen/templates.binpb
 
+frontend/node_modules/.bin/protoc-gen-es:
+	cd frontend; pnpm install
+
 .PHONY: proto
-proto: $(OUTPUT_DIRS)
+proto: $(OUTPUT_DIRS) frontend/node_modules/.bin/protoc-gen-es
 	protoc \
 		-I proto \
 		--plugin=protoc-gen-go-lite="./tools/protoc-gen-go-lite" \
