@@ -36,7 +36,7 @@ func Convert(input *composeeditorv1.ConvertInput) *composeeditorv1.ConvertOutput
 		Warnings: []*composeeditorv1.Message{},
 	}
 
-	tmpl, err := template.New("variant").Funcs(funcMap()).Parse(input.Template)
+	tmpl, err := template.New("variant").Funcs(sprig.FuncMap()).Parse(input.Template)
 	if err != nil {
 		out.Errors = append(out.Errors, &composeeditorv1.Message{Message: "couldn't parse template: " + err.Error()})
 		return out
@@ -59,16 +59,4 @@ func Convert(input *composeeditorv1.ConvertInput) *composeeditorv1.ConvertOutput
 	out.ComposeOutput = buf.String()
 
 	return out
-}
-
-func funcMap() template.FuncMap {
-
-	funcs := sprig.FuncMap()
-
-	// Remove functions tht won't work in WASM
-	delete(funcs, "env")
-	delete(funcs, "expandenv")
-	delete(funcs, "getHostByName")
-
-	return funcs
 }

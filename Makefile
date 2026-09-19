@@ -1,8 +1,9 @@
 VERSION?=v0.0.0
 OUTPUT_DIRS=build frontend/src/gen pkg/proto
+PROTOC_GEN_GO_LITE=build/protoc-gen-go-lite
 
 .PHONY: all
-all: composeeditor test frontend 
+all: composeeditor test frontend
 
 .PHONY: composeeditor
 composeeditor: $(OUTPUT_DIRS) proto
@@ -22,14 +23,25 @@ templates: composeeditor
 	./build/composeeditor build specs frontend/public/gen/templates.binpb
 
 .PHONY: proto
-proto:
-	buf generate proto
-	buf build proto -o build/buf-image.binpb
+proto: $(OUTPUT_DIRS)
+	protoc \
+		-I proto \
+		--plugin=protoc-gen-go-lite="./tools/protoc-gen-go-lite" \
+		--go-lite_out=pkg/proto \
+		--go-lite_opt=paths=source_relative,features=marshal+unmarshal+size+equal+clone+text+json \
+		--plugin=protoc-gen-es=frontend/node_modules/.bin/protoc-gen-es \
+		--es_out=frontend/src/gen \
+		--es_opt=target=ts \
+		--descriptor_set_out=build/proto-image.binpb \
+		--include_imports \
+		--include_source_info \
+		proto/composeeditor/v1/*.proto
 
 .PHONY: frontend
 frontend: build-dir frontend/public/gen wasm templates proto
 	cd frontend; pnpm install
 	cd frontend; pnpm build
+	rm -rf build/frontend
 	mv frontend/dist build/frontend
 
 .PHONY: build-dir
