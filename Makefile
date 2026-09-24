@@ -13,8 +13,9 @@ composeeditor: $(OUTPUT_DIRS) proto
 	go build -ldflags "-X main.version=$(VERSION)" -o out/composeeditor main.go
 
 .PHONY: test
-test:
+test: frontend/node_modules/.bin/protoc-gen-es
 	go test -cover ./...
+	cd frontend; pnpm test
 
 .PHONY: wasm
 wasm: frontend/public/gen proto

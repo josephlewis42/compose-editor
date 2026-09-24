@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { CheckIcon, CodeIcon, CopyIcon, DownloadIcon } from 'lucide-react'
 import type { Message } from '@/gen/composeeditor/v1/wasm_pb'
+import { parseComposeYaml, type ValidationError } from '@/lib/validator'
+import { YamlViewer } from './YamlViewer'
 import type { FormValues } from './FormRenderer'
 
 interface OutputPanelProps {
@@ -14,6 +16,12 @@ interface OutputPanelProps {
 export function OutputPanel({ composeOutput, errors, warnings, values, downloadName }: OutputPanelProps) {
   const [tab, setTab] = useState<'output' | 'details'>('output')
   const [copied, setCopied] = useState(false)
+
+  // Structural validation against compose_spec.json, layered on top of the
+  // engine's own field errors/warnings — this one runs client-side against
+  // the rendered YAML, so it can point at a line/column in it.
+  const schemaErrors = useMemo(() => parseComposeYaml(composeOutput).errors, [composeOutput])
+  const issueCount = errors.length + schemaErrors.length
 
   const copy = async () => {
     await navigator.clipboard.writeText(composeOutput)
@@ -48,7 +56,7 @@ export function OutputPanel({ composeOutput, errors, warnings, values, downloadN
             onClick={() => setTab('details')}
           >
             Details
-            {errors.length > 0 && <span className="badge badge-error badge-sm ml-1">{errors.length}</span>}
+            {issueCount > 0 && <span className="badge badge-error badge-sm ml-1">{issueCount}</span>}
           </a>
         </div>
         <div className="flex gap-2">
@@ -63,12 +71,7 @@ export function OutputPanel({ composeOutput, errors, warnings, values, downloadN
 
       {tab === 'output' && (
         <div className="min-h-0 flex-1 px-4 pb-4">
-          <textarea
-            readOnly
-            value={composeOutput}
-            className="textarea h-full w-full resize-none font-mono text-sm"
-            spellCheck={false}
-          />
+          <YamlViewer value={composeOutput} errors={schemaErrors} className="h-full w-full overflow-hidden rounded-lg border border-base-300" />
         </div>
       )}
 
@@ -77,6 +80,7 @@ export function OutputPanel({ composeOutput, errors, warnings, values, downloadN
           <div className="flex flex-col gap-4 pr-4">
             {errors.length > 0 && <MessageList title="Errors" messages={errors} tone="error" />}
             {warnings.length > 0 && <MessageList title="Warnings" messages={warnings} tone="warning" />}
+            {schemaErrors.length > 0 && <ValidationErrorList title="Compose output issues" errors={schemaErrors} />}
             <div>
               <h4 className="mb-1 text-sm font-medium">Form values</h4>
               <pre className="overflow-x-auto rounded-lg border border-base-300 bg-base-200 p-3 font-mono text-xs">
@@ -107,6 +111,28 @@ function MessageList({
           <li key={i} className="rounded-md border border-base-300 px-2.5 py-1.5">
             {m.field && <span className="mr-1 font-mono text-xs text-base-content/60">[{m.field}]</span>}
             {m.message}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function ValidationErrorList({ title, errors }: { title: string; errors: ValidationError[] }) {
+  return (
+    <div>
+      <h4 className="mb-1 text-sm font-medium text-error">{title}</h4>
+      <ul className="flex flex-col gap-1 text-sm">
+        {errors.map((e, i) => (
+          <li key={i} className="rounded-md border border-base-300 px-2.5 py-1.5">
+            {e.line !== undefined && (
+              <span className="mr-1 font-mono text-xs text-base-content/60">
+                L{e.line}
+                {e.col !== undefined ? `:${e.col}` : ''}
+              </span>
+            )}
+            <span className="mr-1 font-mono text-xs text-base-content/60">[{e.path}]</span>
+            {e.message}
           </li>
         ))}
       </ul>
