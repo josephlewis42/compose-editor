@@ -6,7 +6,7 @@ OUTPUT_DIRS=$(BUILD_DIR) frontend/src/gen pkg/proto frontend/public/gen
 all: build test
 
 .PHONY: build
-build: composeeditor test frontend
+build: composeeditor frontend
 
 .PHONY: composeeditor
 composeeditor: $(OUTPUT_DIRS) proto

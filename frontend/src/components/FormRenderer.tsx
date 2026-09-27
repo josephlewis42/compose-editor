@@ -3,19 +3,15 @@ import { Markdown } from '@/components/Markdown'
 import type { FormElement } from '@/lib/catalog'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type {
-  CodeInput,
   DateInput,
   NumberInput,
   OneOf,
-  PasswordInput,
   PortInput,
   SelectInput,
   StringInput,
   StringValidation,
-  TextAreaInput,
   ToggleInput,
   ToggleSection,
-  URLInput,
 } from '@/gen/composeeditor/v1/spec_pb'
 
 export type Value = string | number | boolean | null
@@ -212,7 +208,7 @@ function useTextInput(field: TextLikeInput, onUpdate: FormUpdate) {
   return { value, setAndCheckValidity, invalid }
 }
 
-function FieldUrl({ field, onUpdate }: { field: URLInput; onUpdate: FormUpdate }) {
+function FieldUrl({ field, onUpdate }: { field: StringInput; onUpdate: FormUpdate }) {
   const { value, setAndCheckValidity, invalid } = useTextInput(field, onUpdate)
 
   return (
@@ -256,7 +252,7 @@ function FieldString({ field, onUpdate }: { field: StringInput; onUpdate: FormUp
   )
 }
 
-function FieldPassword({ field, onUpdate }: { field: PasswordInput; onUpdate: FormUpdate }) {
+function FieldPassword({ field, onUpdate }: { field: StringInput; onUpdate: FormUpdate }) {
   const { value, setAndCheckValidity, invalid } = useTextInput(field, onUpdate)
 
   return (
@@ -278,7 +274,7 @@ function FieldPassword({ field, onUpdate }: { field: PasswordInput; onUpdate: Fo
   )
 }
 
-function FieldTextArea({ field, onUpdate }: { field: TextAreaInput; onUpdate: FormUpdate }) {
+function FieldTextArea({ field, onUpdate }: { field: StringInput; onUpdate: FormUpdate }) {
   const { value, setAndCheckValidity } = useTextInput(field, onUpdate)
 
   return (
@@ -295,7 +291,7 @@ function FieldTextArea({ field, onUpdate }: { field: TextAreaInput; onUpdate: Fo
   )
 }
 
-function FieldCode({ field, onUpdate }: { field: CodeInput; onUpdate: FormUpdate }) {
+function FieldCode({ field, onUpdate }: { field: StringInput; onUpdate: FormUpdate }) {
   const { value, setAndCheckValidity } = useTextInput(field, onUpdate)
 
   return (
