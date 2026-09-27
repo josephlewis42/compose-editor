@@ -13,18 +13,18 @@ composeeditor: $(OUTPUT_DIRS) proto
 	go build -ldflags "-X main.version=$(VERSION)" -o out/composeeditor main.go
 
 .PHONY: test
-test: frontend/node_modules/.bin/protoc-gen-es
+test: proto templates
 	go test -cover ./...
 	cd frontend; pnpm test
 
 .PHONY: wasm
-wasm: frontend/public/gen proto
-	GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o frontend/public/gen/composeeditor.wasm pkg/browser/wasm.go
-	cp -f "$(shell go env GOROOT)/lib/wasm/wasm_exec.js" frontend/public/gen/wasm_exec.js
+wasm: frontend/src/gen proto
+	GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o frontend/src/gen/composeeditor.wasm pkg/browser/wasm.go
+	cp -f "$(shell go env GOROOT)/lib/wasm/wasm_exec.js" frontend/src/gen/wasm_exec.js
 
 .PHONY: templates
 templates: composeeditor
-	./$(BUILD_DIR)/composeeditor build specs frontend/public/gen/templates.binpb
+	./$(BUILD_DIR)/composeeditor build specs frontend/src/gen/templates.binpb
 
 frontend/node_modules/.bin/protoc-gen-es:
 	cd frontend; pnpm install
@@ -45,7 +45,7 @@ proto: $(OUTPUT_DIRS) frontend/node_modules/.bin/protoc-gen-es
 		proto/composeeditor/v1/*.proto
 
 .PHONY: frontend
-frontend: $(BUILD_DIR) frontend/public/gen wasm templates proto
+frontend: $(BUILD_DIR) frontend/src/gen wasm templates proto
 	cd frontend; pnpm install
 	cd frontend; pnpm build
 	rm -rf $(BUILD_DIR)/frontend

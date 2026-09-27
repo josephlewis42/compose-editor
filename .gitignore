@@ -17,6 +17,7 @@ out/
 # Generated
 pkg/proto
 frontend/public/gen
+frontend/src/gen
 
 # Test binary, built with `go test -c`
 *.test

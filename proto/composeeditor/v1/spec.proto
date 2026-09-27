@@ -74,14 +74,14 @@ message FormElement {
     // "one_of" avoids the `oneof` keyword; json_name keeps the wire/YAML
     // key "oneof".
     OneOf one_of = 8 [json_name = "oneof"];
-    URLInput url = 9;
+    StringInput url = 9;
     // "str" sidesteps the `string` scalar type keyword; json_name keeps
     // the wire/YAML key "string".
     StringInput str = 10 [json_name = "string"];
     // The multi-line "text" input element. Renders as a textarea.
-    TextAreaInput text = 11;
-    CodeInput code = 12;
-    PasswordInput password = 13;
+    StringInput text = 11;
+    StringInput code = 12;
+    StringInput password = 13;
     ToggleInput toggle = 14;
     NumberInput number = 15;
     DateInput date = 16;
@@ -175,23 +175,6 @@ message StringValidation {
   string regex = 2;
 }
 
-// URLInput lets a user input a URL in an input box.
-message URLInput {
-  // Required. Variable this field's value is injected as into the
-  // template. Must be [a-zA-Z0-9_]+.
-  string keyname = 1;
-  // Required. Label for the field.
-  string label = 2;
-  // Optional. Markdown description for the field.
-  string description = 3;
-  // Optional. Default value.
-  string default_value = 4;
-  // Optional. Placeholder for the URL input.
-  string placeholder = 5;
-  // Optional. Validation for the input.
-  StringValidation validation = 6;
-}
-
 // StringInput (YAML key "string") lets a user input a single line text
 // string in an input box.
 message StringInput {
@@ -205,60 +188,6 @@ message StringInput {
   // Optional. Default value.
   string default_value = 4;
   // Optional. Placeholder for the string input.
-  string placeholder = 5;
-  // Optional. Validation for the input.
-  StringValidation validation = 6;
-}
-
-// TextAreaInput (YAML key "text") lets a user input a multi-line text
-// string in a textarea box.
-message TextAreaInput {
-  // Required. Variable this field's value is injected as into the
-  // template. Must be [a-zA-Z0-9_]+.
-  string keyname = 1;
-  // Required. Label for the field.
-  string label = 2;
-  // Optional. Markdown description for the field.
-  string description = 3;
-  // Optional. Default value.
-  string default_value = 4;
-  // Optional. Placeholder for the textarea.
-  string placeholder = 5;
-  // Optional. Validation for the input.
-  StringValidation validation = 6;
-}
-
-// CodeInput lets a user input a multi-line text string in a textarea box
-// formatted with a monospace font and line numbers.
-message CodeInput {
-  // Required. Variable this field's value is injected as into the
-  // template. Must be [a-zA-Z0-9_]+.
-  string keyname = 1;
-  // Required. Label for the field.
-  string label = 2;
-  // Optional. Markdown description for the field.
-  string description = 3;
-  // Optional. Default value.
-  string default_value = 4;
-  // Optional. Placeholder for the textarea.
-  string placeholder = 5;
-  // Optional. Validation for the input.
-  StringValidation validation = 6;
-}
-
-// PasswordInput lets a user input a single line text string in an input
-// box with masked input.
-message PasswordInput {
-  // Required. Variable this field's value is injected as into the
-  // template. Must be [a-zA-Z0-9_]+.
-  string keyname = 1;
-  // Required. Label for the field.
-  string label = 2;
-  // Optional. Markdown description for the field.
-  string description = 3;
-  // Optional. Default value.
-  string default_value = 4;
-  // Optional. Placeholder for the input.
   string placeholder = 5;
   // Optional. Validation for the input.
   StringValidation validation = 6;

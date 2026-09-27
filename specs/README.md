@@ -10,6 +10,7 @@ This page outlines how to write compose editor specs.
   * Use more than one collapsible section if needed e.g. for developer options versus security.
 * Link to authoritative sources in form elements.
 * Use the most specific field type possible.
+* Run `make test` to validate specs.
 
 ## File format
 

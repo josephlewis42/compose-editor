@@ -5,14 +5,16 @@
 
 import { fromBinary } from '@bufbuild/protobuf'
 import { CatalogSchema, type Catalog } from '@/gen/composeeditor/v1/spec_pb'
+import templatesURL from '@/gen/templates.binpb?inline'
 
 export type { FormElement } from '@/gen/composeeditor/v1/spec_pb'
 
 export async function loadCatalog(): Promise<Catalog> {
-  const res = await fetch(`${import.meta.env.BASE_URL}gen/templates.binpb`)
+  const res = await fetch(templatesURL)
   if (!res.ok) {
     throw new Error(`couldn't load templates.binpb: ${res.status} ${res.statusText}`)
   }
+  
   const bytes = new Uint8Array(await res.arrayBuffer())
   const catalog = fromBinary(CatalogSchema, bytes)
 

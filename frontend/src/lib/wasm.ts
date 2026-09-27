@@ -7,15 +7,22 @@
 import { create, fromBinary, fromJson, toBinary, type JsonValue } from '@bufbuild/protobuf'
 import { ValueSchema } from '@bufbuild/protobuf/wkt'
 import { ConvertInputSchema, ConvertOutputSchema, type Message } from '@/gen/composeeditor/v1/wasm_pb'
+// Vite's `?init` wasm helper instantiates via fetch()/instantiateStreaming
+// in the browser and via node:fs under SSR/Vitest, so this loads correctly
+// in both a real browser and a Node-based test run.
+import initWasm from '@/gen/composeeditor.wasm?init'
+// import execURL from '@/gen/wasm_exec.js?url'
+import '@/gen/wasm_exec.js'
+
 
 declare global {
-  interface Window {
-    Go: new () => {
-      importObject: WebAssembly.Imports
-      run(instance: WebAssembly.Instance): Promise<void>
-    }
-    convertComposeSpec?: (input: Uint8Array) => Uint8Array
+  // eslint-disable-next-line no-var
+  var Go: new () => {
+    importObject: WebAssembly.Imports
+    run(instance: WebAssembly.Instance): Promise<void>
   }
+  // eslint-disable-next-line no-var
+  var convertComposeSpec: ((input: Uint8Array) => Uint8Array) | undefined
 }
 
 export interface ConvertInput {
@@ -31,23 +38,22 @@ export interface ConvertOutput {
 
 let loading: Promise<void> | null = null
 
-function loadScript(src: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script')
-    script.src = src
-    script.onload = () => resolve()
-    script.onerror = () => reject(new Error(`couldn't load ${src}`))
-    document.body.appendChild(script)
-  })
-}
+// function loadScript(src: string): Promise<void> {
+//   return new Promise((resolve, reject) => {
+//     const script = document.createElement('script')
+//     script.src = src
+//     script.onload = () => resolve()
+//     script.onerror = () => reject(new Error(`couldn't load ${src}`))
+//     document.body.appendChild(script)
+//   })
+// }
 
 async function ensureLoaded(): Promise<void> {
   if (!loading) {
     loading = (async () => {
-      await loadScript(`${import.meta.env.BASE_URL}gen/wasm_exec.js`)
-      const go = new window.Go()
-      const resp = await fetch(`${import.meta.env.BASE_URL}gen/composeeditor.wasm`)
-      const { instance } = await WebAssembly.instantiateStreaming(resp, go.importObject)
+      // await loadScript(execURL)
+      const go = new globalThis.Go()
+      const instance = await initWasm(go.importObject)
       void go.run(instance)
       // The Go program registers convertComposeSpec synchronously at the
       // top of main(), but wait a tick so callers never race it.
@@ -59,7 +65,7 @@ async function ensureLoaded(): Promise<void> {
 
 export async function convertComposeSpec(input: ConvertInput): Promise<ConvertOutput> {
   await ensureLoaded()
-  if (!window.convertComposeSpec) {
+  if (!globalThis.convertComposeSpec) {
     throw new Error('convertComposeSpec was not installed by the wasm module')
   }
 
@@ -69,7 +75,7 @@ export async function convertComposeSpec(input: ConvertInput): Promise<ConvertOu
   }
 
   const message = create(ConvertInputSchema, { template: input.template, values })
-  const resultBytes = window.convertComposeSpec(toBinary(ConvertInputSchema, message))
+  const resultBytes = globalThis.convertComposeSpec(toBinary(ConvertInputSchema, message))
   const result = fromBinary(ConvertOutputSchema, resultBytes)
 
   return {
