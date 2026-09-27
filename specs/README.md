@@ -12,6 +12,7 @@ This page outlines how to write compose editor specs.
 * Link to authoritative sources in form elements.
 * Use the most specific field type possible.
 * Run `make test` to validate specs.
+* For images, use the full `docker.io` path rater than a shortened one so they work with Podman.
 
 ## File format
 

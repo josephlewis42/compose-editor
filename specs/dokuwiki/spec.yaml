@@ -1,0 +1,118 @@
+name: DokuWiki
+tagline: A simple, standards-compliant wiki that stores pages as plain text files.
+url: https://www.dokuwiki.org/
+spdx_license: GPL-2.0-only
+license_url: https://github.com/dokuwiki/dokuwiki/blob/master/COPYING
+tags:
+  - wiki
+  - cms
+  - docs
+template: |-
+  services:
+    dokuwiki:
+      image: {{ .Values.image | quote }}
+      # NOTE: If you change user after the first run,
+      # you must manually chown the existing storage 
+      # directory to match.
+      user: {{ printf "%v:%v" .Values.uid .Values.gid | quote }}
+      restart: unless-stopped
+      ports:
+        - "{{ .Values.port }}:8080"
+      environment:
+        PHP_TIMEZONE: {{ .Values.php_timezone | quote }}
+        {{- if .Values.php_memory_limit }}
+        PHP_MEMORYLIMIT: {{ .Values.php_memory_limit | quote }}
+        {{- end }}
+        {{- if .Values.php_upload_limit }}
+        PHP_UPLOADLIMIT: {{ .Values.php_upload_limit | quote }}
+        {{- end }}
+      volumes:
+        - {{ .Values.storage_path }}:/storage
+form:
+  - select:
+      keyname: image
+      label: Image
+      description: |-
+        Container image to use. 
+        
+        * **`stable` is recommended for most users.**
+        * `oldstable` tracks the previous stable release.
+        * `master` tracks the development branch.
+
+        Images are available from Docker (docker.io) or GitHub (ghcr.io).
+      default_value: docker.io/dokuwiki/dokuwiki:stable
+      options:
+        - title: docker.io/dokuwiki/dokuwiki:stable
+        - title: docker.io/dokuwiki/dokuwiki:oldstable
+        - title: docker.io/dokuwiki/dokuwiki:master
+        - title: ghcr.io/dokuwiki/dokuwiki:stable
+        - title: ghcr.io/dokuwiki/dokuwiki:oldstable
+        - title: ghcr.io/dokuwiki/dokuwiki:master
+  - info:
+      content: |-
+        **First run**: open the site in a browser and follow
+        [DokuWiki's installer](https://www.dokuwiki.org/installer) to finish setup.
+
+  - port:
+      keyname: port
+      label: Port
+      description: Host port to serve DokuWiki on.
+      default_value: 8080
+  - warning:
+      content: |-
+        **Warning**: Don't expose this server to the public Internet unless you
+        put it behind a reverse-proxy with TLS.
+
+  - string:
+      keyname: storage_path
+      label: Storage Path
+      description: |-
+        Host directory for all of DokuWiki's persistent data: pages, media,
+        configuration, and installed plugins/templates.
+      default_value: ./storage
+  - string:
+      keyname: php_timezone
+      label: Time Zone
+      description: The timezone PHP should use, e.g. `Europe/Berlin`. [List of supported time zones](https://www.php.net/timezones).
+      default_value: UTC
+  - string:
+      keyname: php_memory_limit
+      label: PHP Memory Limit
+      description: Maximum memory a PHP process may use. [Valid suffixes are K/M/G.](https://www.php.net/manual/en/faq.using.php#faq.using.shorthandbytes)
+      default_value: 256M
+      validation:
+        regex: "\\d+(K|M|G)"
+        help_text: "Size must be a number with a K/M/G suffix e.g. 10K, 100M, or 2G."
+  - string:
+      keyname: php_upload_limit
+      label: PHP Upload Limit
+      description: Maximum file upload size. [Valid suffixes are K/M/G.](https://www.php.net/manual/en/faq.using.php#faq.using.shorthandbytes)
+      default_value: 128M
+      validation:
+        regex: "\\d+(K|M|G)"
+        help_text: "Size must be a number with a K/M/G suffix e.g. 10K, 100M, or 2G."
+  - collapsible:
+      title: Permissions
+      form:
+        - info:
+            content: |-
+              The container runs as the user ID below for its entire lifetime, so make
+              sure the storage path above is writable by it. If you change this after
+              the first run, you'll need to `chown` the existing storage directory to
+              match.
+        - number:
+            keyname: uid
+            label: User ID
+            description: User ID the container runs as.
+            default_value: 0
+            minimum: 0
+            maximum: 65535
+            step: 1
+        - number:
+            keyname: gid
+            label: Group ID
+            description: Group ID the container runs as.
+            default_value: 0
+            minimum: 0
+            maximum: 65535
+            step: 1
