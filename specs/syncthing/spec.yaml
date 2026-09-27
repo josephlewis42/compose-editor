@@ -1,0 +1,149 @@
+name: Syncthing
+tagline: Continuous file synchronization program that synchronizes files between two or more computers.
+url: https://syncthing.net/
+spdx_license: MPL-2.0
+license_url: https://github.com/syncthing/syncthing/blob/main/LICENSE
+tags:
+  - sync
+  - backup
+  - files
+  - p2p
+template: |-
+  services:
+    syncthing:
+      image: {{ .Values.image | quote }}
+      container_name: syncthing
+      {{- if .Values.hostname }}
+      hostname: {{ .Values.hostname | quote }}
+      {{- end }}
+      environment:
+        - PUID={{ .Values.puid }}
+        - PGID={{ .Values.pgid }}
+        {{- if eq .Values.network_mode "host" }}
+        - STGUIADDRESS=127.0.0.1:8384
+        {{- else }}
+        - STGUIADDRESS=0.0.0.0:8384
+        {{- end }}
+        {{- if .Values.pcap }}
+        - PCAP={{ .Values.pcap }}
+        {{- end }}
+        {{- if .Values.umask }}
+        - UMASK={{ .Values.umask }}
+        {{- end }}
+      volumes:
+        - {{ .Values.data_path }}:/var/syncthing
+      {{- if eq .Values.network_mode "host" }}
+      network_mode: host
+      {{- else }}
+      ports:
+        - "{{ .Values.gui_port }}:8384/tcp"
+        - "{{ .Values.sync_port }}:22000/tcp"
+        - "{{ .Values.sync_port }}:22000/udp"
+        - "{{ .Values.discovery_port }}:21027/udp"
+      {{- end }}
+      restart: unless-stopped
+      {{- if .Values.healthcheck_enabled }}
+      healthcheck:
+        test: ["CMD-SHELL", "curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1"]
+        interval: 1m
+        timeout: 10s
+        retries: 3
+      {{- end }}
+form:
+  - select:
+      keyname: image
+      label: Image
+      description: Container image to use.
+      default_value: syncthing/syncthing:latest
+      options:
+        - title: syncthing/syncthing:latest
+          value: syncthing/syncthing:latest
+  - string:
+      keyname: data_path
+      label: Data Path
+      description: |-
+        Host directory for Syncthing's configuration, keys, index database, and
+        (by default) synced files, mounted at `/var/syncthing`.
+      default_value: ./data
+  - oneof:
+      keyname: network_mode
+      tabs:
+        - title: Host Networking (Recommended)
+          value: host
+          form:
+            - info:
+                content: |-
+                  Shares the host's network stack directly, which is
+                  [strongly recommended by Syncthing](https://github.com/syncthing/syncthing/blob/main/README-Docker.md#discovery)
+                  for reliable local device discovery and LAN transfer speeds. The
+                  GUI listens on `127.0.0.1:8384` on the host by default.
+        - title: Bridged (Custom Ports)
+          value: bridged
+          form:
+            - warning:
+                content: |-
+                  Docker's default bridge network hides devices' real LAN addresses,
+                  which can break local discovery and slow down transfers between
+                  devices on the same network. The GUI is bound to all interfaces
+                  (`0.0.0.0:8384`) so the mapped port below works — make sure you set
+                  a GUI username/password and enable TLS in Syncthing's settings
+                  before exposing this port beyond your local machine.
+            - port:
+                keyname: gui_port
+                label: GUI Port
+                description: Host port for the Syncthing web GUI.
+                default_value: 8384
+            - port:
+                keyname: sync_port
+                label: Sync Protocol Port (TCP + UDP)
+                description: Host port used for device-to-device synchronization.
+                default_value: 22000
+            - port:
+                keyname: discovery_port
+                label: Local Discovery Port (UDP)
+                description: Host port used for local device discovery broadcasts.
+                default_value: 21027
+  - string:
+      keyname: hostname
+      label: Hostname
+      description: |-
+        Name advertised to other devices and set as the container's hostname.
+        Leave blank to use Docker's generated container ID.
+      placeholder: my-syncthing
+
+  - toggle:
+      keyname: healthcheck_enabled
+      label: Enable Healthcheck
+      description: Adds a Docker healthcheck that polls Syncthing's health REST endpoint.
+      default_value: true
+  - collapsible:
+      title: Security
+      form:
+        - number:
+            keyname: puid
+            label: User ID (PUID)
+            description: User ID Syncthing runs as inside the container.
+            default_value: 1000
+            minimum: 0
+            maximum: 65535
+            step: 1
+        - number:
+            keyname: pgid
+            label: Group ID (PGID)
+            description: Group ID Syncthing runs as inside the container.
+            default_value: 1000
+            minimum: 0
+            maximum: 65535
+            step: 1
+        - string:
+            keyname: pcap
+            label: Extra Capabilities
+            description: |-
+              Grants additional Linux capabilities to Syncthing without running as
+              root, using the same syntax as `setcap(8)`.
+            placeholder: cap_chown,cap_fowner+ep
+        - string:
+            keyname: umask
+            label: Umask
+            description: Overrides the default umask used when creating new files.
+            placeholder: "002"

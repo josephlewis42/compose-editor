@@ -1,7 +1,7 @@
 import { CheckCircle2Icon, InfoIcon, TriangleAlertIcon, XCircleIcon } from 'lucide-react'
 import { Markdown } from '@/components/Markdown'
 import type { FormElement } from '@/lib/catalog'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type {
   DateInput,
   NumberInput,
@@ -408,27 +408,25 @@ function FieldOneOf({ field, onUpdate }: { field: OneOf; onUpdate: FormUpdate })
   const [selected, setSelected] = useFieldValue(field.keyname, field.tabs[0]?.value ?? '', onUpdate)
   const activeTab = field.tabs.find((tab) => tab.value === selected) ?? field.tabs[0]
 
-  return (
-    <div>
-      <div role="tablist" className="tabs tabs-lift">
-        {field.tabs.map((tab) => (
+  return (<>
+    <div role="tablist" className="tabs tabs-lift">
+        {field.tabs.map((tab) => (<>
           <a
-            key={tab.value}
+            key={`${tab.value}_tab`}
             role="tab"
             className={`tab ${tab.value === selected ? 'tab-active' : ''}`}
             onClick={() => setSelected(tab.value)}
           >
             {tab.title}
           </a>
+          <div key={`${tab.value}_box`} className="tab-content bg-base-100 border-base-300 p-6">
+            {/* Keyed on the tab so switching tabs remounts its fields and re-emits their defaults. */}
+            <FormRenderer key={activeTab.value} elements={activeTab.form} onUpdate={onUpdate} />
+          </div>
+          </>
         ))}
-      </div>
-      {activeTab && (
-        <div className="pt-3">
-          {/* Keyed on the tab so switching tabs remounts its fields and re-emits their defaults. */}
-          <FormRenderer key={activeTab.value} elements={activeTab.form} onUpdate={onUpdate} />
-        </div>
-      )}
     </div>
+    </>
   )
 }
 

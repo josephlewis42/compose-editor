@@ -8,6 +8,7 @@ This page outlines how to write compose editor specs.
   * Use a warning block if a value is insecure.
 * Hide advanced features (like debugging) in collapsible sections.
   * Use more than one collapsible section if needed e.g. for developer options versus security.
+  * Don't use generic names like "Advanced"
 * Link to authoritative sources in form elements.
 * Use the most specific field type possible.
 * Run `make test` to validate specs.
@@ -63,6 +64,25 @@ values as a sanity check and fails the build if any template fails to parse
 or execute, so a spec with a broken template can't reach the published
 catalog.
 
+## Debugging a spec
+
+`composeeditor render specs/ SLUG` renders a single spec's template to
+stdout using its form defaults, e.g.:
+
+```sh
+go run . render specs jellyfin
+```
+
+Pass a JSON object as a third argument to override specific fields, useful
+for exercising non-default paths (e.g. a `oneof` tab, a `toggle_section`,
+or a multi-line `text` field) without clicking through the UI:
+
+```sh
+go run . render specs jellyfin '{"http_port": 9999, "media_paths": "/movies\n/tv"}'
+```
+
+Values not present in the JSON object keep the field's `default_value`.
+Pass `-` instead of a JSON object to read it from stdin.
 
 ## Template language
 

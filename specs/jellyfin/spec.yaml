@@ -24,9 +24,9 @@ template: |-
         - {{.Values.cache_path}}:/cache
         - type: tmpfs
           target: /media
-        {{- $media := trim (default "" .media_paths) }}
+        {{- $media := trim (default "" .Values.media_paths) }}
         {{- if $media }}
-        {{- range $i, $path := split $media "\n" }}
+        {{- range $i, $path := splitList "\n" $media }}
         - type: bind
           source: {{trim $path}}
           target: /media/{{$i}}

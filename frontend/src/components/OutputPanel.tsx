@@ -50,6 +50,18 @@ export function OutputPanel({ composeOutput, errors, warnings, values, downloadN
           >
             <CodeIcon className="size-4" /> Compose Output
           </a>
+
+          <div className="tab-content bg-base-100 border-base-300 p-6">
+            <button type="button" className="btn btn-outline btn-sm" onClick={copy} disabled={!composeOutput}>
+              {copied ? <CheckIcon /> : <CopyIcon />} {copied ? 'Copied!' : 'Copy'}
+            </button>
+            <button type="button" className="btn btn-outline btn-sm" onClick={download} disabled={!composeOutput}>
+              <DownloadIcon /> Download
+            </button>
+
+            <YamlViewer value={composeOutput} errors={schemaErrors} className="h-full w-full overflow-hidden rounded-lg border border-base-300" />
+          </div>
+
           <a
             role="tab"
             className={`tab gap-1.5 ${tab === 'details' ? 'tab-active' : ''}`}
@@ -58,26 +70,8 @@ export function OutputPanel({ composeOutput, errors, warnings, values, downloadN
             Details
             {issueCount > 0 && <span className="badge badge-error badge-sm ml-1">{issueCount}</span>}
           </a>
-        </div>
-        <div className="flex gap-2">
-          <button type="button" className="btn btn-outline btn-sm" onClick={copy} disabled={!composeOutput}>
-            {copied ? <CheckIcon /> : <CopyIcon />} {copied ? 'Copied!' : 'Copy'}
-          </button>
-          <button type="button" className="btn btn-outline btn-sm" onClick={download} disabled={!composeOutput}>
-            <DownloadIcon /> Download
-          </button>
-        </div>
-      </div>
 
-      {tab === 'output' && (
-        <div className="min-h-0 flex-1 px-4 pb-4">
-          <YamlViewer value={composeOutput} errors={schemaErrors} className="h-full w-full overflow-hidden rounded-lg border border-base-300" />
-        </div>
-      )}
-
-      {tab === 'details' && (
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-          <div className="flex flex-col gap-4 pr-4">
+          <div className="tab-content bg-base-100 border-base-300 p-6">
             {errors.length > 0 && <MessageList title="Errors" messages={errors} tone="error" />}
             {warnings.length > 0 && <MessageList title="Warnings" messages={warnings} tone="warning" />}
             {schemaErrors.length > 0 && <ValidationErrorList title="Compose output issues" errors={schemaErrors} />}
@@ -89,7 +83,7 @@ export function OutputPanel({ composeOutput, errors, warnings, values, downloadN
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }
