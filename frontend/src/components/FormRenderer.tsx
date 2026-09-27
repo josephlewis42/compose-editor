@@ -1,7 +1,7 @@
 import { CheckCircle2Icon, InfoIcon, TriangleAlertIcon, XCircleIcon } from 'lucide-react'
 import { Markdown } from '@/components/Markdown'
 import type { FormElement } from '@/lib/catalog'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type {
   DateInput,
   NumberInput,
