@@ -1,0 +1,319 @@
+name: Karakeep
+tagline: A self-hostable bookmark-everything app for links, notes, and images.
+url: https://karakeep.app/
+spdx_license: AGPL-3.0
+license_url: https://github.com/karakeep-app/karakeep/blob/main/LICENSE
+tags:
+  - bookmarks
+  - self-hosted
+  - productivity
+template: |-
+  services:
+    karakeep:
+      image: {{ .Values.image | quote }}
+      container_name: karakeep
+      restart: unless-stopped
+      ports:
+        - "{{ .Values.http_port }}:3000"
+      volumes:
+        # DON'T CHANGE the /data target below; to move where data lives on the
+        # host, change the source (left-hand) side of this line instead.
+        - {{ .Values.data_path }}:/data
+      environment:
+        DATA_DIR: /data
+        MEILI_ADDR: http://karakeep_meilisearch:7700
+        BROWSER_WEB_URL: http://karakeep_chrome:9222
+        NEXTAUTH_URL: {{ .Values.base_url | quote }}
+        NEXTAUTH_SECRET: {{ .Values.nextauth_secret | quote }}
+        MEILI_MASTER_KEY: {{ .Values.meili_master_key | quote }}
+        DISABLE_SIGNUPS: {{ .Values.disable_signups | ternary "true" "false" | quote }}
+        MAX_ASSET_SIZE_MB: {{ .Values.max_asset_size_mb | quote }}
+        OCR_LANGS: {{ .Values.ocr_langs | quote }}
+        CRAWLER_NUM_WORKERS: {{ .Values.crawler_num_workers | quote }}
+        CRAWLER_ENABLE_ADBLOCKER: {{ .Values.crawler_enable_adblocker | ternary "true" "false" | quote }}
+        CRAWLER_ENABLE_AUTOCONSENT: {{ .Values.crawler_enable_autoconsent | ternary "true" "false" | quote }}
+        CRAWLER_STORE_SCREENSHOT: {{ .Values.crawler_store_screenshot | ternary "true" "false" | quote }}
+        CRAWLER_STORE_PDF: {{ .Values.crawler_store_pdf | ternary "true" "false" | quote }}
+        CRAWLER_FULL_PAGE_ARCHIVE: {{ .Values.crawler_full_page_archive | ternary "true" "false" | quote }}
+        CRAWLER_VIDEO_DOWNLOAD: {{ .Values.crawler_video_download | ternary "true" "false" | quote }}
+        {{- if .Values.allowed_internal_hostnames }}
+        CRAWLER_ALLOWED_INTERNAL_HOSTNAMES: {{ .Values.allowed_internal_hostnames | quote }}
+        {{- end }}
+        CRAWLER_FULL_PAGE_SCREENSHOT: {{ .Values.crawler_full_page_screenshot | ternary "true" "false" | quote }}
+        CRAWLER_DOWNLOAD_BANNER_IMAGE: {{ .Values.crawler_download_banner_image | ternary "true" "false" | quote }}
+        CRAWLER_JOB_TIMEOUT_SEC: {{ .Values.crawler_job_timeout_sec | quote }}
+        CRAWLER_NAVIGATE_TIMEOUT_SEC: {{ .Values.crawler_navigate_timeout_sec | quote }}
+        SEARCH_NUM_WORKERS: {{ .Values.search_num_workers | quote }}
+        MAX_RSS_FEEDS_PER_USER: {{ .Values.max_rss_feeds_per_user | quote }}
+        MAX_WEBHOOKS_PER_USER: {{ .Values.max_webhooks_per_user | quote }}
+        DB_WAL_MODE: {{ .Values.db_wal_mode | ternary "true" "false" | quote }}
+        RATE_LIMITING_ENABLED: {{ .Values.rate_limiting_enabled | ternary "true" "false" | quote }}
+        LOG_LEVEL: {{ .Values.log_level | quote }}
+        DISABLE_NEW_RELEASE_CHECK: {{ .Values.disable_new_release_check | ternary "true" "false" | quote }}
+      depends_on:
+        - karakeep_chrome
+        - karakeep_meilisearch
+    karakeep_chrome:
+      image: ghcr.io/karakeep-app/karakeep-chrome:release
+      container_name: karakeep_chrome
+      restart: unless-stopped
+      init: true
+      command:
+        - --disable-gpu
+        - --disable-dev-shm-usage
+        - --hide-scrollbars
+        - --disable-blink-features=AutomationControlled
+        - --window-size=1440,900
+    karakeep_meilisearch:
+      image: {{ printf "docker.io/getmeili/meilisearch:%v" .Values.meilisearch_image_tag | quote }}
+      container_name: karakeep_meilisearch
+      restart: unless-stopped
+      environment:
+        MEILI_NO_ANALYTICS: "true"
+        MEILI_MASTER_KEY: {{ .Values.meili_master_key | quote }}
+      volumes:
+        - {{ .Values.meilisearch_data_path }}:/meili_data
+form:
+  - select:
+      keyname: image
+      label: Image
+      description: |-
+        Container image to use. `release` always points at the latest stable
+        version. Browse [available tags](https://github.com/karakeep-app/karakeep/pkgs/container/karakeep)
+        to pin a specific version instead.
+      default_value: ghcr.io/karakeep-app/karakeep:release
+      options:
+        - title: ghcr.io/karakeep-app/karakeep:release
+        - title: ghcr.io/karakeep-app/karakeep:nightly
+  - port:
+      keyname: http_port
+      label: HTTP Port
+      description: Host port for the web interface.
+      default_value: 3000
+  - string:
+      keyname: data_path
+      label: Data Storage Path
+      description: |-
+        Host directory for Karakeep's persistent data: the database and any
+        assets not stored in object storage.
+      default_value: ./karakeep-data
+  - warning:
+      content: |-
+        **Warning**: Karakeep should be placed behind a reverse proxy with
+        HTTPS in production, and the Base URL below must match the address
+        clients actually use to reach it — mismatches break sign-in.
+
+  - heading:
+      title: Authentication
+      content: |-
+        This spec configures username/password sign-in. See
+        [OAuth/OIDC configuration](https://docs.karakeep.app/configuration/environment-variables/#authentication)
+        if you'd like to add single sign-on instead.
+  - url:
+      keyname: base_url
+      label: Base URL
+      description: |-
+        The public address Karakeep is reached at, including scheme, e.g.
+        `https://bookmarks.example.com`. Must match exactly, including the
+        absence/presence of a trailing port.
+      placeholder: https://bookmarks.example.com
+  - password:
+      keyname: nextauth_secret
+      label: Auth Secret
+      description: |-
+        Random string used to sign session tokens. Generate one with
+        `openssl rand -base64 36` and keep it stable — changing it invalidates
+        all existing sessions.
+  - toggle:
+      keyname: disable_signups
+      label: Disable Public Signups
+      description: |-
+        Prevents new accounts from being created. Leave this off until you've
+        created your own account, then turn it on to stop anyone else who can
+        reach the server from registering.
+      default_value: false
+
+  - heading:
+      title: Search
+      content: Karakeep uses [Meilisearch](https://www.meilisearch.com/) for full-text search over your bookmarks.
+  - password:
+      keyname: meili_master_key
+      label: Meilisearch Master Key
+      description: |-
+        Random string shared between Karakeep and its Meilisearch instance.
+        Generate one with `openssl rand -base64 36`. Meilisearch isn't exposed
+        outside this compose project, but setting a key still keeps other
+        containers on the same Docker network from reading your search index.
+  - string:
+      keyname: meilisearch_data_path
+      label: Meilisearch Data Path
+      description: Host directory for Meilisearch's search index.
+      default_value: ./karakeep-meilisearch
+
+  - heading:
+      title: Crawler & Browser
+      content: |-
+        A headless Chrome instance is included automatically for rendering
+        JavaScript-heavy pages and taking screenshots.
+  - number:
+      keyname: crawler_num_workers
+      label: Crawler Workers
+      description: Number of bookmarks Karakeep will crawl concurrently.
+      default_value: 1
+      minimum: 1
+      maximum: 20
+      step: 1
+  - toggle:
+      keyname: crawler_enable_adblocker
+      label: Enable Adblocker
+      description: Blocks ads while crawling pages, generally improving screenshot quality and load time.
+      default_value: true
+  - toggle:
+      keyname: crawler_enable_autoconsent
+      label: Auto-dismiss Cookie Banners
+      description: Automatically opts out of cookie/consent dialogs encountered while crawling.
+      default_value: true
+  - toggle:
+      keyname: crawler_store_screenshot
+      label: Store Screenshots
+      description: Saves a screenshot of each bookmarked page.
+      default_value: true
+  - toggle:
+      keyname: crawler_store_pdf
+      label: Store PDF Snapshots
+      description: Saves a PDF snapshot of each bookmarked page. Increases storage use.
+      default_value: false
+  - toggle:
+      keyname: crawler_full_page_archive
+      label: Store Full Page Archive
+      description: |-
+        Saves a full, self-contained local copy of each page (via Monolith).
+        Most thorough archival option, but uses the most storage.
+      default_value: false
+  - toggle:
+      keyname: crawler_video_download
+      label: Download Linked Videos
+      description: |-
+        Downloads videos from bookmarked links using yt-dlp. Can use
+        significant storage and bandwidth.
+      default_value: false
+
+  - heading:
+      title: OCR
+  - string:
+      keyname: ocr_langs
+      label: OCR Languages
+      description: |-
+        Comma-separated [Tesseract language codes](https://github.com/tesseract-ocr/tessdata)
+        used to extract text from images.
+      default_value: eng
+
+  - collapsible:
+      title: Advanced Crawler Settings
+      form:
+        - toggle:
+            keyname: crawler_full_page_screenshot
+            label: Full-page Screenshots
+            description: Captures the entire page instead of just the visible viewport.
+            default_value: false
+        - toggle:
+            keyname: crawler_download_banner_image
+            label: Cache Banner Images
+            description: Downloads and caches each bookmark's preview/banner image locally.
+            default_value: true
+        - number:
+            keyname: crawler_job_timeout_sec
+            label: Crawl Job Timeout (seconds)
+            description: Maximum time allowed for a single bookmark's full crawl to complete.
+            default_value: 60
+            minimum: 1
+            maximum: 3600
+            step: 1
+        - number:
+            keyname: crawler_navigate_timeout_sec
+            label: Page Navigation Timeout (seconds)
+            description: Maximum time to wait for a page to load before giving up.
+            default_value: 30
+            minimum: 1
+            maximum: 600
+            step: 1
+        - string:
+            keyname: allowed_internal_hostnames
+            label: Allowed Internal Hostnames
+            description: |-
+              Comma-separated hostnames/IPs the crawler may fetch from despite
+              being internal/private addresses. Leave blank unless you
+              specifically need to bookmark pages on your private network.
+            placeholder: internal.example.lan
+
+  - collapsible:
+      title: Limits, Performance & Logging
+      form:
+        - number:
+            keyname: max_asset_size_mb
+            label: Max Upload Size (MB)
+            description: Largest asset (image, PDF, etc.) users may upload.
+            default_value: 50
+            minimum: 1
+            maximum: 1000
+            step: 1
+        - number:
+            keyname: max_rss_feeds_per_user
+            label: Max RSS Feeds Per User
+            default_value: 1000
+            minimum: 1
+            maximum: 100000
+            step: 1
+        - number:
+            keyname: max_webhooks_per_user
+            label: Max Webhooks Per User
+            default_value: 100
+            minimum: 1
+            maximum: 10000
+            step: 1
+        - number:
+            keyname: search_num_workers
+            label: Search Indexing Workers
+            description: Number of bookmarks indexed into Meilisearch concurrently.
+            default_value: 1
+            minimum: 1
+            maximum: 20
+            step: 1
+        - toggle:
+            keyname: db_wal_mode
+            label: Enable Database WAL Mode
+            description: |-
+              Enables SQLite Write-Ahead Logging, which can improve
+              performance under concurrent access.
+            default_value: false
+        - toggle:
+            keyname: rate_limiting_enabled
+            label: Enable API Rate Limiting
+            description: Recommended if this instance is reachable from the public Internet.
+            default_value: false
+        - select:
+            keyname: log_level
+            label: Log Level
+            default_value: debug
+            options:
+              - title: debug
+              - title: info
+              - title: warn
+              - title: error
+        - toggle:
+            keyname: disable_new_release_check
+            label: Disable New Release Check
+            description: Stops Karakeep from checking for and notifying about new releases.
+            default_value: false
+
+  - collapsible:
+      title: Search Engine Version (Not typical)
+      form:
+        - string:
+            keyname: meilisearch_image_tag
+            label: Meilisearch Image Tag
+            description: |-
+              Pins the Meilisearch version. See
+              [Meilisearch releases](https://github.com/meilisearch/meilisearch/releases)
+              before upgrading across major versions.
+            default_value: v1.41.0
