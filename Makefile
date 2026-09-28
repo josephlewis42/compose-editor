@@ -13,7 +13,7 @@ composeeditor: $(OUTPUT_DIRS) proto
 	go build -ldflags "-X main.version=$(VERSION)" -o out/composeeditor main.go
 
 .PHONY: test
-test: proto templates
+test: proto templates wasm
 	go test -cover ./...
 	cd frontend; pnpm test
 

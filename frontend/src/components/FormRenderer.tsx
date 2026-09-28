@@ -52,8 +52,9 @@ function FormElementView({
 
     case 'heading':
       return (
-        <div>
-          <h3 className="text-base font-semibold">{el.value.title}</h3>
+        <div className="mt-3 mb-3">
+          <div className="divider"></div>
+          <h3 className="text-base font-semibold ">{el.value.title}</h3>
           {el.value.content && <Markdown className="text-base-content/60">{el.value.content}</Markdown>}
         </div>
       )

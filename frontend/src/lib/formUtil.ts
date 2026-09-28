@@ -251,13 +251,6 @@ export class FormElementWrapper {
                     })
                 }
 
-                if (element.value.content.length == 0) {
-                    errors.push({
-                        path: childPath(this._jsonPath, 'content'),
-                        type: 'required',
-                        message: 'content must not be empty'
-                    })
-                }
                 return errors
             }
             case "markdown": {

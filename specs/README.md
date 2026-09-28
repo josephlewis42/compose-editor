@@ -13,6 +13,11 @@ This page outlines how to write compose editor specs.
 * Use the most specific field type possible.
 * Run `make test` to validate specs.
 * For images, use the full `docker.io` path rater than a shortened one so they work with Podman.
+* Mark atypical settings with (Not typical), (Legacy), etc.
+* Use headers to separate features.
+* Documentation
+  * If info is needed at runtime, add it as comments to the compose spec.
+  * If there are multiple volumes or ports, leave a short note about what each does in the spec.
 
 ## File format
 

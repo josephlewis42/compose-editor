@@ -1,0 +1,187 @@
+name: Pi-hole
+tagline: Network-wide ad blocking via your own Linux hardware.
+url: https://pi-hole.net/
+spdx_license: EUPL-1.2
+license_url: https://github.com/pi-hole/pi-hole/blob/master/LICENSE
+tags:
+  - dns
+  - adblock
+  - networking
+template: |-
+  services:
+    pihole:
+      image: {{ .Values.image | quote }}
+      container_name: pihole
+      restart: unless-stopped
+      ports:
+        - "{{ .Values.dns_port }}:53/tcp"
+        - "{{ .Values.dns_port }}:53/udp"
+        - "{{ .Values.http_port }}:80/tcp"
+        - "{{ .Values.https_port }}:443/tcp"
+        {{- if .Values.enable_dhcp }}
+        - "67:67/udp"
+        {{- end }}
+        {{- if .Values.enable_ntp }}
+        - "123:123/udp"
+        {{- end }}
+      environment:
+        TZ: {{ .Values.tz | quote }}
+        {{- if (eq .Values.password_kind "custom") }}
+        FTLCONF_webserver_api_password: {{ .Values.web_password | quote }}
+        {{- else }}
+        # NOTE: The password is printed in the logs on startup.
+        # Uncomment the following line to set one:
+        # FTLCONF_webserver_api_password: <password>
+        {{- end }}
+        FTLCONF_dns_listeningMode: {{ .Values.dns_listening_mode | quote }}
+        {{- if .Values.enable_legacy_dnsmasq }}
+        FTLCONF_misc_etc_dnsmasq_d: "true"
+        {{- end }}
+      volumes:
+        - {{ .Values.storage_path }}:/etc/pihole
+        {{- if .Values.enable_legacy_dnsmasq }}
+        - {{ .Values.dnsmasq_path }}:/etc/dnsmasq.d
+        {{- end }}
+      {{- if or .Values.enable_dhcp .Values.enable_ntp .Values.enable_nice }}
+      cap_add:
+        {{- if .Values.enable_dhcp }}
+        - NET_ADMIN
+        {{- end }}
+        {{- if .Values.enable_ntp }}
+        - SYS_TIME
+        {{- end }}
+        {{- if .Values.enable_nice }}
+        - SYS_NICE
+        {{- end }}
+      {{- end }}
+form:
+  - select:
+      keyname: image
+      label: Image
+      description: Container image to use.
+      default_value: docker.io/pihole/pihole:latest
+      options:
+        - title: docker.io/pihole/pihole:latest
+  - string:
+      keyname: tz
+      label: Time Zone
+      description: |-
+        The timezone Pi-hole should use, e.g. `Europe/London`.
+        [List of supported time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+      default_value: UTC
+  - string:
+      keyname: storage_path
+      label: Storage Path
+      description: |-
+        Host directory that persists your block lists, query history, and
+        settings between container upgrades.
+      default_value: ./etc-pihole
+  - heading:
+      title: Web UI
+      content: Configuration related to the Pi-Hole web administration UI.
+  - oneof:
+      keyname: password_kind
+      tabs:
+        - title: Random Password
+          value: automatic
+          form:
+            - info:
+                content: |-
+                  A random password will be printed to the container logs each time the container starts.
+
+                  Pick "Custom Password" if you want to set one yourself.
+        - title: Custom Password
+          value: custom
+          form:
+            - string:
+                keyname: web_password
+                label: Web Interface Password
+                description: |-
+                  Password for the Pi-hole web interface admin account. If blank, a random password
+                  will be printed to the logs.
+  - port:
+      keyname: http_port
+      label: HTTP Port
+      description: Host port for the web interface.
+      default_value: 80
+  - port:
+      keyname: https_port
+      label: HTTPS Port
+      description: |-
+        Host port for the web interface over HTTPS. FTL generates a
+        self-signed certificate for this automatically.
+      default_value: 443
+
+  - heading:
+      title: DNS
+
+  - port:
+      keyname: dns_port
+      label: DNS Port
+      description: Host port for the DNS service (TCP and UDP).
+      default_value: 53
+
+  - select:
+      keyname: dns_listening_mode
+      label: DNS Listening Mode
+      description: |-
+        Which network interfaces Pi-hole's DNS resolver should listen on. Use
+        `ALL` if you're using Docker's default bridge network, since incoming
+        requests won't otherwise appear to come from the LAN.
+        [More information](https://docs.pi-hole.net/ftldns/configfile/#dns_listeningmode).
+      default_value: ALL
+      options:
+        - title: ALL - respond on all interfaces
+          value: ALL
+        - title: LOCAL - respond only to requests from local subnets
+          value: LOCAL
+        - title: SINGLE - respond only on the interface used for the default route
+          value: SINGLE
+        - title: BIND - bind to only one interface
+          value: BIND
+  - toggle_section:
+      keyname: enable_legacy_dnsmasq
+      label: (Legacy) Mount Custom dnsmasq Configuration
+      description: |-
+        Sets up custom `dnsmasq` config files. Not needed for most users
+        starting fresh with Pi-hole v6.
+      form:
+        - string:
+            keyname: dnsmasq_path
+            label: dnsmasq Config Path
+            description: Host directory mounted at `/etc/dnsmasq.d`.
+            default_value: ./etc-dnsmasq.d
+
+
+  - heading:
+      title: Additional Services
+
+  - toggle_section:
+      keyname: enable_dhcp
+      label: Use Pi-hole as DHCP Server
+      description: |-
+        Opens port 67/udp and grants the `NET_ADMIN` capability required for
+        Pi-hole to serve DHCP leases.
+      form:
+        - info:
+            content: |-
+              You'll still need to enable and configure the DHCP server in
+              Pi-hole's web interface.
+  - toggle_section:
+      keyname: enable_ntp
+      label: Use Pi-hole as NTP Server
+      description: |-
+        Opens port 123/udp and grants the `SYS_TIME` capability so Pi-hole can
+        act as an NTP server/client and set the host's system time.
+      form:
+        - info:
+            content: |-
+              Enable and configure the NTP server/client in Pi-hole's web interface
+              once the container is running.
+
+  - toggle:
+      keyname: enable_nice
+      label: Grant Extra Scheduling Priority
+      description: |-
+        Adds the `SYS_NICE` capability, giving Pi-hole's FTL process more
+        favorable CPU scheduling. Optional; not required for normal operation.
