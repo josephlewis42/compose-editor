@@ -2,7 +2,7 @@ name: RSS-Bridge
 tagline: Generates RSS and Atom feeds for websites that don't have one.
 url: https://github.com/RSS-Bridge/rss-bridge
 spdx_license: Unlicense
-license_url: https://github.com/RSS-Bridge/rss-bridge/blob/master/LICENSE
+license_url: https://github.com/RSS-Bridge/rss-bridge/blob/master/UNLICENSE
 tags:
   - rss
   - news
