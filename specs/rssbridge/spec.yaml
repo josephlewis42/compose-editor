@@ -1,0 +1,73 @@
+name: RSS-Bridge
+tagline: Generates RSS and Atom feeds for websites that don't have one.
+url: https://github.com/RSS-Bridge/rss-bridge
+spdx_license: Unlicense
+license_url: https://github.com/RSS-Bridge/rss-bridge/blob/master/LICENSE
+tags:
+  - rss
+  - news
+  - scraping
+template: |-
+  services:
+    rss-bridge:
+      image: {{ .Values.image | quote }}
+      container_name: rss-bridge
+      restart: unless-stopped
+      ports:
+        - "{{ .Values.http_port }}:80"
+      volumes:
+        # Drop a custom config.ini.php, whitelist.txt, or *Bridge.php/*Format.php
+        # file here to override the defaults. Restart the container to apply changes.
+        - {{ .Values.config_path }}:/config
+      {{- if .Values.enable_internal_port }}
+      environment:
+        # Changes the port nginx listens on inside the container. Only useful
+        # with network_mode: service, where two containers can't both bind
+        # to port 80.
+        HTTP_PORT: {{ .Values.internal_port | quote }}
+      {{- end }}
+form:
+  - select:
+      keyname: image
+      label: Image
+      description: Container image to use.
+      default_value: docker.io/rssbridge/rss-bridge:latest
+      options:
+        - title: docker.io/rssbridge/rss-bridge:latest
+  - string:
+      keyname: config_path
+      label: Config Storage Path
+      description: |-
+        Host directory mounted at `/config`. Place a custom `config.ini.php`,
+        `whitelist.txt`, or bridge/format PHP file here to override RSS-Bridge's
+        defaults — matching files are copied in each time the container starts.
+        [Custom Configuration docs](https://github.com/RSS-Bridge/rss-bridge/blob/master/docs/03_For_Hosts/08_Custom_Configuration.md).
+      default_value: ./config
+  - port:
+      keyname: http_port
+      label: HTTP Port
+      description: Host port for the web interface.
+      default_value: 3000
+  - warning:
+      content: |-
+        **Warning**: RSS-Bridge has no authentication enabled by default —
+        anyone who can reach it can use it to fetch content on your behalf.
+        Enable [HTTP basic auth or a token](https://github.com/RSS-Bridge/rss-bridge/blob/master/docs/03_For_Hosts/06_Authentication.md)
+        via a custom `config.ini.php` in the config volume, or place this
+        service behind a reverse proxy with its own authentication, before
+        exposing it outside your LAN.
+  - collapsible:
+      title: Networking (Not typical)
+      form:
+        - toggle_section:
+            keyname: enable_internal_port
+            label: Override Internal Port
+            description: |-
+              Changes the port nginx listens on inside the container instead
+              of 80. Only needed when running with `network_mode: service`
+              alongside another container that also wants port 80.
+            form:
+              - port:
+                  keyname: internal_port
+                  label: Internal Port
+                  default_value: 8080
