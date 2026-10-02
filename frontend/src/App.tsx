@@ -4,6 +4,7 @@ import { NavBar } from '@/components/NavBar'
 import { EditorPage } from '@/pages/EditorPage'
 import { CatalogPage } from '@/pages/CatalogPage'
 import { BuilderPage } from '@/pages/BuilderPage'
+import { SpecLinterPage } from '@/pages/SpecLinterPage'
 import { loadCatalog } from '@/lib/catalog'
 import { type Catalog } from '@/gen/composeeditor/v1/spec_pb'
 
@@ -31,6 +32,7 @@ export default function App() {
             <Route path="/edit/:slug" element={<EditorRoute catalog={catalog} />} />
             <Route path="/build" element={<BuilderPage catalog={catalog} />} />
             <Route path="/build/:data" element={<BuilderRoute catalog={catalog} />} />
+            <Route path="/compose-spec-linter" element={<SpecLinterPage />} />
           </Routes>
         )}
       </div>

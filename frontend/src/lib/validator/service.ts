@@ -114,7 +114,7 @@ function validateUniqueStringArray(value: unknown, path: string): ValidationErro
   const seen = new Set<string>()
   items.forEach((item, i) => {
     if (typeof item !== 'string') return
-    if (seen.has(item)) errors.push({ path: indexPath(path, i), type: 'unique_items', message: `duplicate value ${JSON.stringify(item)}` })
+    if (seen.has(item)) errors.push({ path: indexPath(path, i), type: 'parse', message: `duplicate value ${JSON.stringify(item)}` })
     seen.add(item)
   })
   return errors

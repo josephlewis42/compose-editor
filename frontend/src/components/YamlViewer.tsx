@@ -1,9 +1,8 @@
-// A read-only, line-numbered, syntax-highlighted YAML viewer with inline
-// error markers, built on CodeMirror 6 rather than Monaco: we only need a
-// read-only viewer (no autocomplete/IntelliSense), so the handful of
-// `@codemirror/*` packages this pulls in (view + state + lang-yaml + lint)
-// keep the bundle a fraction of Monaco's size. Colors are drawn from the
-// app's daisyUI CSS variables (src/index.css) rather than a canned CM theme,
+// A line-numbered, syntax-highlighted YAML viewer with inline error
+// markers, built on CodeMirror.
+// 
+// Colors are drawn from the app's daisyUI CSS variables
+// (src/index.css) rather than a canned CM theme,
 // so this stays in sync with the rest of the UI automatically.
 
 import { useEffect, useRef } from 'react'
@@ -11,7 +10,7 @@ import { EditorState } from '@codemirror/state'
 import { EditorView, lineNumbers, highlightActiveLine, highlightActiveLineGutter } from '@codemirror/view'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { yaml } from '@codemirror/lang-yaml'
-import { lintGutter, linter, forceLinting, type Diagnostic } from '@codemirror/lint'
+import { lintGutter, setDiagnostics, type Diagnostic } from '@codemirror/lint'
 import { tags } from '@lezer/highlight'
 import type { ValidationError } from '@/lib/validator'
 
@@ -58,6 +57,8 @@ interface YamlViewerProps {
   value: string
   errors?: ValidationError[]
   className?: string
+  /** Makes the viewer editable; called with the full document on every edit. */
+  onChange?: (value: string) => void
 }
 
 /** Converts our (line, col) validation errors into CodeMirror Diagnostics, positioned against the current doc. */
@@ -73,10 +74,14 @@ function toDiagnostics(state: EditorState, errors: ValidationError[]): Diagnosti
   return diagnostics
 }
 
-export function YamlViewer({ value, errors = [], className }: YamlViewerProps) {
+export function YamlViewer({ value, errors = [], className, onChange }: YamlViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
-  const errorsRef = useRef(errors)
+  const onChangeRef = useRef(onChange)
+
+  useEffect(() => {
+    onChangeRef.current = onChange
+  }, [onChange])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -88,13 +93,15 @@ export function YamlViewer({ value, errors = [], className }: YamlViewerProps) {
         lineNumbers(),
         highlightActiveLine(),
         highlightActiveLineGutter(),
-        EditorState.readOnly.of(true),
+        EditorState.readOnly.of(!onChange),
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged) onChangeRef.current?.(update.state.doc.toString())
+        }),
         EditorView.lineWrapping,
         yaml(),
         syntaxHighlighting(yamlHighlightStyle),
         theme,
         lintGutter(),
-        linter((v) => toDiagnostics(v.state, errorsRef.current), { delay: 0 }),
       ],
     })
     viewRef.current = view
@@ -105,16 +112,15 @@ export function YamlViewer({ value, errors = [], className }: YamlViewerProps) {
   }, [])
 
   useEffect(() => {
-    errorsRef.current = errors
     const view = viewRef.current
     if (!view) return
     if (view.state.doc.toString() !== value) {
-      // A doc change re-runs the linter extension on its own.
       view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: value } })
-    } else {
-      // Doc unchanged but errors did (e.g. validator re-ran) — force a relint.
-      forceLinting(view)
     }
+    // Errors are computed outside the editor (and, when editable, arrive
+    // after the edit that caused them), so push them in directly rather
+    // than through a `linter()` source that would lint stale errors.
+    view.dispatch(setDiagnostics(view.state, toDiagnostics(view.state, errors)))
   }, [value, errors])
 
   return <div ref={containerRef} className={className} />
