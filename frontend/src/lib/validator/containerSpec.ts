@@ -408,7 +408,7 @@ function validateNetworks(value: unknown, path: string): ValidationError[] {
   const errors: ValidationError[] = []
   for (const key of Object.keys(obj)) {
     if (!NAME_PATTERN.test(key)) {
-      errors.push({ path: childPath(path, key), type: 'pattern', message: `key must match pattern ${NAME_PATTERN}` })
+      errors.push({ path: childPath(path, key), type: 'parse', message: `key must match pattern ${NAME_PATTERN}` })
       continue
     }
     errors.push(...validateNetworkRefDetail(obj[key], childPath(path, key)))
@@ -525,7 +525,7 @@ function validateContainerVolumes(value: unknown, path: string): ValidationError
   const seen = new Set<string>()
   items.forEach((item, i) => {
     const key = JSON.stringify(item)
-    if (seen.has(key)) {errors.push({ path: indexPath(path, i), type: 'unique_items', message: 'duplicate volume mount' })}
+    if (seen.has(key)) errors.push({ path: indexPath(path, i), type: 'parse', message: 'duplicate volume mount' })
     seen.add(key)
   })
   return errors

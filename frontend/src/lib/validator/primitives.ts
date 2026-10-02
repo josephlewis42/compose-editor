@@ -33,7 +33,7 @@ export function checkType(value: unknown, allowed: readonly JsonType[], path: st
     }
     if (jsonTypeOf(value) === t) {return null}
   }
-  return { path, type: 'type', message: `expected ${allowed.join(' or ')}, got ${jsonTypeOf(value)}` }
+  return { path, type: 'parse', message: `expected ${allowed.join(' or ')}, got ${jsonTypeOf(value)}` }
 }
 
 /** Runs checkType only when the field is actually present (most compose_spec.json fields are optional). */
@@ -51,7 +51,7 @@ export function checkFieldType(
 
 export function checkEnum(value: unknown, allowed: readonly string[], path: string): ValidationError | null {
   if (typeof value === 'string' && allowed.includes(value)) {return null}
-  return { path, type: 'enum', message: `expected one of ${allowed.join(', ')}, got ${JSON.stringify(value)}` }
+  return { path, type: 'parse', message: `expected one of ${allowed.join(', ')}, got ${JSON.stringify(value)}` }
 }
 
 export function checkFieldEnum(
@@ -69,7 +69,7 @@ export function checkFieldEnum(
 export function checkPattern(value: unknown, pattern: RegExp, path: string): ValidationError | null {
   if (typeof value !== 'string') {return null} // CheckType reports the type mismatch separately
   if (pattern.test(value)) {return null}
-  return { path, type: 'pattern', message: `must match pattern ${pattern}` }
+  return { path, type: 'parse', message: `must match pattern ${pattern}` }
 }
 
 export function checkFieldPattern(
@@ -86,15 +86,15 @@ export function checkFieldPattern(
 
 export function checkRange(value: unknown, min: number | undefined, max: number | undefined, path: string): ValidationError | null {
   if (typeof value !== 'number') {return null} // CheckType reports the type mismatch separately
-  if (min !== undefined && value < min) {return { path, type: 'range', message: `must be >= ${min}, got ${value}` }}
-  if (max !== undefined && value > max) {return { path, type: 'range', message: `must be <= ${max}, got ${value}` }}
+  if (min !== undefined && value < min) {return { path, type: 'parse', message: `must be >= ${min}, got ${value}` }}
+  if (max !== undefined && value > max) {return { path, type: 'parse', message: `must be <= ${max}, got ${value}` }}
   return null
 }
 
 export function checkRequired(obj: Record<string, unknown>, fields: readonly string[], path: string): ValidationError[] {
   return fields
     .filter((field) => obj[field] === undefined)
-    .map((field) => ({ path: childPath(path, field), type: 'required' as const, message: `"${field}" is required` }))
+    .map((field) => ({ path: childPath(path, field), type: 'parse' as const, message: `"${field}" is required` }))
 }
 
 const DEFAULT_ADDITIONAL_PATTERNS = [/^x-/]
@@ -110,7 +110,7 @@ export function checkAdditionalProperties(
   for (const key of Object.keys(obj)) {
     if (knownKeys.includes(key)) {continue}
     if (allowedPatterns.some((pattern) => pattern.test(key))) {continue}
-    errors.push({ path: childPath(path, key), type: 'additional_property', message: `unknown property "${key}"` })
+    errors.push({ path: childPath(path, key), type: 'parse', message: `unknown property "${key}"` })
   }
   return errors
 }
@@ -119,7 +119,7 @@ export function checkAdditionalProperties(
 export function checkKeyPattern(keys: readonly string[], pattern: RegExp, path: string): ValidationError[] {
   return keys
     .filter((key) => !pattern.test(key))
-    .map((key) => ({ path: childPath(path, key), type: 'pattern' as const, message: `key must match pattern ${pattern}` }))
+    .map((key) => ({ path: childPath(path, key), type: 'parse' as const, message: `key must match pattern ${pattern}` }))
 }
 
 export function validateMapOf(
@@ -165,7 +165,7 @@ export function validateListOrDict(value: unknown, path: string): ValidationErro
       return err ? [err] : []
     })
   }
-  return [{ path, type: 'one_of', message: 'expected a mapping of string to scalar, or a list of strings' }]
+  return [{ path, type: 'parse', message: 'expected a mapping of string to scalar, or a list of strings' }]
 }
 
 // #/$defs/extra_hosts
@@ -180,7 +180,7 @@ export function validateExtraHosts(value: unknown, path: string): ValidationErro
       return validateListOfStrings(entry, entryPath)
     })
   }
-  return [{ path, type: 'one_of', message: 'expected a mapping of hostname to IP(s), or a list of "host:ip" strings' }]
+  return [{ path, type: 'parse', message: 'expected a mapping of hostname to IP(s), or a list of "host:ip" strings' }]
 }
 
 // #/$defs/command
