@@ -55,10 +55,10 @@ form:
       keyname: image
       label: Image
       description: Container image to use.
-      default_value: syncthing/syncthing:latest
+      default_value: docker.io/syncthing/syncthing:latest
       options:
-        - title: syncthing/syncthing:latest
-          value: syncthing/syncthing:latest
+        - title: docker.io/syncthing/syncthing:latest
+          value: docker.io/syncthing/syncthing:latest
   - string:
       keyname: data_path
       label: Data Path
