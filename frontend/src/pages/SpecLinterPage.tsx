@@ -1,7 +1,7 @@
 import { useDeferredValue, useMemo, useState } from 'react'
 import { CircleCheckIcon } from 'lucide-react'
 import { YamlViewer } from '@/components/YamlViewer'
-import { parseComposeYaml, type ValidationError } from '@/lib/validator'
+import { type ValidationError, parseComposeYaml } from '@/lib/validator'
 
 const DEFAULT_SPEC = `# This is a demo spec, you can paste yours here.
 version: 1.0
@@ -13,10 +13,10 @@ services:
 // Runs the same validators the Output panel runs over rendered templates
 // (lib/validator) against any compose file pasted in by hand.
 export function SpecLinterPage() {
-  const [composeYaml, setComposeYaml] = useState(DEFAULT_SPEC)
-  const deferredYaml = useDeferredValue(composeYaml)
-  const errors = useMemo(() => parseComposeYaml(deferredYaml).errors, [deferredYaml])
-  const hasInput = composeYaml.trim().length > 0
+  const [composeYaml, setComposeYaml] = useState(DEFAULT_SPEC),
+   deferredYaml = useDeferredValue(composeYaml),
+   errors = useMemo(() => parseComposeYaml(deferredYaml).errors, [deferredYaml]),
+   hasInput = composeYaml.trim().length > 0
 
   return (
     <div className="flex h-full min-h-0 flex-col">

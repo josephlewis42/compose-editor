@@ -1,6 +1,3 @@
-// Shared error shape for every validateXxx() function in this folder, plus
-// the JSONPath-building helpers used to report where a failure occurred.
-
 export type Linter =
   | 'parse'
   | 'style'

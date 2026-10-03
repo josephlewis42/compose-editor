@@ -10,15 +10,15 @@ interface CatalogPageProps {
 }
 
 export function CatalogPage({ catalog }: CatalogPageProps) {
-  const [search, setSearch] = useState('')
-  const [activeTag, setActiveTag] = useState<string | null>(null)
+  const [search, setSearch] = useState(''),
+   [activeTag, setActiveTag] = useState<string | null>(null),
 
-  const applications = useMemo(
+   applications = useMemo(
     () => [...catalog.applications].sort((a, b) => a.name.localeCompare(b.name)),
     [catalog.applications],
-  )
+  ),
 
-  const tagCounts = useMemo(() => {
+   tagCounts = useMemo(() => {
     const counts = new Map<string, number>()
     for (const app of applications) {
       for (const tag of app.tags ?? []) {
@@ -26,17 +26,17 @@ export function CatalogPage({ catalog }: CatalogPageProps) {
       }
     }
     return counts
-  }, [applications])
+  }, [applications]),
 
-  const visibleTags = useMemo(
+   visibleTags = useMemo(
     () =>
       [...tagCounts.entries()]
         .filter(([, count]) => count >= MIN_APPS_FOR_TAG_CHIP)
         .sort((a, b) => a[0].localeCompare(b[0])),
     [tagCounts],
-  )
+  ),
 
-  const filtered = useMemo(() => {
+   filtered = useMemo(() => {
     const query = search.trim().toLowerCase()
     return applications.filter((app) => {
       if (activeTag && !app.tags?.includes(activeTag)) {

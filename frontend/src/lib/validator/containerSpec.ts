@@ -525,7 +525,7 @@ function validateContainerVolumes(value: unknown, path: string): ValidationError
   const seen = new Set<string>()
   items.forEach((item, i) => {
     const key = JSON.stringify(item)
-    if (seen.has(key)) errors.push({ path: indexPath(path, i), type: 'parse', message: 'duplicate volume mount' })
+    if (seen.has(key)) {errors.push({ path: indexPath(path, i), type: 'parse', message: 'duplicate volume mount' })}
     seen.add(key)
   })
   return errors

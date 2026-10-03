@@ -1,8 +1,8 @@
 // Generic JSON Schema-style checks (type/enum/pattern/range/required/
-// additionalProperties) plus the handful of union type aliases
+// AdditionalProperties) plus the handful of union type aliases
 // (`#/$defs/string_or_list`, `list_or_dict`, ...) that compose_spec.json
-// reuses across many definitions. Everything under this folder that
-// validates a field's shape is built out of these.
+// Reuses across many definitions. Everything under this folder that
+// Validates a field's shape is built out of these.
 
 /* eslint-disable max-params */
 
@@ -33,7 +33,34 @@ export function checkType(value: unknown, allowed: readonly JsonType[], path: st
     }
     if (jsonTypeOf(value) === t) {return null}
   }
-  return { path, type: 'parse', message: `expected ${allowed.join(' or ')}, got ${jsonTypeOf(value)}` }
+  return { message: `expected ${allowed.join(' or ')}, got ${jsonTypeOf(value)}`, path, type: 'parse' }
+}
+
+/** Maps each JsonType descriptor to the TypeScript type it narrows to. */
+export interface JsonTypeMap {
+  string: string
+  number: number
+  integer: number
+  boolean: boolean
+  null: null
+  object: Record<string, unknown>
+  array: unknown[]
+}
+
+/**
+ * Invokes `callback` with `value` narrowed to the union of `types` if it matches
+ * one of them. Returns whether it matched.
+ *
+ *   check(value, ['object', 'string'], (res) => { ... }) // res: Record<string, unknown> | string
+ */
+export function check<const T extends readonly JsonType[]>(
+  value: unknown,
+  types: T,
+  callback: (value: JsonTypeMap[T[number]]) => void,
+): boolean {
+  if (checkType(value, types, '') !== null) {return false}
+  callback(value as JsonTypeMap[T[number]])
+  return true
 }
 
 /** Runs checkType only when the field is actually present (most compose_spec.json fields are optional). */
@@ -94,7 +121,7 @@ export function checkRange(value: unknown, min: number | undefined, max: number 
 export function checkRequired(obj: Record<string, unknown>, fields: readonly string[], path: string): ValidationError[] {
   return fields
     .filter((field) => obj[field] === undefined)
-    .map((field) => ({ path: childPath(path, field), type: 'parse' as const, message: `"${field}" is required` }))
+    .map((field) => ({ message: `"${field}" is required`, path: childPath(path, field), type: 'parse' as const }))
 }
 
 const DEFAULT_ADDITIONAL_PATTERNS = [/^x-/]
@@ -119,7 +146,7 @@ export function checkAdditionalProperties(
 export function checkKeyPattern(keys: readonly string[], pattern: RegExp, path: string): ValidationError[] {
   return keys
     .filter((key) => !pattern.test(key))
-    .map((key) => ({ path: childPath(path, key), type: 'parse' as const, message: `key must match pattern ${pattern}` }))
+    .map((key) => ({ message: `key must match pattern ${pattern}`, path: childPath(path, key), type: 'parse' as const }))
 }
 
 export function validateMapOf(
@@ -165,7 +192,7 @@ export function validateListOrDict(value: unknown, path: string): ValidationErro
       return err ? [err] : []
     })
   }
-  return [{ path, type: 'parse', message: 'expected a mapping of string to scalar, or a list of strings' }]
+  return [{ message: 'expected a mapping of string to scalar, or a list of strings', path, type: 'parse' }]
 }
 
 // #/$defs/extra_hosts
@@ -180,7 +207,7 @@ export function validateExtraHosts(value: unknown, path: string): ValidationErro
       return validateListOfStrings(entry, entryPath)
     })
   }
-  return [{ path, type: 'parse', message: 'expected a mapping of hostname to IP(s), or a list of "host:ip" strings' }]
+  return [{ message: 'expected a mapping of hostname to IP(s), or a list of "host:ip" strings', path, type: 'parse' }]
 }
 
 // #/$defs/command
@@ -333,8 +360,8 @@ export function validateGenericResources(value: unknown, path: string): Validati
     const entry = item as Record<string, unknown>
     const errors: ValidationError[] = []
     if (entry.discrete_resource_spec !== undefined) {
-      const specPath = childPath(itemPath, 'discrete_resource_spec')
-      const specErr = checkType(entry.discrete_resource_spec, ['object'], specPath)
+      const specPath = childPath(itemPath, 'discrete_resource_spec'),
+       specErr = checkType(entry.discrete_resource_spec, ['object'], specPath)
       if (specErr) {
         errors.push(specErr)
       } else {
@@ -379,7 +406,7 @@ export function validateReservationDevices(value: unknown, path: string): Valida
 }
 
 // The `external:` field shared by network/volume/secret/config: either a
-// boolean/string shorthand, or an object with just a `name`.
+// Boolean/string shorthand, or an object with just a `name`.
 export type External = boolean | string | { name?: string }
 
 // Network/volume close `external` to just {name} (+ x-); secret/config leave

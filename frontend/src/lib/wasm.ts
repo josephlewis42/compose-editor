@@ -1,15 +1,15 @@
 // Loads the Go template engine compiled to WASM (pkg/browser/wasm) and
-// exposes a typed wrapper around the `convertComposeSpec` global it
-// installs, per design/frontend.md. `convertComposeSpec` exchanges
-// binary-encoded composeeditor.v1.ConvertInput/ConvertOutput messages
+// Exposes a typed wrapper around the `convertComposeSpec` global it
+// Installs, per design/frontend.md. `convertComposeSpec` exchanges
+// Binary-encoded composeeditor.v1.ConvertInput/ConvertOutput messages
 // (Uint8Array), not JSON.
 
 import { type JsonValue, create, fromBinary, fromJson, toBinary } from '@bufbuild/protobuf'
 import { ValueSchema } from '@bufbuild/protobuf/wkt'
 import { ConvertInputSchema, ConvertOutputSchema, type Message } from '@/gen/composeeditor/v1/wasm_pb'
 // Vite's `?init` wasm helper instantiates via fetch()/instantiateStreaming
-// in the browser and via node:fs under SSR/Vitest, so this loads correctly
-// in both a real browser and a Node-based test run.
+// In the browser and via node:fs under SSR/Vitest, so this loads correctly
+// In both a real browser and a Node-based test run.
 import initWasm from '@/gen/composeeditor.wasm?init'
 // Import execURL from '@/gen/wasm_exec.js?url'
 import '@/gen/wasm_exec.js'
@@ -21,9 +21,9 @@ declare global {
     importObject: WebAssembly.Imports
     // eslint-disable-next-line method-signature-style
     run(instance: WebAssembly.Instance): Promise<void>
-  }
+  },
   // eslint-disable-next-line no-var
-  var convertComposeSpec: ((input: Uint8Array) => Uint8Array) | undefined
+   convertComposeSpec: ((input: Uint8Array) => Uint8Array) | undefined
 }
 
 export interface ConvertInput {
@@ -47,7 +47,7 @@ async function ensureLoaded(): Promise<void> {
       const instance = await initWasm(go.importObject)
       void go.run(instance)
       // The Go program registers convertComposeSpec synchronously at the
-      // top of main(), but wait a tick so callers never race it.
+      // Top of main(), but wait a tick so callers never race it.
       await new Promise((resolve) => setTimeout(resolve, 0))
     })()
   }
@@ -65,9 +65,9 @@ export async function convertComposeSpec(input: ConvertInput): Promise<ConvertOu
     values[key] = fromJson(ValueSchema, (value ?? null) as JsonValue)
   }
 
-  const message = create(ConvertInputSchema, { template: input.template, values })
-  const resultBytes = globalThis.convertComposeSpec(toBinary(ConvertInputSchema, message))
-  const result = fromBinary(ConvertOutputSchema, resultBytes)
+  const message = create(ConvertInputSchema, { template: input.template, values }),
+   resultBytes = globalThis.convertComposeSpec(toBinary(ConvertInputSchema, message)),
+   result = fromBinary(ConvertOutputSchema, resultBytes)
 
   return {
     compose_output: result.composeOutput,

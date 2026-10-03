@@ -1,19 +1,13 @@
-// A line-numbered, syntax-highlighted YAML viewer with inline error
-// markers, built on CodeMirror.
-// 
-// Colors are drawn from the app's daisyUI CSS variables
-// (src/index.css) rather than a canned CM theme,
-// so this stays in sync with the rest of the UI automatically.
-
 import { useEffect, useRef } from 'react'
 import { EditorState } from '@codemirror/state'
 import { EditorView, highlightActiveLine, highlightActiveLineGutter, lineNumbers } from '@codemirror/view'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { yaml } from '@codemirror/lang-yaml'
-import { lintGutter, setDiagnostics, type Diagnostic } from '@codemirror/lint'
+import { type Diagnostic, lintGutter, setDiagnostics } from '@codemirror/lint'
 import { tags } from '@lezer/highlight'
 import type { ValidationError } from '@/lib/validator'
 
+// Use DaisyUI CSS vars to keep in sync with the theme and dark/light transitions.
 const yamlHighlightStyle = HighlightStyle.define([
   { tag: tags.definition(tags.propertyName), color: 'var(--color-primary)', fontWeight: 600 },
   { tag: tags.string, color: 'var(--color-success)' },
@@ -35,6 +29,9 @@ const theme = EditorView.theme({
     backgroundColor: 'var(--color-base-100)',
     fontSize: '0.8125rem',
   },
+  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
+    backgroundColor: 'color-mix(in oklab, var(--color-primary) 25%, transparent) !important',
+  },
   '.cm-content': {
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
     padding: '0.5rem 0',
@@ -48,16 +45,13 @@ const theme = EditorView.theme({
   '.cm-activeLine, .cm-activeLineGutter': {
     backgroundColor: 'var(--color-base-200)',
   },
-  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
-    backgroundColor: 'color-mix(in oklab, var(--color-primary) 25%, transparent) !important',
-  },
 })
 
 interface YamlViewerProps {
   value: string
   errors?: ValidationError[]
   className?: string
-  /** Makes the viewer editable; called with the full document on every edit. */
+  /** If set, the viewer becomes editable. */
   onChange?: (value: string) => void
 }
 
@@ -101,7 +95,7 @@ export function YamlViewer({ value, errors = NO_ERRORS, className, onChange }: Y
         highlightActiveLineGutter(),
         EditorState.readOnly.of(!onChange),
         EditorView.updateListener.of((update) => {
-          if (update.docChanged) onChangeRef.current?.(update.state.doc.toString())
+          if (update.docChanged) {onChangeRef.current?.(update.state.doc.toString())}
         }),
         EditorView.lineWrapping,
         yaml(),
@@ -117,17 +111,23 @@ export function YamlViewer({ value, errors = NO_ERRORS, className, onChange }: Y
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Document updates
   useEffect(() => {
     const view = viewRef.current
     if (!view) {return}
     if (view.state.doc.toString() !== value) {
-      view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: value } })
+      view.dispatch({ changes: { from: 0, insert: value, to: view.state.doc.length } })
     }
-    // Errors are computed outside the editor (and, when editable, arrive
-    // after the edit that caused them), so push them in directly rather
-    // than through a `linter()` source that would lint stale errors.
-    view.dispatch(setDiagnostics(view.state, toDiagnostics(view.state, errors)))
-  }, [value, errors])
+  }, [value])
+
+  // Linter items
+  useEffect(() => {
+    const view = viewRef.current
+    if (view) {
+      view.dispatch(setDiagnostics(view.state, toDiagnostics(view.state, errors)))
+    }
+  }, [errors])
+
 
   return <div ref={containerRef} className={className} />
 }

@@ -1,6 +1,6 @@
 // #/$defs/pre_start_hook — allOf[container_spec] + per_replica, closed with
-// unevaluatedProperties: false, i.e. the full container_spec shape plus one
-// extra field.
+// UnevaluatedProperties: false, i.e. the full container_spec shape plus one
+// Extra field.
 
 import { type ValidationError } from './errors'
 import { CONTAINER_SPEC_KNOWN_KEYS, type ContainerSpec, validateContainerSpecFields } from './containerSpec'

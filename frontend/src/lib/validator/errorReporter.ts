@@ -1,73 +1,159 @@
 import type { Linter, ValidationError } from "./errors";
+import { type JsonType, checkType } from "./primitives";
+
+/** Maps JsonType descriptor to the TypeScript type it narrows to. */
+interface JsonTypeMap {
+    string: string
+    number: number
+    integer: number
+    boolean: boolean
+    null: null
+    object: Record<string, unknown>
+    array: unknown[]
+}
 
 
 export class ErrorReporter {
-    private _linter: Linter
-    private _errors: ValidationError[]
-    private _currentPath: string
+    #linter: Linter
+    #errors: ValidationError[]
+    #currentPath: string
 
     constructor(linter: Linter) {
-        this._linter = linter
-        this._errors = []
-        this._currentPath = '$'
+        this.#linter = linter
+        this.#errors = []
+        this.#currentPath = '$'
     }
 
     get errors(): ValidationError[] {
-        return this._errors
+        return this.#errors
     }
 
     public assert(assertion: boolean, message: string) {
-        if (! assertion) {
+        if (!assertion) {
             this.addError(message)
         }
     }
 
 
     public addError(message: string) {
-        this._errors.push({
-            path: this._currentPath,
-            type: this._linter,
-            message: message,
+        this.#errors.push({
+            message,
+            path: this.#currentPath,
+            type: this.#linter,
         })
     }
 
-    public field(name: string, callback: Function){
-        var _oldPath = this._currentPath
-        this._currentPath = `${_oldPath}.${name}`
+    public field(name: string, callback: Function) {
+        const oldPath = this.#currentPath
+        this.#currentPath = `${oldPath}.${name}`
 
         callback()
 
-        this._currentPath = _oldPath
+        this.#currentPath = oldPath
     }
 
-    public index(idx: number, callback: Function){
-                var _oldPath = this._currentPath
-        this._currentPath = `${_oldPath}[${idx}]`
+    public index(idx: number, callback: Function) {
+        var _oldPath = this.#currentPath
+        this.#currentPath = `${_oldPath}[${idx}]`
 
         callback()
 
-        this._currentPath = _oldPath
+        this.#currentPath = _oldPath
     }
 
-    public each<T>(fieldName: string, items: T[], callback: (value: T, index: number) => void){
+    public each<T>(fieldName: string, items: T[], callback: (value: T, index: number) => void) {
         this.field(fieldName, () => {
             items.forEach((value, index) => {
-                this.index(index, ()=>{
+                this.index(index, () => {
                     callback(value, index)
                 })
             })
         })
     }
 
-    public fields<T>(items: Record<string, T>|undefined, callback: (value: T, key: string) => void){
-        if(items === undefined) {
+    public fields<T>(items: Record<string, T> | undefined, callback: (value: T, key: string) => void) {
+        if (items === undefined) {
             return
         }
-        for (let prop in items) {
+        for (const prop in items) {
             this.field(prop, () => {
                 callback(items[prop], prop)
             })
         }
     }
 
+    public assertType<const T extends readonly JsonType[]>(
+        value: unknown,
+        types: T,
+        callback?: (value: JsonTypeMap[T[number]]) => void
+    ) {
+        if (undefined === value) {
+            this.addError(`field is missing`)
+            return
+        }
+
+        const typeResult = checkType(value, types, '')
+        if (typeResult !== null) {
+            this.addError(typeResult.message)
+            return
+        }
+
+        if(callback) {
+            callback(value as JsonTypeMap[T[number]])
+        }
+    }
+
+    public assertOptionalFieldType<const T extends readonly JsonType[]>(
+        fieldName: string,
+        value: unknown,
+        types: T,
+        callback?: (value: JsonTypeMap[T[number]]) => void
+    ) {
+        if (value === undefined) {
+            return
+        }
+
+        this.field(fieldName, () => {
+            this.assertType(value, types, callback)
+        })
+    }
+
+
+    public assertFieldType<const T extends readonly JsonType[]>(
+        fieldName: string,
+        value: unknown,
+        types: T,
+        callback?: (value: JsonTypeMap[T[number]]) => void
+    ) {
+        this.field(fieldName, () => {
+            this.assertType(value, types, callback)
+        })
+    }
+
+
+    public assertOptionalObjectKeyType<const T extends readonly JsonType[]>(
+        keyName: string,
+        object: Record<string, unknown>,
+        types: T,
+        callback?: (value: JsonTypeMap[T[number]]) => void
+    ) {
+        this.assertOptionalFieldType(
+            keyName,
+            object[keyName],
+            types,
+            callback)
+    }
+
+    public assertObjectKeyType<const T extends readonly JsonType[]>(
+        keyName: string,
+        object: Record<string, unknown>,
+        types: T,
+        callback?: (value: JsonTypeMap[T[number]]) => void
+    ) {
+        this.assertFieldType(
+            keyName,
+            object[keyName],
+            types,
+            callback)
+    }
 }

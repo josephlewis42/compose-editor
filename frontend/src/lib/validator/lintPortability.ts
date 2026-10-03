@@ -8,7 +8,7 @@ export function checkPortability(toCheck: ComposeFile): ValidationError[] {
     reporter.field('services', ()=>{
         reporter.fields(toCheck.services, (value) => {
             reporter.field('image', ()=> {
-                const image = value.image
+                const {image} = value
                 if (image) {
                     reporter.assert(
                         image.split('/').length > 2, 

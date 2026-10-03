@@ -1,7 +1,5 @@
 // Tests target the package's public interface (parseComposeYaml /
-// validateComposeFile) with realistic YAML, not the internal per-def
-// helpers — those are exercised indirectly through every field they touch
-// on services/jobs/networks/etc below.
+// validateComposeFile) with realistic YAML.
 
 /* eslint-disable no-magic-numbers */
 

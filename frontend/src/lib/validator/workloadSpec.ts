@@ -1,8 +1,8 @@
 // #/$defs/workload_spec — attributes shared by services and jobs that
-// describe how the container is built/exposed/depended-on. Same story as
-// container_spec: no `additionalProperties: false` of its own, so this
-// exports `validateWorkloadSpecFields` + `WORKLOAD_SPEC_KNOWN_KEYS` for the
-// composite (service/job) validators to close over.
+// Describe how the container is built/exposed/depended-on. Same story as
+// Container_spec: no `additionalProperties: false` of its own, so this
+// Exports `validateWorkloadSpecFields` + `WORKLOAD_SPEC_KNOWN_KEYS` for the
+// Composite (service/job) validators to close over.
 
 import { type ValidationError, childPath, indexPath } from './errors'
 import { type ExtraHosts, type ListOrDict, type ServiceConfigOrSecret, type Ulimits, validateExtraHosts, validateListOrDict, validateServiceConfigOrSecret, validateUlimits, checkAdditionalProperties, checkFieldEnum, checkFieldType, checkRequired, checkType } from './primitives'
@@ -141,8 +141,8 @@ function validateBuild(value: unknown, path: string): ValidationError[] {
   return errors
 }
 
-const NAME_PATTERN = /^[a-zA-Z0-9._-]+$/
-const CONDITION_VALUES = ['service_started', 'service_healthy', 'service_completed_successfully']
+const NAME_PATTERN = /^[a-zA-Z0-9._-]+$/,
+ CONDITION_VALUES = ['service_started', 'service_healthy', 'service_completed_successfully']
 
 function validateDependsOnDetail(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
@@ -164,7 +164,7 @@ function validateDependsOn(value: unknown, path: string): ValidationError[] {
   const errors: ValidationError[] = []
   for (const key of Object.keys(obj)) {
     if (!NAME_PATTERN.test(key)) {
-      errors.push({ path: childPath(path, key), type: 'parse', message: `key must match pattern ${NAME_PATTERN}` })
+      errors.push({ message: `key must match pattern ${NAME_PATTERN}`, path: childPath(path, key), type: 'parse' })
       continue
     }
     errors.push(...validateDependsOnDetail(obj[key], childPath(path, key)))
@@ -199,8 +199,8 @@ export function validateWorkloadSpecFields(obj: Record<string, unknown>, path: s
   if (obj.depends_on !== undefined) { errors.push(...validateDependsOn(obj.depends_on, childPath(path, 'depends_on'))) }
   if (obj.healthcheck !== undefined) { errors.push(...validateHealthcheck(obj.healthcheck, childPath(path, 'healthcheck'))) }
   if (obj.ports !== undefined) {
-    const portsPath = childPath(path, 'ports')
-    const portsErr = checkType(obj.ports, ['array'], portsPath)
+    const portsPath = childPath(path, 'ports'),
+     portsErr = checkType(obj.ports, ['array'], portsPath)
     if (portsErr) {
       errors.push(portsErr)
     } else {
@@ -208,8 +208,8 @@ export function validateWorkloadSpecFields(obj: Record<string, unknown>, path: s
     }
   }
   if (obj.expose !== undefined) {
-    const exposePath = childPath(path, 'expose')
-    const exposeErr = checkType(obj.expose, ['array'], exposePath)
+    const exposePath = childPath(path, 'expose'),
+     exposeErr = checkType(obj.expose, ['array'], exposePath)
     if (exposeErr) {
       errors.push(exposeErr)
     } else {

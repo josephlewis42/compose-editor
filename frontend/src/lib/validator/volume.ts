@@ -22,8 +22,8 @@ export function validateVolume(value: unknown, path: string): ValidationError[] 
   checkFieldType(obj, 'name', ['string'], path, errors)
   checkFieldType(obj, 'driver', ['string'], path, errors)
   if (obj.driver_opts !== undefined) {
-    const optsPath = childPath(path, 'driver_opts')
-    const optsErr = checkType(obj.driver_opts, ['object'], optsPath)
+    const optsPath = childPath(path, 'driver_opts'),
+     optsErr = checkType(obj.driver_opts, ['object'], optsPath)
     if (optsErr) {
       errors.push(optsErr)
     } else {

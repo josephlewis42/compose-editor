@@ -1,5 +1,5 @@
 // #/$defs/service — allOf[container_spec, workload_spec] plus its own
-// fields, closed with unevaluatedProperties: false.
+// Fields, closed with unevaluatedProperties: false.
 
 import { type ValidationError, childPath, indexPath } from './errors'
 import { CONTAINER_SPEC_KNOWN_KEYS, type ContainerSpec, validateContainerSpecFields } from './containerSpec'
@@ -39,9 +39,9 @@ export type Service = ContainerSpec &
     pre_stop?: ServiceHook[]
   }
 
-const CONTAINER_NAME_PATTERN = /[a-zA-Z0-9][a-zA-Z0-9_.-]+/
+const CONTAINER_NAME_PATTERN = /[a-zA-Z0-9][a-zA-Z0-9_.-]+/,
 
-const SERVICE_OWN_KEYS = [
+ SERVICE_OWN_KEYS = [
   'deploy',
   'develop',
   'profiles',
@@ -56,9 +56,9 @@ const SERVICE_OWN_KEYS = [
   'pre_start',
   'post_start',
   'pre_stop',
-]
+],
 
-const SERVICE_KNOWN_KEYS = [...CONTAINER_SPEC_KNOWN_KEYS, ...WORKLOAD_SPEC_KNOWN_KEYS, ...SERVICE_OWN_KEYS]
+ SERVICE_KNOWN_KEYS = [...CONTAINER_SPEC_KNOWN_KEYS, ...WORKLOAD_SPEC_KNOWN_KEYS, ...SERVICE_OWN_KEYS]
 
 function validateProvider(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
@@ -67,8 +67,8 @@ function validateProvider(value: unknown, path: string): ValidationError[] {
   const errors: ValidationError[] = checkRequired(obj, ['type'], path)
   checkFieldType(obj, 'type', ['string'], path, errors)
   if (obj.options !== undefined) {
-    const optionsPath = childPath(path, 'options')
-    const optionsErr = checkType(obj.options, ['object'], optionsPath)
+    const optionsPath = childPath(path, 'options'),
+     optionsErr = checkType(obj.options, ['object'], optionsPath)
     if (optionsErr) {
       errors.push(optionsErr)
     } else {
@@ -110,8 +110,8 @@ function validateUniqueStringArray(value: unknown, path: string): ValidationErro
   const errors: ValidationError[] = items.flatMap((item, i) => {
     const itemErr = checkType(item, ['string'], indexPath(path, i))
     return itemErr ? [itemErr] : []
-  })
-  const seen = new Set<string>()
+  }),
+   seen = new Set<string>()
   items.forEach((item, i) => {
     if (typeof item !== 'string') {return}
     if (seen.has(item)) {errors.push({ path: indexPath(path, i), type: 'parse', message: `duplicate value ${JSON.stringify(item)}` })}
