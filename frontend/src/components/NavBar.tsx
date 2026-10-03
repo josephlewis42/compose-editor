@@ -47,9 +47,6 @@ export function NavBar() {
           <li>
             <CatalogLink />
           </li>
-          <li>
-            <Link to="/build">Builder</Link>
-          </li>
         </ul>
       </div>
       <div className="flex-none">
