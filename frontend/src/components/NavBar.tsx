@@ -1,6 +1,7 @@
 import { MoonIcon, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Link } from 'react-router-dom'
+import { ExternalLink } from './ExternalLink';
 
 function GitHubIcon() {
   return (
@@ -12,15 +13,9 @@ function GitHubIcon() {
 
 function GitHubLink() {
   return (
-    <a
-      href="https://github.com/josephlewis42/compose-editor"
-      target="_blank"
-      rel="noreferrer"
-      aria-label="View source on GitHub"
-      className="btn btn-ghost btn-square"
-    >
+    <ExternalLink href="https://github.com/josephlewis42/compose-editor">
       <GitHubIcon />
-    </a>
+    </ExternalLink>
   );
 }
 
@@ -47,19 +42,19 @@ export function NavBar() {
         <Link to="/" className="btn btn-ghost text-xl">
           Compose Editor
         </Link>
-      </div>
-      <div className="flex-none">
-        <ul className="menu menu-horizontal px-1">
+        <ul className="menu menu-horizontal">
           <li>
             <Link to="/">Catalog</Link>
           </li>
           <li>
             <Link to="/build">Builder</Link>
           </li>
+        </ul>
+      </div>
+      <div className="flex-none">
+        <ul className="menu menu-horizontal">
           <li className="w-8"><ThemeToggle /></li>
-          <li className="w-8">
-            <GitHubLink />
-          </li>
+          <li className="w-8"><GitHubLink /></li>
         </ul>
       </div>
     </header>

@@ -18,7 +18,7 @@ function App() {
   }, [])
 
   return (
-    <div className="flex h-screen min-h-0 flex-col">
+    <div className="flex min-h-0 flex-col">
       <NavBar />
       <div className="min-h-0 flex-1 overflow-y-auto bg-base-200">
         {error ? (

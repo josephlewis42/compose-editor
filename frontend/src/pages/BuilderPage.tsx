@@ -61,7 +61,7 @@ const EMPTY_METADATA: Metadata = { slug: '', name: '', tagline: '', url: '', spd
 // Directory-name-safe slug, matching specs/README.md's convention
 // (lower-case, underscores rather than spaces) closely enough for a
 // starting suggestion the user can still edit by hand.
-export function slugify(value: string): string {
+function slugify(value: string): string {
   return value
     .trim()
     .toLowerCase()
@@ -309,8 +309,8 @@ export function BuilderPage({ catalog }: BuilderPageProps) {
                 Compose template
               </label>
               <p className="text-xs text-base-content/60">
-                Reference: <ExternalLink href="https://pkg.go.dev/text/template" text="Go template syntax" /> and{' '}
-                <ExternalLink href="https://masterminds.github.io/sprig/" text="Sprig functions" /> (the same template language and
+                Reference: <ExternalLink href="https://pkg.go.dev/text/template">Go template syntax</ExternalLink> and{' '}
+                <ExternalLink href="https://masterminds.github.io/sprig/">Sprig functions</ExternalLink> (the same template language and
                 function library used in Helm charts).
               </p>
               <textarea
@@ -396,7 +396,7 @@ function MetadataFields({ metadata, onChange }: { metadata: Metadata; onChange: 
       <div className="flex flex-col gap-1 text-sm">
         <label className="font-medium">SPDX license</label>
         <span className="text-base-content/60">
-          <ExternalLink href="https://spdx.org/licenses/" text="SPDX license"/> for the main app. Use <code>Other</code> if unknown.
+          <ExternalLink href="https://spdx.org/licenses/">SPDX license</ExternalLink> for the main app. Use <code>Other</code> if unknown.
         </span>
         <datalist id="spdx-license-datalist">
           {COMMON_SPDX_LICENSES.map((license) => (

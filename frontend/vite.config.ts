@@ -15,5 +15,12 @@ export default defineConfig({
     },
   },
   assetsInclude: ['**/*.binpb'],
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: true
+      }
+    }
+  }
 })
 
