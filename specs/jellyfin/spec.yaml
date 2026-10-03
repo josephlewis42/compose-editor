@@ -52,10 +52,10 @@ form:
       keyname: image
       label: Image
       description: Container image to use.
-      default_value: jellyfin/jellyfin:latest
+      default_value: docker.io/jellyfin/jellyfin:latest
       options:
-        - title: jellyfin/jellyfin:latest
-          value: jellyfin/jellyfin:latest
+        - title: docker.io/jellyfin/jellyfin:latest
+          value: docker.io/jellyfin/jellyfin:latest
   - number:
       keyname: http_port
       label: Web UI Port

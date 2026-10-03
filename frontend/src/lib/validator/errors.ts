@@ -1,21 +1,15 @@
 // Shared error shape for every validateXxx() function in this folder, plus
 // the JSONPath-building helpers used to report where a failure occurred.
 
-export type ValidationErrorType =
+export type Linter =
   | 'parse'
-  | 'required'
-  | 'type'
-  | 'enum'
-  | 'pattern'
-  | 'range'
-  | 'additional_property'
-  | 'one_of'
-  | 'unique_items'
+  | 'style'
+  | 'portability'
 
 export interface ValidationError {
   /** JSONPath to the offending value, e.g. $.services.web.ports[0].target */
   path: string
-  type: ValidationErrorType
+  type: Linter
   message: string
   /** 1-indexed source position, filled in by parseComposeYaml when it can be resolved against the original YAML text. */
   line?: number

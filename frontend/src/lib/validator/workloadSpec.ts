@@ -165,7 +165,7 @@ function validateDependsOn(value: unknown, path: string): ValidationError[] {
   const errors: ValidationError[] = []
   for (const key of Object.keys(obj)) {
     if (!NAME_PATTERN.test(key)) {
-      errors.push({ path: childPath(path, key), type: 'pattern', message: `key must match pattern ${NAME_PATTERN}` })
+      errors.push({ path: childPath(path, key), type: 'parse', message: `key must match pattern ${NAME_PATTERN}` })
       continue
     }
     errors.push(...validateDependsOnDetail(obj[key], childPath(path, key)))

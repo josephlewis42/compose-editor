@@ -13,6 +13,8 @@ import { parseDocument, LineCounter } from 'yaml'
 import { validateComposeFile, type ComposeFile } from './composeFile'
 import { resolvePosition } from './position'
 import type { ValidationError } from './errors'
+import { checkStyle } from './lint_style'
+import { checkPortability } from './lintPortability'
 
 export interface ParseResult {
   /** The parsed YAML, cast to ComposeFile's shape. Present even when `errors` is non-empty. */
@@ -41,14 +43,22 @@ export function parseComposeYaml(yamlText: string): ParseResult {
   const parsed: unknown = doc.toJS()
   if (parsed === null || parsed === undefined) return { errors: [] }
 
-  const errors = validateComposeFile(parsed).map((error) => {
+  var allErrors = validateComposeFile(parsed)
+
+  // Only check semantics if the parse came back okay.
+  if (allErrors.length == 0) {
+    allErrors.push(...checkStyle(parsed as ComposeFile))
+    allErrors.push(...checkPortability(parsed as ComposeFile))
+  }
+
+  const errors = allErrors.map((error) => {
     const position = resolvePosition(doc, lineCounter, error.path)
     return position ? { ...error, ...position } : error
   })
   return { spec: parsed as ComposeFile, errors }
 }
 
-export type { ValidationError, ValidationErrorType } from './errors'
+export type { ValidationError } from './errors'
 export type { ComposeFile } from './composeFile'
 export { validateComposeFile } from './composeFile'
 export type { Service } from './service'

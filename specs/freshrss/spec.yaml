@@ -9,7 +9,6 @@ tags:
   - entertainment
   - productivity
 template: |-
-  version: "3.7"
   services:
     server:
       image: {{ .Values.image | quote }}
@@ -81,10 +80,10 @@ form:
         Container image to use. `latest` (Debian-based) is the default and generally
         recommended. The `alpine` variant is smaller and much faster to build, with newer
         packages, but was slower in official benchmarks.
-      default_value: "freshrss/freshrss:latest"
+      default_value: "docker.io/freshrss/freshrss:latest"
       options:
-        - title: freshrss/freshrss:latest
-        - title: freshrss/freshrss:alpine
+        - title: docker.io/freshrss/freshrss:latest
+        - title: docker.io/freshrss/freshrss:alpine
   - string:
       keyname: tz
       label: Time Zone
