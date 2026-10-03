@@ -8,6 +8,7 @@ tags:
   - backup
   - files
   - p2p
+  - utility
 template: |-
   services:
     syncthing:

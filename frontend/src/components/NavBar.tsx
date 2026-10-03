@@ -2,6 +2,7 @@ import { MoonIcon, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Link } from 'react-router-dom'
 import { ExternalLink } from './ExternalLink';
+import { CatalogLink } from './CatalogLink';
 
 function GitHubIcon() {
   return (
@@ -44,7 +45,7 @@ export function NavBar() {
         </Link>
         <ul className="menu menu-horizontal">
           <li>
-            <Link to="/">Catalog</Link>
+            <CatalogLink />
           </li>
           <li>
             <Link to="/build">Builder</Link>

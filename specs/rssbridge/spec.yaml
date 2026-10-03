@@ -7,6 +7,7 @@ tags:
   - rss
   - news
   - scraping
+  - utility
 template: |-
   services:
     rss-bridge:

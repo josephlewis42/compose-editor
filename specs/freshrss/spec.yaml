@@ -6,6 +6,8 @@ license_url: https://github.com/FreshRSS/FreshRSS/blob/edge/LICENSE.txt
 tags:
   - rss
   - news
+  - entertainment
+  - productivity
 template: |-
   version: "3.7"
   services:

@@ -12,14 +12,12 @@ interface EditorPageProps {
 
 export function EditorPage({ app }: EditorPageProps) {
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div>
       <header className="w-full shrink-0 bg-primary/30">
         <div className="mx-auto max-w-6xl px-6 py-5">
           <div className="breadcrumbs text-sm">
             <ul>
-              <li>
-                <Link to="/">Catalog</Link>
-              </li>
+              <li><Link to="/">App Catalog</Link></li>
               <li>{app.name}</li>
             </ul>
           </div>

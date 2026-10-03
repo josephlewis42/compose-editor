@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { type Catalog, type Application } from '@/gen/composeeditor/v1/spec_pb'
 import { ExternalLink } from '@/components/ExternalLink'
 
-const MIN_APPS_FOR_TAG_CHIP = 3
+const MIN_APPS_FOR_TAG_CHIP = 2
 
 interface CatalogPageProps {
   catalog: Catalog
@@ -31,7 +31,7 @@ export function CatalogPage({ catalog }: CatalogPageProps) {
   const visibleTags = useMemo(
     () =>
       [...tagCounts.entries()]
-        .filter(([, count]) => count > MIN_APPS_FOR_TAG_CHIP)
+        .filter(([, count]) => count >= MIN_APPS_FOR_TAG_CHIP)
         .sort((a, b) => a[0].localeCompare(b[0])),
     [tagCounts],
   )
@@ -39,8 +39,12 @@ export function CatalogPage({ catalog }: CatalogPageProps) {
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase()
     return applications.filter((app) => {
-      if (activeTag && !app.tags?.includes(activeTag)) return false
-      if (!query) return true
+      if (activeTag && !app.tags?.includes(activeTag)) {
+        return false
+      }
+      if (!query) {
+        return true
+      } 
       return (
         app.name.toLowerCase().includes(query) || app.tagline.toLowerCase().includes(query)
       )
@@ -55,11 +59,11 @@ export function CatalogPage({ catalog }: CatalogPageProps) {
 
           <div className="mt-2 max-w-2xl text-base-content/90">
             <p>
-              Browse self-hostable applications and generate a ready-to-run Docker Compose file
+              Browse self-hostable apps and generate a ready-to-run Docker Compose file
               through a guided form, no YAML required.
             </p>
 
-            <p className="pt-4">Select an application below to get started.</p>
+            <p className="pt-4">Select an app below to get started.</p>
           </div>
         </div>
       </div>
@@ -68,9 +72,9 @@ export function CatalogPage({ catalog }: CatalogPageProps) {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search applications..."
+          placeholder="Search apps..."
           className="input w-full max-w-md"
-          aria-label="Search applications"
+          aria-label="Search apps"
         />
 
         {visibleTags.length > 0 && (
@@ -89,7 +93,7 @@ export function CatalogPage({ catalog }: CatalogPageProps) {
                 className={`badge cursor-pointer select-none ${activeTag === tag ? 'badge-primary' : 'badge-outline'}`}
                 onClick={() => setActiveTag(activeTag === tag ? null : tag)}
               >
-                {tag} ({count})
+                {tag} <div className="badge badge-soft badge-primary badge-sm">{count}</div>
               </button>
             ))}
           </div>
@@ -126,7 +130,6 @@ function ApplicationCard({ app }: { app: Application }) {
 
 function RequestCard() {
   return (
-    <a >
       <div className="card h-full card-border card-dash border-neutral transition-colors hover:border-neutral/80">
         <div className="card-body">
           <h2 className="card-title">Missing an application?</h2>
@@ -136,7 +139,6 @@ function RequestCard() {
           </p>
         </div>
       </div>
-    </a>
   )
 }
 
