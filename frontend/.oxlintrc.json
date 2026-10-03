@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-max-depth": ["warn", {"max": 4}],
+    "react/no-array-index-key": "off",
+    "eslint/id-length": "off",
+    "eslint/no-ternary": "off",
+    "eslint/func-style": "off",
+    "eslint/no-magic-numbers": ["error", {"ignore": [0, 1]}]
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "pedantic": "off",
+    "perf": "error",
+    "style": "off"
+  }
+
+}

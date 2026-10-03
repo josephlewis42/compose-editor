@@ -18,6 +18,7 @@ src/gen/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.oxlintrc.json
 .idea
 .DS_Store
 *.suo

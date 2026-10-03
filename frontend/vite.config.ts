@@ -6,7 +6,7 @@ import { defineConfig } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   // Relative so the build works from any subpath/host, see
-  // design/publishing_workflow.md.
+  // Design/publishing_workflow.md.
   base: './',
   plugins: [react(), tailwindcss()],
   resolve: {
