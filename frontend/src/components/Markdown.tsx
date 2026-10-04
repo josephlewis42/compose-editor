@@ -19,6 +19,7 @@ export function Markdown({ children, className }: { children: string; className?
   )
 }
 
+ /* oxlint-disable react/jsx-props-no-spreading */ 
 
 function MdA({...props}: React.ClassAttributes<HTMLAnchorElement> & React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   return (

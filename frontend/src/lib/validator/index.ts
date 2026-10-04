@@ -45,7 +45,7 @@ export function parseComposeYaml(yamlText: string): ParseResult {
     return { errors: [] }
   }
 
-  let errors = validateComposeFile(parsed)
+  const errors = validateComposeFile(parsed)
 
   // Only check semantics if the parse came back okay.
   if (errors.length == 0) {

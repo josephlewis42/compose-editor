@@ -53,12 +53,12 @@ export class ErrorReporter {
     }
 
     public index(idx: number, callback: Function) {
-        var _oldPath = this.#currentPath
-        this.#currentPath = `${_oldPath}[${idx}]`
+        const oldPath = this.#currentPath
+        this.#currentPath = `${oldPath}[${idx}]`
 
         callback()
 
-        this.#currentPath = _oldPath
+        this.#currentPath = oldPath
     }
 
     public each<T>(fieldName: string, items: T[], callback: (value: T, index: number) => void) {
@@ -75,9 +75,9 @@ export class ErrorReporter {
         if (items === undefined) {
             return
         }
-        for (const prop in items) {
-            this.field(prop, () => {
-                callback(items[prop], prop)
+        for (const [key, value] of Object.entries(items)) {
+            this.field(key, () => {
+                callback(value, key)
             })
         }
     }
@@ -101,59 +101,5 @@ export class ErrorReporter {
         if(callback) {
             callback(value as JsonTypeMap[T[number]])
         }
-    }
-
-    public assertOptionalFieldType<const T extends readonly JsonType[]>(
-        fieldName: string,
-        value: unknown,
-        types: T,
-        callback?: (value: JsonTypeMap[T[number]]) => void
-    ) {
-        if (value === undefined) {
-            return
-        }
-
-        this.field(fieldName, () => {
-            this.assertType(value, types, callback)
-        })
-    }
-
-
-    public assertFieldType<const T extends readonly JsonType[]>(
-        fieldName: string,
-        value: unknown,
-        types: T,
-        callback?: (value: JsonTypeMap[T[number]]) => void
-    ) {
-        this.field(fieldName, () => {
-            this.assertType(value, types, callback)
-        })
-    }
-
-
-    public assertOptionalObjectKeyType<const T extends readonly JsonType[]>(
-        keyName: string,
-        object: Record<string, unknown>,
-        types: T,
-        callback?: (value: JsonTypeMap[T[number]]) => void
-    ) {
-        this.assertOptionalFieldType(
-            keyName,
-            object[keyName],
-            types,
-            callback)
-    }
-
-    public assertObjectKeyType<const T extends readonly JsonType[]>(
-        keyName: string,
-        object: Record<string, unknown>,
-        types: T,
-        callback?: (value: JsonTypeMap[T[number]]) => void
-    ) {
-        this.assertFieldType(
-            keyName,
-            object[keyName],
-            types,
-            callback)
     }
 }
