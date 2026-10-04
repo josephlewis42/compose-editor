@@ -39,7 +39,7 @@ function validateTriggers(value: unknown, path: string): ValidationError[] {
     }
   }
   if (obj.manual === undefined && obj.schedule === undefined) {
-    errors.push({ path, type: 'one_of', message: '"triggers" must set at least one of "manual" or "schedule"' })
+    errors.push({ path, type: 'parse', message: '"triggers" must set at least one of "manual" or "schedule"' })
   }
   errors.push(...checkAdditionalProperties(obj, ['manual', 'schedule'], path))
   return errors

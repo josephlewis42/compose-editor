@@ -1,20 +1,13 @@
-// A read-only, line-numbered, syntax-highlighted YAML viewer with inline
-// error markers, built on CodeMirror 6 rather than Monaco: we only need a
-// read-only viewer (no autocomplete/IntelliSense), so the handful of
-// `@codemirror/*` packages this pulls in (view + state + lang-yaml + lint)
-// keep the bundle a fraction of Monaco's size. Colors are drawn from the
-// app's daisyUI CSS variables (src/index.css) rather than a canned CM theme,
-// so this stays in sync with the rest of the UI automatically.
-
 import { useEffect, useRef } from 'react'
 import { EditorState } from '@codemirror/state'
 import { EditorView, highlightActiveLine, highlightActiveLineGutter, lineNumbers } from '@codemirror/view'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { yaml } from '@codemirror/lang-yaml'
-import { type Diagnostic, forceLinting, lintGutter, linter } from '@codemirror/lint'
+import { type Diagnostic, lintGutter, setDiagnostics } from '@codemirror/lint'
 import { tags } from '@lezer/highlight'
 import type { ValidationError } from '@/lib/validator'
 
+// Use DaisyUI CSS vars to keep in sync with the theme and dark/light transitions.
 const yamlHighlightStyle = HighlightStyle.define([
   { tag: tags.definition(tags.propertyName), color: 'var(--color-primary)', fontWeight: 600 },
   { tag: tags.string, color: 'var(--color-success)' },
@@ -36,6 +29,9 @@ const theme = EditorView.theme({
     backgroundColor: 'var(--color-base-100)',
     fontSize: '0.8125rem',
   },
+  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
+    backgroundColor: 'color-mix(in oklab, var(--color-primary) 25%, transparent) !important',
+  },
   '.cm-content': {
     fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
     padding: '0.5rem 0',
@@ -49,15 +45,14 @@ const theme = EditorView.theme({
   '.cm-activeLine, .cm-activeLineGutter': {
     backgroundColor: 'var(--color-base-200)',
   },
-  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
-    backgroundColor: 'color-mix(in oklab, var(--color-primary) 25%, transparent) !important',
-  },
 })
 
 interface YamlViewerProps {
   value: string
   errors?: ValidationError[]
   className?: string
+  /** If set, the viewer becomes editable. */
+  onChange?: (value: string) => void
 }
 
 /** Converts our (line, col) validation errors into CodeMirror Diagnostics, positioned against the current doc. */
@@ -79,10 +74,14 @@ function toDiagnostics(state: EditorState, errors: ValidationError[]): Diagnosti
 
 const NO_ERRORS: ValidationError[] = []
 
-export function YamlViewer({ value, errors = NO_ERRORS, className }: YamlViewerProps) {
+export function YamlViewer({ value, errors = NO_ERRORS, className, onChange }: YamlViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
-  const errorsRef = useRef(errors)
+  const onChangeRef = useRef(onChange)
+
+  useEffect(() => {
+    onChangeRef.current = onChange
+  }, [onChange])
 
   useEffect(() => {
     if (!containerRef.current) {return}
@@ -94,13 +93,15 @@ export function YamlViewer({ value, errors = NO_ERRORS, className }: YamlViewerP
         lineNumbers(),
         highlightActiveLine(),
         highlightActiveLineGutter(),
-        EditorState.readOnly.of(true),
+        EditorState.readOnly.of(!onChange),
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged) {onChangeRef.current?.(update.state.doc.toString())}
+        }),
         EditorView.lineWrapping,
         yaml(),
         syntaxHighlighting(yamlHighlightStyle),
         theme,
         lintGutter(),
-        linter((v) => toDiagnostics(v.state, errorsRef.current), { delay: 0 }),
       ],
     })
     viewRef.current = view
@@ -110,18 +111,23 @@ export function YamlViewer({ value, errors = NO_ERRORS, className }: YamlViewerP
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Document updates
   useEffect(() => {
-    errorsRef.current = errors
     const view = viewRef.current
     if (!view) {return}
     if (view.state.doc.toString() !== value) {
-      // A doc change re-runs the linter extension on its own.
-      view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: value } })
-    } else {
-      // Doc unchanged but errors did (e.g. validator re-ran) — force a relint.
-      forceLinting(view)
+      view.dispatch({ changes: { from: 0, insert: value, to: view.state.doc.length } })
     }
-  }, [value, errors])
+  }, [value])
+
+  // Linter items
+  useEffect(() => {
+    const view = viewRef.current
+    if (view) {
+      view.dispatch(setDiagnostics(view.state, toDiagnostics(view.state, errors)))
+    }
+  }, [errors])
+
 
   return <div ref={containerRef} className={className} />
 }

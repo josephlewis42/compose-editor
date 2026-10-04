@@ -47,6 +47,9 @@ export function NavBar() {
           <li>
             <CatalogLink />
           </li>
+          <li>
+            <Link to="/compose-spec-linter">Compose Spec Linter</Link>
+          </li>
         </ul>
       </div>
       <div className="flex-none">

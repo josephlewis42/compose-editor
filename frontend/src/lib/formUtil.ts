@@ -217,7 +217,7 @@ export class FormElementWrapper {
             if (value.length == 0) {
                 errors.push({
                     path: childPath(path || rootPath, propertyName),
-                    type: 'required',
+                    type: 'parse',
                     message: 'field must not be empty'
                 })
             }
@@ -236,7 +236,7 @@ export class FormElementWrapper {
                 if (element.value.content.length == 0) {
                     errors.push({
                         path: childPath(this.#jsonPath, 'content'),
-                        type: 'required',
+                        type: 'parse',
                         message: 'content must not be empty'
                     })
                 }
@@ -247,7 +247,7 @@ export class FormElementWrapper {
                 if (element.value.title.length == 0) {
                     errors.push({
                         path: childPath(this.#jsonPath, 'title'),
-                        type: 'required',
+                        type: 'parse',
                         message: 'title must not be empty'
                     })
                 }
@@ -258,7 +258,7 @@ export class FormElementWrapper {
                 if (element.value.content.length == 0) {
                     errors.push({
                         path: childPath(this.#jsonPath, 'content'),
-                        type: 'required',
+                        type: 'parse',
                         message: 'content must not be empty'
                     })
                 }
@@ -268,14 +268,14 @@ export class FormElementWrapper {
                 if (element.value.title.length == 0) {
                     errors.push({
                         path: childPath(this.#jsonPath, 'title'),
-                        type: 'required',
+                        type: 'parse',
                         message: 'title must not be empty'
                     })
                 }
                 if (element.value.form.length == 0) {
                     errors.push({
                         path: childPath(this.#jsonPath, 'form'),
-                        type: 'required',
+                        type: 'parse',
                         message: 'form must not be empty'
                     })
                 }
@@ -290,7 +290,7 @@ export class FormElementWrapper {
                 if (input.tabs.length == 0) {
                     errors.push({
                         path: childPath(rootPath, 'tabs'),
-                        type: 'required',
+                        type: 'parse',
                         message: 'tabs must not be empty'
                     })
                 }
@@ -306,7 +306,7 @@ export class FormElementWrapper {
                         if (seenTabValues.has(tab.value)) {
                             errors.push({
                                 path: childPath(tabPath, 'value'),
-                                type: 'unique_items',
+                                type: 'parse',
                                 message: `duplicate tab value ${JSON.stringify(tab.value)}`
                             })
                         }
@@ -316,7 +316,7 @@ export class FormElementWrapper {
                     if (tab.form.length == 0) {
                         errors.push({
                             path: childPath(tabPath, 'form'),
-                            type: 'required',
+                            type: 'parse',
                             message: 'form must not be empty'
                         })
                     }
@@ -340,7 +340,7 @@ export class FormElementWrapper {
                 if (input.form.length == 0) {
                     errors.push({
                         path: childPath(rootPath, 'form'),
-                        type: 'required',
+                        type: 'parse',
                         message: 'form must not be empty'
                     })
                 }
@@ -355,7 +355,7 @@ export class FormElementWrapper {
                 if (!this.isValid(input.defaultValue)) {
                     errors.push({
                         path: childPath(rootPath, 'defaultValue'),
-                        type: 'range',
+                        type: 'parse',
                         message: 'default value must be a port between 1 and 65536'
                     })
                 }
@@ -371,7 +371,7 @@ export class FormElementWrapper {
                 if (input.minimum > input.maximum) {
                     errors.push({
                         path: childPath(rootPath, 'minimum'),
-                        type: 'range',
+                        type: 'parse',
                         message: 'minimum must not be greater than maximum'
                     })
                 }
@@ -379,7 +379,7 @@ export class FormElementWrapper {
                 if (input.step <= 0) {
                     errors.push({
                         path: childPath(rootPath, 'step'),
-                        type: 'range',
+                        type: 'parse',
                         message: 'step must be greater than zero'
                     })
                 }
@@ -387,7 +387,7 @@ export class FormElementWrapper {
                 if (!this.isValid(input.defaultValue)) {
                     errors.push({
                         path: childPath(rootPath, 'defaultValue'),
-                        type: 'range',
+                        type: 'parse',
                         message: 'default value must be between minimum and maximum and a multiple of step'
                     })
                 }
@@ -402,7 +402,7 @@ export class FormElementWrapper {
                 if (input.options.length == 0) {
                     errors.push({
                         path: childPath(rootPath, 'options'),
-                        type: 'required',
+                        type: 'parse',
                         message: 'options must not be empty'
                     })
                 }
@@ -422,7 +422,7 @@ export class FormElementWrapper {
                     if (seenOptionValues.has(value)) {
                         errors.push({
                             path: childPath(optionPath, 'value'),
-                            type: 'unique_items',
+                            type: 'parse',
                             message: `duplicate option value ${JSON.stringify(value)}`
                         })
                     }
@@ -471,7 +471,7 @@ export class FormElementWrapper {
                     } catch (e) {
                         errors.push({
                             path: childPath(stringValidationPath, 'regex'),
-                            type: 'pattern',
+                            type: 'parse',
                             message: `invalid regex: ${e}`
                         })
                     }
