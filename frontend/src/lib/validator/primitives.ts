@@ -4,6 +4,8 @@
 // reuses across many definitions. Everything under this folder that
 // validates a field's shape is built out of these.
 
+/* eslint-disable max-params */
+
 import { type ValidationError, childPath, indexPath } from './errors'
 
 export type JsonType = 'string' | 'number' | 'integer' | 'boolean' | 'null' | 'object' | 'array'
@@ -13,12 +15,12 @@ export function isPlainObject(value: unknown): value is Record<string, unknown> 
 }
 
 function jsonTypeOf(value: unknown): Exclude<JsonType, 'integer'> {
-  if (value === null || value === undefined) return 'null'
-  if (Array.isArray(value)) return 'array'
-  if (isPlainObject(value)) return 'object'
-  if (typeof value === 'string') return 'string'
-  if (typeof value === 'number') return 'number'
-  if (typeof value === 'boolean') return 'boolean'
+  if (value === null || value === undefined) {return 'null'}
+  if (Array.isArray(value)) {return 'array'}
+  if (isPlainObject(value)) {return 'object'}
+  if (typeof value === 'string') {return 'string'}
+  if (typeof value === 'number') {return 'number'}
+  if (typeof value === 'boolean') {return 'boolean'}
   return 'null'
 }
 
@@ -26,10 +28,10 @@ function jsonTypeOf(value: unknown): Exclude<JsonType, 'integer'> {
 export function checkType(value: unknown, allowed: readonly JsonType[], path: string): ValidationError | null {
   for (const t of allowed) {
     if (t === 'integer') {
-      if (typeof value === 'number' && Number.isInteger(value)) return null
+      if (typeof value === 'number' && Number.isInteger(value)) {return null}
       continue
     }
-    if (jsonTypeOf(value) === t) return null
+    if (jsonTypeOf(value) === t) {return null}
   }
   return { path, type: 'type', message: `expected ${allowed.join(' or ')}, got ${jsonTypeOf(value)}` }
 }
@@ -42,13 +44,13 @@ export function checkFieldType(
   path: string,
   errors: ValidationError[],
 ): void {
-  if (obj[key] === undefined) return
+  if (obj[key] === undefined) {return}
   const err = checkType(obj[key], allowed, childPath(path, key))
-  if (err) errors.push(err)
+  if (err) {errors.push(err)}
 }
 
 export function checkEnum(value: unknown, allowed: readonly string[], path: string): ValidationError | null {
-  if (typeof value === 'string' && allowed.includes(value)) return null
+  if (typeof value === 'string' && allowed.includes(value)) {return null}
   return { path, type: 'enum', message: `expected one of ${allowed.join(', ')}, got ${JSON.stringify(value)}` }
 }
 
@@ -59,14 +61,14 @@ export function checkFieldEnum(
   path: string,
   errors: ValidationError[],
 ): void {
-  if (obj[key] === undefined) return
+  if (obj[key] === undefined) {return}
   const err = checkEnum(obj[key], allowed, childPath(path, key))
-  if (err) errors.push(err)
+  if (err) {errors.push(err)}
 }
 
 export function checkPattern(value: unknown, pattern: RegExp, path: string): ValidationError | null {
-  if (typeof value !== 'string') return null // checkType reports the type mismatch separately
-  if (pattern.test(value)) return null
+  if (typeof value !== 'string') {return null} // CheckType reports the type mismatch separately
+  if (pattern.test(value)) {return null}
   return { path, type: 'pattern', message: `must match pattern ${pattern}` }
 }
 
@@ -77,15 +79,15 @@ export function checkFieldPattern(
   path: string,
   errors: ValidationError[],
 ): void {
-  if (obj[key] === undefined) return
+  if (obj[key] === undefined) {return}
   const err = checkPattern(obj[key], pattern, childPath(path, key))
-  if (err) errors.push(err)
+  if (err) {errors.push(err)}
 }
 
 export function checkRange(value: unknown, min: number | undefined, max: number | undefined, path: string): ValidationError | null {
-  if (typeof value !== 'number') return null // checkType reports the type mismatch separately
-  if (min !== undefined && value < min) return { path, type: 'range', message: `must be >= ${min}, got ${value}` }
-  if (max !== undefined && value > max) return { path, type: 'range', message: `must be <= ${max}, got ${value}` }
+  if (typeof value !== 'number') {return null} // CheckType reports the type mismatch separately
+  if (min !== undefined && value < min) {return { path, type: 'range', message: `must be >= ${min}, got ${value}` }}
+  if (max !== undefined && value > max) {return { path, type: 'range', message: `must be <= ${max}, got ${value}` }}
   return null
 }
 
@@ -97,7 +99,7 @@ export function checkRequired(obj: Record<string, unknown>, fields: readonly str
 
 const DEFAULT_ADDITIONAL_PATTERNS = [/^x-/]
 
-/** additionalProperties: false (optionally combined with patternProperties like `^x-`). */
+/** AdditionalProperties: false (optionally combined with patternProperties like `^x-`). */
 export function checkAdditionalProperties(
   obj: Record<string, unknown>,
   knownKeys: readonly string[],
@@ -106,8 +108,8 @@ export function checkAdditionalProperties(
 ): ValidationError[] {
   const errors: ValidationError[] = []
   for (const key of Object.keys(obj)) {
-    if (knownKeys.includes(key)) continue
-    if (allowedPatterns.some((pattern) => pattern.test(key))) continue
+    if (knownKeys.includes(key)) {continue}
+    if (allowedPatterns.some((pattern) => pattern.test(key))) {continue}
     errors.push({ path: childPath(path, key), type: 'additional_property', message: `unknown property "${key}"` })
   }
   return errors
@@ -127,7 +129,7 @@ export function validateMapOf(
   validateEntry: (entry: unknown, entryPath: string) => ValidationError[],
 ): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   return [...checkKeyPattern(Object.keys(obj), keyPattern, path), ...Object.entries(obj).flatMap(([key, entry]) => validateEntry(entry, childPath(path, key)))]
 }
@@ -137,7 +139,7 @@ export type ListOfStrings = string[]
 
 export function validateListOfStrings(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['array'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   return (value as unknown[]).flatMap((item, i) => {
     const itemErr = checkType(item, ['string'], indexPath(path, i))
     return itemErr ? [itemErr] : []
@@ -148,7 +150,7 @@ export function validateListOfStrings(value: unknown, path: string): ValidationE
 export type StringOrList = string | string[]
 
 export function validateStringOrList(value: unknown, path: string): ValidationError[] {
-  if (typeof value === 'string') return []
+  if (typeof value === 'string') {return []}
   return validateListOfStrings(value, path)
 }
 
@@ -156,7 +158,7 @@ export function validateStringOrList(value: unknown, path: string): ValidationEr
 export type ListOrDict = Record<string, string | number | boolean | null> | string[]
 
 export function validateListOrDict(value: unknown, path: string): ValidationError[] {
-  if (Array.isArray(value)) return validateListOfStrings(value, path)
+  if (Array.isArray(value)) {return validateListOfStrings(value, path)}
   if (isPlainObject(value)) {
     return Object.entries(value).flatMap(([key, entry]) => {
       const err = checkType(entry, ['string', 'number', 'boolean', 'null'], childPath(path, key))
@@ -170,11 +172,11 @@ export function validateListOrDict(value: unknown, path: string): ValidationErro
 export type ExtraHosts = Record<string, string | string[]> | string[]
 
 export function validateExtraHosts(value: unknown, path: string): ValidationError[] {
-  if (Array.isArray(value)) return validateListOfStrings(value, path)
+  if (Array.isArray(value)) {return validateListOfStrings(value, path)}
   if (isPlainObject(value)) {
     return Object.entries(value).flatMap(([key, entry]) => {
       const entryPath = childPath(path, key)
-      if (typeof entry === 'string') return []
+      if (typeof entry === 'string') {return []}
       return validateListOfStrings(entry, entryPath)
     })
   }
@@ -185,7 +187,7 @@ export function validateExtraHosts(value: unknown, path: string): ValidationErro
 export type Command = null | string | string[]
 
 export function validateCommand(value: unknown, path: string): ValidationError[] {
-  if (value === null || typeof value === 'string') return []
+  if (value === null || typeof value === 'string') {return []}
   return validateListOfStrings(value, path)
 }
 
@@ -193,7 +195,7 @@ export function validateCommand(value: unknown, path: string): ValidationError[]
 export type LabelFile = string | string[]
 
 export function validateLabelFile(value: unknown, path: string): ValidationError[] {
-  if (typeof value === 'string') return []
+  if (typeof value === 'string') {return []}
   return validateListOfStrings(value, path)
 }
 
@@ -206,14 +208,14 @@ export interface EnvFileEntry {
 export type EnvFile = string | (string | EnvFileEntry)[]
 
 export function validateEnvFile(value: unknown, path: string): ValidationError[] {
-  if (typeof value === 'string') return []
+  if (typeof value === 'string') {return []}
   const err = checkType(value, ['array'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   return (value as unknown[]).flatMap((item, i) => {
     const itemPath = indexPath(path, i)
-    if (typeof item === 'string') return []
+    if (typeof item === 'string') {return []}
     const itemErr = checkType(item, ['object'], itemPath)
-    if (itemErr) return [itemErr]
+    if (itemErr) {return [itemErr]}
     const entry = item as Record<string, unknown>
     const errors: ValidationError[] = checkRequired(entry, ['path'], itemPath)
     checkFieldType(entry, 'path', ['string'], itemPath, errors)
@@ -233,12 +235,12 @@ export type Ulimits = Record<string, number | string | UlimitDetail>
 
 export function validateUlimits(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   return Object.entries(value as Record<string, unknown>).flatMap(([key, entry]) => {
     const entryPath = childPath(path, key)
-    if (typeof entry === 'number' || typeof entry === 'string') return []
+    if (typeof entry === 'number' || typeof entry === 'string') {return []}
     const entryErr = checkType(entry, ['object'], entryPath)
-    if (entryErr) return [entryErr]
+    if (entryErr) {return [entryErr]}
     const detail = entry as Record<string, unknown>
     const errors: ValidationError[] = checkRequired(detail, ['soft', 'hard'], entryPath)
     checkFieldType(detail, 'soft', ['integer', 'string'], entryPath, errors)
@@ -260,12 +262,12 @@ export type ServiceConfigOrSecret = (string | ServiceConfigOrSecretDetail)[]
 
 export function validateServiceConfigOrSecret(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['array'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   return (value as unknown[]).flatMap((item, i) => {
     const itemPath = indexPath(path, i)
-    if (typeof item === 'string') return []
+    if (typeof item === 'string') {return []}
     const itemErr = checkType(item, ['object'], itemPath)
-    if (itemErr) return [itemErr]
+    if (itemErr) {return [itemErr]}
     const entry = item as Record<string, unknown>
     const errors: ValidationError[] = []
     checkFieldType(entry, 'source', ['string'], itemPath, errors)
@@ -286,7 +288,7 @@ export interface BlkioLimit {
 
 export function validateBlkioLimit(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'path', ['string'], path, errors)
@@ -303,7 +305,7 @@ export interface BlkioWeight {
 
 export function validateBlkioWeight(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'path', ['string'], path, errors)
@@ -323,11 +325,11 @@ export type GenericResources = GenericResource[]
 
 export function validateGenericResources(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['array'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   return (value as unknown[]).flatMap((item, i) => {
     const itemPath = indexPath(path, i)
     const itemErr = checkType(item, ['object'], itemPath)
-    if (itemErr) return [itemErr]
+    if (itemErr) {return [itemErr]}
     const entry = item as Record<string, unknown>
     const errors: ValidationError[] = []
     if (entry.discrete_resource_spec !== undefined) {
@@ -359,18 +361,18 @@ export type ReservationDevices = ReservationDevice[]
 
 export function validateReservationDevices(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['array'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   return (value as unknown[]).flatMap((item, i) => {
     const itemPath = indexPath(path, i)
     const itemErr = checkType(item, ['object'], itemPath)
-    if (itemErr) return [itemErr]
+    if (itemErr) {return [itemErr]}
     const entry = item as Record<string, unknown>
     const errors: ValidationError[] = checkRequired(entry, ['capabilities'], itemPath)
-    if (entry.capabilities !== undefined) errors.push(...validateListOfStrings(entry.capabilities, childPath(itemPath, 'capabilities')))
+    if (entry.capabilities !== undefined) {errors.push(...validateListOfStrings(entry.capabilities, childPath(itemPath, 'capabilities')))}
     checkFieldType(entry, 'count', ['string', 'integer'], itemPath, errors)
-    if (entry.device_ids !== undefined) errors.push(...validateListOfStrings(entry.device_ids, childPath(itemPath, 'device_ids')))
+    if (entry.device_ids !== undefined) {errors.push(...validateListOfStrings(entry.device_ids, childPath(itemPath, 'device_ids')))}
     checkFieldType(entry, 'driver', ['string'], itemPath, errors)
-    if (entry.options !== undefined) errors.push(...validateListOrDict(entry.options, childPath(itemPath, 'options')))
+    if (entry.options !== undefined) {errors.push(...validateListOrDict(entry.options, childPath(itemPath, 'options')))}
     errors.push(...checkAdditionalProperties(entry, ['capabilities', 'count', 'device_ids', 'driver', 'options'], itemPath, []))
     return errors
   })
@@ -380,15 +382,15 @@ export function validateReservationDevices(value: unknown, path: string): Valida
 // boolean/string shorthand, or an object with just a `name`.
 export type External = boolean | string | { name?: string }
 
-// network/volume close `external` to just {name} (+ x-); secret/config leave
+// Network/volume close `external` to just {name} (+ x-); secret/config leave
 // it open (no additionalProperties: false in compose_spec.json for those).
 export function validateExternal(value: unknown, path: string, strict = false): ValidationError[] {
   const err = checkType(value, ['boolean', 'string', 'object'], path)
-  if (err) return [err]
-  if (!isPlainObject(value)) return []
+  if (err) {return [err]}
+  if (!isPlainObject(value)) {return []}
   const errors: ValidationError[] = []
   checkFieldType(value, 'name', ['string'], path, errors)
-  if (strict) errors.push(...checkAdditionalProperties(value, ['name'], path))
+  if (strict) {errors.push(...checkAdditionalProperties(value, ['name'], path))}
   return errors
 }
 
@@ -403,20 +405,20 @@ export interface GpuDetail {
 export type Gpus = 'all' | GpuDetail[]
 
 export function validateGpus(value: unknown, path: string): ValidationError[] {
-  if (value === 'all') return []
+  if (value === 'all') {return []}
   const err = checkType(value, ['array'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   return (value as unknown[]).flatMap((item, i) => {
     const itemPath = indexPath(path, i)
     const itemErr = checkType(item, ['object'], itemPath)
-    if (itemErr) return [itemErr]
+    if (itemErr) {return [itemErr]}
     const entry = item as Record<string, unknown>
     const errors: ValidationError[] = []
-    if (entry.capabilities !== undefined) errors.push(...validateListOfStrings(entry.capabilities, childPath(itemPath, 'capabilities')))
+    if (entry.capabilities !== undefined) {errors.push(...validateListOfStrings(entry.capabilities, childPath(itemPath, 'capabilities')))}
     checkFieldType(entry, 'count', ['string', 'integer'], itemPath, errors)
-    if (entry.device_ids !== undefined) errors.push(...validateListOfStrings(entry.device_ids, childPath(itemPath, 'device_ids')))
+    if (entry.device_ids !== undefined) {errors.push(...validateListOfStrings(entry.device_ids, childPath(itemPath, 'device_ids')))}
     checkFieldType(entry, 'driver', ['string'], itemPath, errors)
-    if (entry.options !== undefined) errors.push(...validateListOrDict(entry.options, childPath(itemPath, 'options')))
+    if (entry.options !== undefined) {errors.push(...validateListOrDict(entry.options, childPath(itemPath, 'options')))}
     return errors
   })
 }

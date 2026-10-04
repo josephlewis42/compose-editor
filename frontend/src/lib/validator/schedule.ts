@@ -14,7 +14,7 @@ const KNOWN_KEYS = ['cron', 'timezone', 'concurrency', 'missed_fires']
 
 export function validateSchedule(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = checkRequired(obj, ['cron'], path)
   checkFieldType(obj, 'cron', ['string'], path, errors)

@@ -8,10 +8,10 @@
 
 import { useEffect, useRef } from 'react'
 import { EditorState } from '@codemirror/state'
-import { EditorView, lineNumbers, highlightActiveLine, highlightActiveLineGutter } from '@codemirror/view'
+import { EditorView, highlightActiveLine, highlightActiveLineGutter, lineNumbers } from '@codemirror/view'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { yaml } from '@codemirror/lang-yaml'
-import { lintGutter, linter, forceLinting, type Diagnostic } from '@codemirror/lint'
+import { type Diagnostic, forceLinting, lintGutter, linter } from '@codemirror/lint'
 import { tags } from '@lezer/highlight'
 import type { ValidationError } from '@/lib/validator'
 
@@ -64,8 +64,12 @@ interface YamlViewerProps {
 function toDiagnostics(state: EditorState, errors: ValidationError[]): Diagnostic[] {
   const diagnostics: Diagnostic[] = []
   for (const error of errors) {
-    if (error.line === undefined || error.col === undefined) continue
-    if (error.line < 1 || error.line > state.doc.lines) continue
+    if (error.line === undefined || error.col === undefined) {
+      continue
+    }
+    if (error.line < 1 || error.line > state.doc.lines) {
+      continue
+    }
     const docLine = state.doc.line(error.line)
     const from = Math.min(docLine.from + (error.col - 1), docLine.to)
     diagnostics.push({ from, to: docLine.to, severity: 'error', source: error.type, message: error.message })
@@ -73,13 +77,15 @@ function toDiagnostics(state: EditorState, errors: ValidationError[]): Diagnosti
   return diagnostics
 }
 
-export function YamlViewer({ value, errors = [], className }: YamlViewerProps) {
+const NO_ERRORS: ValidationError[] = []
+
+export function YamlViewer({ value, errors = NO_ERRORS, className }: YamlViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const viewRef = useRef<EditorView | null>(null)
   const errorsRef = useRef(errors)
 
   useEffect(() => {
-    if (!containerRef.current) return
+    if (!containerRef.current) {return}
 
     const view = new EditorView({
       doc: value,
@@ -107,7 +113,7 @@ export function YamlViewer({ value, errors = [], className }: YamlViewerProps) {
   useEffect(() => {
     errorsRef.current = errors
     const view = viewRef.current
-    if (!view) return
+    if (!view) {return}
     if (view.state.doc.toString() !== value) {
       // A doc change re-runs the linter extension on its own.
       view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: value } })

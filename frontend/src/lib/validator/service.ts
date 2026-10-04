@@ -1,14 +1,14 @@
 // #/$defs/service — allOf[container_spec, workload_spec] plus its own
 // fields, closed with unevaluatedProperties: false.
 
-import { childPath, indexPath, type ValidationError } from './errors'
-import { CONTAINER_SPEC_KNOWN_KEYS, validateContainerSpecFields, type ContainerSpec } from './containerSpec'
-import { WORKLOAD_SPEC_KNOWN_KEYS, validateWorkloadSpecFields, type WorkloadSpec } from './workloadSpec'
-import { validateDeployment, type Deployment } from './deployment'
-import { validateDevelopment, type Development } from './development'
-import { validateServiceHook, type ServiceHook } from './hooks'
-import { validatePreStartHooks, type PreStartHook } from './preStartHook'
-import { checkAdditionalProperties, checkFieldPattern, checkFieldType, checkRequired, checkType, validateListOfStrings, type ListOfStrings } from './primitives'
+import { type ValidationError, childPath, indexPath } from './errors'
+import { CONTAINER_SPEC_KNOWN_KEYS, type ContainerSpec, validateContainerSpecFields } from './containerSpec'
+import { WORKLOAD_SPEC_KNOWN_KEYS, type WorkloadSpec, validateWorkloadSpecFields } from './workloadSpec'
+import { type Deployment, validateDeployment } from './deployment'
+import { type Development, validateDevelopment } from './development'
+import { type ServiceHook, validateServiceHook } from './hooks'
+import { type PreStartHook, validatePreStartHooks } from './preStartHook'
+import { type ListOfStrings, checkAdditionalProperties, checkFieldPattern, checkFieldType, checkRequired, checkType, validateListOfStrings } from './primitives'
 
 export interface ProviderConfig {
   type: string
@@ -62,7 +62,7 @@ const SERVICE_KNOWN_KEYS = [...CONTAINER_SPEC_KNOWN_KEYS, ...WORKLOAD_SPEC_KNOWN
 
 function validateProvider(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = checkRequired(obj, ['type'], path)
   checkFieldType(obj, 'type', ['string'], path, errors)
@@ -92,9 +92,9 @@ function validateProvider(value: unknown, path: string): ValidationError[] {
 }
 
 function validateExtends(value: unknown, path: string): ValidationError[] {
-  if (typeof value === 'string') return []
+  if (typeof value === 'string') {return []}
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = checkRequired(obj, ['service'], path)
   checkFieldType(obj, 'service', ['string'], path, errors)
@@ -105,7 +105,7 @@ function validateExtends(value: unknown, path: string): ValidationError[] {
 
 function validateUniqueStringArray(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['array'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const items = value as unknown[]
   const errors: ValidationError[] = items.flatMap((item, i) => {
     const itemErr = checkType(item, ['string'], indexPath(path, i))
@@ -113,8 +113,8 @@ function validateUniqueStringArray(value: unknown, path: string): ValidationErro
   })
   const seen = new Set<string>()
   items.forEach((item, i) => {
-    if (typeof item !== 'string') return
-    if (seen.has(item)) errors.push({ path: indexPath(path, i), type: 'unique_items', message: `duplicate value ${JSON.stringify(item)}` })
+    if (typeof item !== 'string') {return}
+    if (seen.has(item)) {errors.push({ path: indexPath(path, i), type: 'unique_items', message: `duplicate value ${JSON.stringify(item)}` })}
     seen.add(item)
   })
   return errors
@@ -122,33 +122,33 @@ function validateUniqueStringArray(value: unknown, path: string): ValidationErro
 
 export function validateService(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = [...validateContainerSpecFields(obj, path), ...validateWorkloadSpecFields(obj, path)]
 
-  if (obj.deploy !== undefined) errors.push(...validateDeployment(obj.deploy, childPath(path, 'deploy')))
-  if (obj.develop !== undefined) errors.push(...validateDevelopment(obj.develop, childPath(path, 'develop')))
-  if (obj.profiles !== undefined) errors.push(...validateListOfStrings(obj.profiles, childPath(path, 'profiles')))
+  if (obj.deploy !== undefined) {errors.push(...validateDeployment(obj.deploy, childPath(path, 'deploy')))}
+  if (obj.develop !== undefined) {errors.push(...validateDevelopment(obj.develop, childPath(path, 'develop')))}
+  if (obj.profiles !== undefined) {errors.push(...validateListOfStrings(obj.profiles, childPath(path, 'profiles')))}
   checkFieldType(obj, 'restart', ['string'], path, errors)
   checkFieldType(obj, 'scale', ['integer', 'string'], path, errors)
   checkFieldType(obj, 'attach', ['boolean', 'string'], path, errors)
   checkFieldPattern(obj, 'container_name', CONTAINER_NAME_PATTERN, path, errors)
-  if (obj.provider !== undefined) errors.push(...validateProvider(obj.provider, childPath(path, 'provider')))
-  if (obj.extends !== undefined) errors.push(...validateExtends(obj.extends, childPath(path, 'extends')))
-  if (obj.links !== undefined) errors.push(...validateUniqueStringArray(obj.links, childPath(path, 'links')))
-  if (obj.external_links !== undefined) errors.push(...validateUniqueStringArray(obj.external_links, childPath(path, 'external_links')))
-  if (obj.pre_start !== undefined) errors.push(...validatePreStartHooks(obj.pre_start, childPath(path, 'pre_start')))
+  if (obj.provider !== undefined) {errors.push(...validateProvider(obj.provider, childPath(path, 'provider')))}
+  if (obj.extends !== undefined) {errors.push(...validateExtends(obj.extends, childPath(path, 'extends')))}
+  if (obj.links !== undefined) {errors.push(...validateUniqueStringArray(obj.links, childPath(path, 'links')))}
+  if (obj.external_links !== undefined) {errors.push(...validateUniqueStringArray(obj.external_links, childPath(path, 'external_links')))}
+  if (obj.pre_start !== undefined) {errors.push(...validatePreStartHooks(obj.pre_start, childPath(path, 'pre_start')))}
   if (obj.post_start !== undefined) {
     const p = childPath(path, 'post_start')
     const listErr = checkType(obj.post_start, ['array'], p)
-    if (listErr) errors.push(listErr)
-    else errors.push(...(obj.post_start as unknown[]).flatMap((item, i) => validateServiceHook(item, indexPath(p, i))))
+    if (listErr) {errors.push(listErr)}
+    else {errors.push(...(obj.post_start as unknown[]).flatMap((item, i) => validateServiceHook(item, indexPath(p, i))))}
   }
   if (obj.pre_stop !== undefined) {
     const p = childPath(path, 'pre_stop')
     const listErr = checkType(obj.pre_stop, ['array'], p)
-    if (listErr) errors.push(listErr)
-    else errors.push(...(obj.pre_stop as unknown[]).flatMap((item, i) => validateServiceHook(item, indexPath(p, i))))
+    if (listErr) {errors.push(listErr)}
+    else {errors.push(...(obj.pre_stop as unknown[]).flatMap((item, i) => validateServiceHook(item, indexPath(p, i))))}
   }
 
   errors.push(...checkAdditionalProperties(obj, SERVICE_KNOWN_KEYS, path))

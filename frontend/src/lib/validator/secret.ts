@@ -1,7 +1,7 @@
 // #/$defs/secret
 
-import { childPath, type ValidationError } from './errors'
-import { checkAdditionalProperties, checkFieldType, checkType, validateExternal, validateListOrDict, type External, type ListOrDict } from './primitives'
+import { type ValidationError, childPath } from './errors'
+import { type External, type ListOrDict, checkAdditionalProperties, checkFieldType, checkType, validateExternal, validateListOrDict } from './primitives'
 
 export interface Secret {
   name?: string
@@ -18,14 +18,14 @@ const KNOWN_KEYS = ['name', 'environment', 'file', 'external', 'labels', 'driver
 
 export function validateSecret(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'name', ['string'], path, errors)
   checkFieldType(obj, 'environment', ['string'], path, errors)
   checkFieldType(obj, 'file', ['string'], path, errors)
-  if (obj.external !== undefined) errors.push(...validateExternal(obj.external, childPath(path, 'external')))
-  if (obj.labels !== undefined) errors.push(...validateListOrDict(obj.labels, childPath(path, 'labels')))
+  if (obj.external !== undefined) {errors.push(...validateExternal(obj.external, childPath(path, 'external')))}
+  if (obj.labels !== undefined) {errors.push(...validateListOrDict(obj.labels, childPath(path, 'labels')))}
   checkFieldType(obj, 'driver', ['string'], path, errors)
   if (obj.driver_opts !== undefined) {
     const optsPath = childPath(path, 'driver_opts')

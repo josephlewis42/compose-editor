@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { type Catalog, type Application } from '@/gen/composeeditor/v1/spec_pb'
+import { type Application, type Catalog } from '@/gen/composeeditor/v1/spec_pb'
 import { ExternalLink } from '@/components/ExternalLink'
 
 const MIN_APPS_FOR_TAG_CHIP = 2

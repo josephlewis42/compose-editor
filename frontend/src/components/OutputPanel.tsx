@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
-import { CheckIcon, CodeIcon, CopyIcon, DownloadIcon } from 'lucide-react'
+import { CodeIcon, DownloadIcon } from 'lucide-react'
 import type { Message } from '@/gen/composeeditor/v1/wasm_pb'
-import { parseComposeYaml, type ValidationError } from '@/lib/validator'
+import { type ValidationError, parseComposeYaml } from '@/lib/validator'
 import { YamlViewer } from './YamlViewer'
 import type { FormValues } from './FormRenderer'
+import CopyButton from './CopyButton'
 
 interface OutputPanelProps {
   composeOutput: string
@@ -15,7 +16,6 @@ interface OutputPanelProps {
 
 export function OutputPanel({ composeOutput, errors, warnings, values, downloadName }: OutputPanelProps) {
   const [tab, setTab] = useState<'output' | 'details'>('output')
-  const [copied, setCopied] = useState(false)
 
   // Structural validation against compose_spec.json, layered on top of the
   // engine's own field errors/warnings — this one runs client-side against
@@ -23,11 +23,6 @@ export function OutputPanel({ composeOutput, errors, warnings, values, downloadN
   const schemaErrors = useMemo(() => parseComposeYaml(composeOutput).errors, [composeOutput])
   const issueCount = errors.length + schemaErrors.length
 
-  const copy = async () => {
-    await navigator.clipboard.writeText(composeOutput)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
-  }
 
   const download = () => {
     const blob = new Blob([composeOutput], { type: 'application/yaml' })
@@ -52,9 +47,7 @@ export function OutputPanel({ composeOutput, errors, warnings, values, downloadN
           </a>
 
           <div className="tab-content bg-base-100 border-base-300 p-6">
-            <button type="button" className="btn btn-outline btn-sm" onClick={copy} disabled={!composeOutput}>
-              {copied ? <CheckIcon /> : <CopyIcon />} {copied ? 'Copied!' : 'Copy'}
-            </button>
+            <CopyButton text={composeOutput} />
             <button type="button" className="btn btn-outline btn-sm" onClick={download} disabled={!composeOutput}>
               <DownloadIcon /> Download
             </button>
@@ -78,7 +71,7 @@ export function OutputPanel({ composeOutput, errors, warnings, values, downloadN
             <div>
               <h4 className="mb-1 text-sm font-medium">Form values</h4>
               <pre className="overflow-x-auto rounded-lg border border-base-300 bg-base-200 p-3 font-mono text-xs">
-                {JSON.stringify(values, null, 2)}
+                {JSON.stringify(values, null, "  ")}
               </pre>
             </div>
           </div>

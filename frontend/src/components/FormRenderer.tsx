@@ -53,7 +53,7 @@ function FormElementView({
     case 'heading':
       return (
         <div className="mt-3 mb-3">
-          <div className="divider"></div>
+          <div className="divider" />
           <h3 className="text-base font-semibold ">{el.value.title}</h3>
           {el.value.content && <Markdown className="text-base-content/60">{el.value.content}</Markdown>}
         </div>
@@ -179,7 +179,7 @@ function useFieldValue<T extends Value>(keyname: string, defaultValue: T, onUpda
   return [value, update]
 }
 
-type TextLikeInput = {
+interface TextLikeInput {
   keyname: string
   label: string
   description: string
@@ -192,9 +192,9 @@ function useTextInput(field: TextLikeInput, onUpdate: FormUpdate) {
   const [value, setValue] = useFieldValue(field.keyname, field.defaultValue, onUpdate)
   const [invalid, setInvalid] = useState(false)
 
-  const rawRegex = useMemo(() => {
-    return field.validation?.regex
-  }, [field])
+  const rawRegex = useMemo(() => 
+    field.validation?.regex
+  , [field])
 
   const setAndCheckValidity = useCallback((newValue: string) => {
     var isInvalid = false

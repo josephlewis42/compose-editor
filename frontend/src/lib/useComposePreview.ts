@@ -6,7 +6,7 @@ import { create } from '@bufbuild/protobuf'
 import { useEffect, useState } from 'react'
 import { convertComposeSpec } from '@/lib/wasm'
 import type { FormValues } from '@/components/FormRenderer'
-import { MessageSchema, type Message } from '@/gen/composeeditor/v1/wasm_pb'
+import { type Message, MessageSchema } from '@/gen/composeeditor/v1/wasm_pb'
 
 const DEBOUNCE_MS = 100
 

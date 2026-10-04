@@ -7,6 +7,17 @@ import { loadCatalog } from '@/lib/catalog'
 import { type Catalog } from '@/gen/composeeditor/v1/spec_pb'
 
 export default function App() {
+  return (
+    <div className="flex min-h-0 flex-col">
+      <NavBar />
+      <div className="min-h-0 flex-1 overflow-y-auto bg-base-200">
+        <AppContent />
+      </div>
+    </div>
+  )
+}
+
+function AppContent() {
   const [catalog, setCatalog] = useState<Catalog | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -16,22 +27,19 @@ export default function App() {
       .catch((err: unknown) => setError(err instanceof Error ? err.message : String(err)))
   }, [])
 
+  if (error) {
+    return (<p className="p-6 text-error">Couldn't load the application catalog: {error}</p>)
+  }
+
+  if (!catalog) {
+    return (<p className="p-6 text-base-content/60">Loading the application catalog...</p>)
+  }
+
   return (
-    <div className="flex min-h-0 flex-col">
-      <NavBar />
-      <div className="min-h-0 flex-1 overflow-y-auto bg-base-200">
-        {error ? (
-          <p className="p-6 text-error">Couldn't load the application catalog: {error}</p>
-        ) : !catalog ? (
-          <p className="p-6 text-base-content/60">Loading the application catalog...</p>
-        ) : (
-          <Routes>
-            <Route path="/" element={<CatalogPage catalog={catalog} />} />
-            <Route path="/edit/:slug" element={<EditorRoute catalog={catalog} />} />
-          </Routes>
-        )}
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<CatalogPage catalog={catalog} />} />
+      <Route path="/edit/:slug" element={<EditorRoute catalog={catalog} />} />
+    </Routes>
   )
 }
 

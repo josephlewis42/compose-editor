@@ -13,7 +13,7 @@ export function flattenForm(elements: FormElement[], parentJsonPath: string): Fo
 }
 
 function flattenFormElement(formElement: FormElement, parentJsonPath: string): FormElementWrapper[] {
-    const basePath: string = `${parentJsonPath}.${formElement.element.case}`
+    const basePath = `${parentJsonPath}.${formElement.element.case}`
     const output: FormElementWrapper[] = []
     output.push(new FormElementWrapper(formElement, basePath))
 
@@ -57,20 +57,20 @@ function flattenFormElement(formElement: FormElement, parentJsonPath: string): F
 }
 
 export class FormElementWrapper {
-    _formElement: FormElement
-    _jsonPath: string
+    #formElement: FormElement
+    #jsonPath: string
 
     constructor(formElement: FormElement, jsonPath: string) {
-        this._formElement = formElement
-        this._jsonPath = jsonPath
+        this.#formElement = formElement
+        this.#jsonPath = jsonPath
     }
 
     public get formElement(): FormElement{
-        return this._formElement
+        return this.#formElement
     }
 
     public get jsonPath(): string{
-        return this._jsonPath
+        return this.#jsonPath
     }
 
     public isInput(): boolean {
@@ -78,7 +78,7 @@ export class FormElementWrapper {
     }
 
     public keyName(): string|undefined {
-        switch(this._formElement.element.case) {
+        switch(this.#formElement.element.case) {
             case "info":
             case "warning":
             case "danger":
@@ -90,12 +90,12 @@ export class FormElementWrapper {
                 return undefined 
 
             default:
-                return this._formElement.element.value.keyname
+                return this.#formElement.element.value.keyname
         }
     }
 
     public defaultValue(): string|number|boolean|undefined {
-         switch(this._formElement.element.case) {
+         switch(this.#formElement.element.case) {
             case "info":
             case "warning":
             case "danger":
@@ -107,15 +107,15 @@ export class FormElementWrapper {
                 return undefined 
 
             case "oneOf":
-                return this._formElement.element.value.tabs[0].value
+                return this.#formElement.element.value.tabs[0].value
 
             default:
-                return this._formElement.element.value.defaultValue
+                return this.#formElement.element.value.defaultValue
         }
     }
 
     public isValid(value: string|number|boolean|undefined): boolean {
-        switch(this._formElement.element.case) {
+        switch(this.#formElement.element.case) {
             // Form elements that don't support values:
             case "info":
             case "warning":
@@ -127,13 +127,13 @@ export class FormElementWrapper {
             case undefined:
                 return false 
 
-            // oneOf allows any of its sub-tabs:
+            // OneOf allows any of its sub-tabs:
             case "oneOf": {
-                const found = this._formElement.element.value.tabs.find(tab => tab.value === value)
+                const found = this.#formElement.element.value.tabs.find(tab => tab.value === value)
                 return undefined !== found
             }
 
-            // boolean values
+            // Boolean values
             case "toggle":
             case "toggleSection":
                 return value === true || value === false
@@ -141,6 +141,7 @@ export class FormElementWrapper {
             case "port": {
                 if (Number.isFinite(value)) {
                     const parsed = Number(value)
+                    // eslint-disable-next-line no-magic-numbers
                     return (parsed > 0 && parsed <= 65536)
                 } else {
                     return false
@@ -151,9 +152,9 @@ export class FormElementWrapper {
                 if (Number.isFinite(value)) {
                     const parsed = Number(value)
 
-                    return (parsed >= this._formElement.element.value.minimum) && 
-                            (parsed <= this._formElement.element.value.maximum) &&
-                            (parsed % this._formElement.element.value.step === 0);
+                    return (parsed >= this.#formElement.element.value.minimum) && 
+                            (parsed <= this.#formElement.element.value.maximum) &&
+                            (parsed % this.#formElement.element.value.step === 0);
                 } else {
                     return false
                 }
@@ -166,7 +167,7 @@ export class FormElementWrapper {
 
                 const strValue = value?.toString()
 
-                const matchingOption = this._formElement.element.value.options.find(option => {
+                const matchingOption = this.#formElement.element.value.options.find(option => {
                     if (option.value === '') {
                         return option.title === strValue
                     } else {
@@ -197,7 +198,7 @@ export class FormElementWrapper {
                 }
                 const strValue = value?.toString()
 
-                const validation = this._formElement.element.value.validation
+                const {validation} = this.#formElement.element.value
                 if (!validation) {
                     return true
                 }
@@ -208,11 +209,11 @@ export class FormElementWrapper {
     }
 
     public validateElement(): ValidationError[] {
-        const element = this._formElement.element
+        const {element} = this.#formElement
         const errors: ValidationError[] = []
-        const rootPath = this._jsonPath
+        const rootPath = this.#jsonPath
 
-        const requireString = function(propertyName: string, value: string, path?: string) {
+        const requireString = function requireString(propertyName: string, value: string, path?: string) {
             if (value.length == 0) {
                 errors.push({
                     path: childPath(path || rootPath, propertyName),
@@ -225,7 +226,7 @@ export class FormElementWrapper {
 
         switch(element.case) {
             case undefined:
-                return [{path: this._jsonPath, type: 'parse', message: 'Unknown element type'}]
+                return [{path: this.#jsonPath, type: 'parse', message: 'Unknown element type'}]
 
             // Alerts
             case "info":
@@ -234,7 +235,7 @@ export class FormElementWrapper {
             case "success": {
                 if (element.value.content.length == 0) {
                     errors.push({
-                        path: childPath(this._jsonPath, 'content'),
+                        path: childPath(this.#jsonPath, 'content'),
                         type: 'required',
                         message: 'content must not be empty'
                     })
@@ -245,7 +246,7 @@ export class FormElementWrapper {
             case "heading": {
                 if (element.value.title.length == 0) {
                     errors.push({
-                        path: childPath(this._jsonPath, 'title'),
+                        path: childPath(this.#jsonPath, 'title'),
                         type: 'required',
                         message: 'title must not be empty'
                     })
@@ -256,7 +257,7 @@ export class FormElementWrapper {
             case "markdown": {
                 if (element.value.content.length == 0) {
                     errors.push({
-                        path: childPath(this._jsonPath, 'content'),
+                        path: childPath(this.#jsonPath, 'content'),
                         type: 'required',
                         message: 'content must not be empty'
                     })
@@ -266,14 +267,14 @@ export class FormElementWrapper {
             case "collapsible": {
                 if (element.value.title.length == 0) {
                     errors.push({
-                        path: childPath(this._jsonPath, 'title'),
+                        path: childPath(this.#jsonPath, 'title'),
                         type: 'required',
                         message: 'title must not be empty'
                     })
                 }
                 if (element.value.form.length == 0) {
                     errors.push({
-                        path: childPath(this._jsonPath, 'form'),
+                        path: childPath(this.#jsonPath, 'form'),
                         type: 'required',
                         message: 'form must not be empty'
                     })
@@ -334,7 +335,7 @@ export class FormElementWrapper {
                 const input = element.value
                 requireString('keyname', input.keyname)
                 requireString('label', input.label)
-                // description is optional
+                // Description is optional
 
                 if (input.form.length == 0) {
                     errors.push({
@@ -412,7 +413,7 @@ export class FormElementWrapper {
                     const optionPath = indexPath(optionsPath, idx)
                     requireString('title', option.title, optionPath)
 
-                    // optgroups are headers, not selectable values
+                    // Optgroups are headers, not selectable values
                     if (option.optgroup.length > 0) {
                         return
                     }
@@ -456,7 +457,7 @@ export class FormElementWrapper {
                 const stringInput = element.value
                 requireString('keyname', stringInput.keyname)
                 requireString('label', stringInput.label)
-                // description is optional
+                // Description is optional
                 
                 if (stringInput.validation !== undefined) {
                     const stringValidation = stringInput.validation
@@ -465,6 +466,7 @@ export class FormElementWrapper {
                     requireString('regex', stringValidation.regex, stringValidationPath)
 
                     try {
+                        // eslint-disable-next-line no-new
                         new RegExp(stringValidation.regex)
                     } catch (e) {
                         errors.push({
@@ -473,8 +475,6 @@ export class FormElementWrapper {
                             message: `invalid regex: ${e}`
                         })
                     }
-
-                    stringValidation.regex
                 }
 
                 const defaultValue = this.defaultValue() || ''

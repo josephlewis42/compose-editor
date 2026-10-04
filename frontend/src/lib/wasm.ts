@@ -4,14 +4,14 @@
 // binary-encoded composeeditor.v1.ConvertInput/ConvertOutput messages
 // (Uint8Array), not JSON.
 
-import { create, fromBinary, fromJson, toBinary, type JsonValue } from '@bufbuild/protobuf'
+import { type JsonValue, create, fromBinary, fromJson, toBinary } from '@bufbuild/protobuf'
 import { ValueSchema } from '@bufbuild/protobuf/wkt'
 import { ConvertInputSchema, ConvertOutputSchema, type Message } from '@/gen/composeeditor/v1/wasm_pb'
 // Vite's `?init` wasm helper instantiates via fetch()/instantiateStreaming
 // in the browser and via node:fs under SSR/Vitest, so this loads correctly
 // in both a real browser and a Node-based test run.
 import initWasm from '@/gen/composeeditor.wasm?init'
-// import execURL from '@/gen/wasm_exec.js?url'
+// Import execURL from '@/gen/wasm_exec.js?url'
 import '@/gen/wasm_exec.js'
 
 
@@ -19,6 +19,7 @@ declare global {
   // eslint-disable-next-line no-var
   var Go: new () => {
     importObject: WebAssembly.Imports
+    // eslint-disable-next-line method-signature-style
     run(instance: WebAssembly.Instance): Promise<void>
   }
   // eslint-disable-next-line no-var
@@ -38,20 +39,10 @@ export interface ConvertOutput {
 
 let loading: Promise<void> | null = null
 
-// function loadScript(src: string): Promise<void> {
-//   return new Promise((resolve, reject) => {
-//     const script = document.createElement('script')
-//     script.src = src
-//     script.onload = () => resolve()
-//     script.onerror = () => reject(new Error(`couldn't load ${src}`))
-//     document.body.appendChild(script)
-//   })
-// }
-
 async function ensureLoaded(): Promise<void> {
   if (!loading) {
     loading = (async () => {
-      // await loadScript(execURL)
+      // Await loadScript(execURL)
       const go = new globalThis.Go()
       const instance = await initWasm(go.importObject)
       void go.run(instance)

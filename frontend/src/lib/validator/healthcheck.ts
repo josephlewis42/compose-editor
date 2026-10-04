@@ -1,7 +1,7 @@
 // #/$defs/healthcheck
 
-import { type ValidationError } from './errors'
 import { checkAdditionalProperties, checkFieldType, checkType, validateListOfStrings } from './primitives'
+import { type ValidationError } from './errors'
 
 export interface Healthcheck {
   disable?: boolean | string
@@ -17,7 +17,7 @@ const KNOWN_KEYS = ['disable', 'interval', 'retries', 'test', 'timeout', 'start_
 
 export function validateHealthcheck(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'disable', ['boolean', 'string'], path, errors)

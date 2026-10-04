@@ -1,11 +1,11 @@
 // #/$defs/job — allOf[container_spec, workload_spec] plus `triggers`
 // (required), closed with unevaluatedProperties: false.
 
-import { childPath, indexPath, type ValidationError } from './errors'
-import { CONTAINER_SPEC_KNOWN_KEYS, validateContainerSpecFields, type ContainerSpec } from './containerSpec'
-import { WORKLOAD_SPEC_KNOWN_KEYS, validateWorkloadSpecFields, type WorkloadSpec } from './workloadSpec'
-import { validateSchedule, type Schedule } from './schedule'
-import { checkAdditionalProperties, checkFieldType, checkRequired, checkType, validateListOfStrings, type ListOfStrings } from './primitives'
+import { type ValidationError, childPath, indexPath } from './errors'
+import { CONTAINER_SPEC_KNOWN_KEYS, type ContainerSpec, validateContainerSpecFields } from './containerSpec'
+import { WORKLOAD_SPEC_KNOWN_KEYS, type WorkloadSpec, validateWorkloadSpecFields } from './workloadSpec'
+import { type Schedule, validateSchedule } from './schedule'
+import { type ListOfStrings, checkAdditionalProperties, checkFieldType, checkRequired, checkType, validateListOfStrings } from './primitives'
 
 export interface Triggers {
   manual?: boolean | string
@@ -23,7 +23,7 @@ const JOB_KNOWN_KEYS = [...CONTAINER_SPEC_KNOWN_KEYS, ...WORKLOAD_SPEC_KNOWN_KEY
 
 function validateTriggers(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'manual', ['boolean', 'string'], path, errors)
@@ -47,12 +47,12 @@ function validateTriggers(value: unknown, path: string): ValidationError[] {
 
 export function validateJob(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = [...checkRequired(obj, ['triggers'], path), ...validateContainerSpecFields(obj, path), ...validateWorkloadSpecFields(obj, path)]
 
-  if (obj.profiles !== undefined) errors.push(...validateListOfStrings(obj.profiles, childPath(path, 'profiles')))
-  if (obj.triggers !== undefined) errors.push(...validateTriggers(obj.triggers, childPath(path, 'triggers')))
+  if (obj.profiles !== undefined) {errors.push(...validateListOfStrings(obj.profiles, childPath(path, 'profiles')))}
+  if (obj.triggers !== undefined) {errors.push(...validateTriggers(obj.triggers, childPath(path, 'triggers')))}
 
   errors.push(...checkAdditionalProperties(obj, JOB_KNOWN_KEYS, path))
   return errors

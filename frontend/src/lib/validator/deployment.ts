@@ -1,7 +1,10 @@
 // #/$defs/deployment (the compose file's `deploy:` key)
 
-import { childPath, type ValidationError } from './errors'
+import { type ValidationError, childPath } from './errors'
 import {
+  type GenericResources,
+  type ListOrDict,
+  type ReservationDevices,
   checkAdditionalProperties,
   checkFieldEnum,
   checkFieldType,
@@ -9,9 +12,6 @@ import {
   validateGenericResources,
   validateListOrDict,
   validateReservationDevices,
-  type GenericResources,
-  type ListOrDict,
-  type ReservationDevices,
 } from './primitives'
 
 export interface RollbackConfig {
@@ -84,7 +84,7 @@ const ROLLING_CONFIG_KEYS = ['parallelism', 'delay', 'failure_action', 'monitor'
 
 function validateRollingConfig(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'parallelism', ['integer', 'string'], path, errors)
@@ -99,7 +99,7 @@ function validateRollingConfig(value: unknown, path: string): ValidationError[] 
 
 function validateResourceLimits(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'cpus', ['number', 'string'], path, errors)
@@ -111,31 +111,31 @@ function validateResourceLimits(value: unknown, path: string): ValidationError[]
 
 function validateResourceReservations(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'cpus', ['number', 'string'], path, errors)
   checkFieldType(obj, 'memory', ['string'], path, errors)
-  if (obj.generic_resources !== undefined) errors.push(...validateGenericResources(obj.generic_resources, childPath(path, 'generic_resources')))
-  if (obj.devices !== undefined) errors.push(...validateReservationDevices(obj.devices, childPath(path, 'devices')))
+  if (obj.generic_resources !== undefined) {errors.push(...validateGenericResources(obj.generic_resources, childPath(path, 'generic_resources')))}
+  if (obj.devices !== undefined) {errors.push(...validateReservationDevices(obj.devices, childPath(path, 'devices')))}
   errors.push(...checkAdditionalProperties(obj, ['cpus', 'memory', 'generic_resources', 'devices'], path))
   return errors
 }
 
 function validateResources(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
-  if (obj.limits !== undefined) errors.push(...validateResourceLimits(obj.limits, childPath(path, 'limits')))
-  if (obj.reservations !== undefined) errors.push(...validateResourceReservations(obj.reservations, childPath(path, 'reservations')))
+  if (obj.limits !== undefined) {errors.push(...validateResourceLimits(obj.limits, childPath(path, 'limits')))}
+  if (obj.reservations !== undefined) {errors.push(...validateResourceReservations(obj.reservations, childPath(path, 'reservations')))}
   errors.push(...checkAdditionalProperties(obj, ['limits', 'reservations'], path))
   return errors
 }
 
 function validateRestartPolicy(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'condition', ['string'], path, errors)
@@ -148,7 +148,7 @@ function validateRestartPolicy(value: unknown, path: string): ValidationError[] 
 
 function validatePlacementPreference(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'spread', ['string'], path, errors)
@@ -158,7 +158,7 @@ function validatePlacementPreference(value: unknown, path: string): ValidationEr
 
 function validatePlacement(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   if (obj.constraints !== undefined) {
@@ -202,20 +202,20 @@ const DEPLOYMENT_KNOWN_KEYS = [
 ]
 
 export function validateDeployment(value: unknown, path: string): ValidationError[] {
-  if (value === null) return []
+  if (value === null) {return []}
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'mode', ['string'], path, errors)
   checkFieldType(obj, 'endpoint_mode', ['string'], path, errors)
   checkFieldType(obj, 'replicas', ['integer', 'string'], path, errors)
-  if (obj.labels !== undefined) errors.push(...validateListOrDict(obj.labels, childPath(path, 'labels')))
-  if (obj.rollback_config !== undefined) errors.push(...validateRollingConfig(obj.rollback_config, childPath(path, 'rollback_config')))
-  if (obj.update_config !== undefined) errors.push(...validateRollingConfig(obj.update_config, childPath(path, 'update_config')))
-  if (obj.resources !== undefined) errors.push(...validateResources(obj.resources, childPath(path, 'resources')))
-  if (obj.restart_policy !== undefined) errors.push(...validateRestartPolicy(obj.restart_policy, childPath(path, 'restart_policy')))
-  if (obj.placement !== undefined) errors.push(...validatePlacement(obj.placement, childPath(path, 'placement')))
+  if (obj.labels !== undefined) {errors.push(...validateListOrDict(obj.labels, childPath(path, 'labels')))}
+  if (obj.rollback_config !== undefined) {errors.push(...validateRollingConfig(obj.rollback_config, childPath(path, 'rollback_config')))}
+  if (obj.update_config !== undefined) {errors.push(...validateRollingConfig(obj.update_config, childPath(path, 'update_config')))}
+  if (obj.resources !== undefined) {errors.push(...validateResources(obj.resources, childPath(path, 'resources')))}
+  if (obj.restart_policy !== undefined) {errors.push(...validateRestartPolicy(obj.restart_policy, childPath(path, 'restart_policy')))}
+  if (obj.placement !== undefined) {errors.push(...validatePlacement(obj.placement, childPath(path, 'placement')))}
   errors.push(...checkAdditionalProperties(obj, DEPLOYMENT_KNOWN_KEYS, path))
   return errors
 }

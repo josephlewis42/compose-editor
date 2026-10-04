@@ -9,8 +9,8 @@
 // file — see the per-definition files in this folder (one per
 // compose_spec.json `$defs` entry, named the same as their `$ref`).
 
-import { parseDocument, LineCounter } from 'yaml'
-import { validateComposeFile, type ComposeFile } from './composeFile'
+import { LineCounter, parseDocument } from 'yaml'
+import { type ComposeFile, validateComposeFile } from './composeFile'
 import { resolvePosition } from './position'
 import type { ValidationError } from './errors'
 
@@ -22,7 +22,7 @@ export interface ParseResult {
 
 export function parseComposeYaml(yamlText: string): ParseResult {
   const lineCounter = new LineCounter()
-  // parseDocument (unlike `parse`) never throws on invalid YAML — syntax
+  // ParseDocument (unlike `parse`) never throws on invalid YAML — syntax
   // errors land in `doc.errors`, each already carrying a `linePos` since we
   // pass our own `lineCounter` (prettyErrors defaults to true).
   const doc = parseDocument(yamlText, { lineCounter })
@@ -39,12 +39,19 @@ export function parseComposeYaml(yamlText: string): ParseResult {
   }
 
   const parsed: unknown = doc.toJS()
-  if (parsed === null || parsed === undefined) return { errors: [] }
+  if (parsed === null || parsed === undefined) {
+    return { errors: [] }
+  }
 
-  const errors = validateComposeFile(parsed).map((error) => {
+  const errors = validateComposeFile(parsed)
+  errors.forEach((error) => {
     const position = resolvePosition(doc, lineCounter, error.path)
-    return position ? { ...error, ...position } : error
+    if (position) {
+      error.col = position.col
+      error.line = position.line
+    }
   })
+  
   return { spec: parsed as ComposeFile, errors }
 }
 

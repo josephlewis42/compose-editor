@@ -1,7 +1,7 @@
 // #/$defs/network
 
-import { childPath, type ValidationError } from './errors'
-import { checkAdditionalProperties, checkFieldType, checkType, validateExternal, validateListOrDict, type External, type ListOrDict } from './primitives'
+import { type ValidationError, childPath } from './errors'
+import { type External, type ListOrDict, checkAdditionalProperties, checkFieldType, checkType, validateExternal, validateListOrDict } from './primitives'
 
 export interface IpamConfigBlock {
   subnet?: string
@@ -31,7 +31,7 @@ export interface Network {
 
 function validateIpamConfigBlock(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'subnet', ['string'], path, errors)
@@ -57,7 +57,7 @@ function validateIpamConfigBlock(value: unknown, path: string): ValidationError[
 
 function validateDriverOpts(value: unknown, path: string, types: ('string' | 'number')[] = ['string', 'number']): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   return Object.entries(value as Record<string, unknown>).flatMap(([key, entry]) => {
     const entryErr = checkType(entry, types, childPath(path, key))
     return entryErr ? [entryErr] : []
@@ -66,7 +66,7 @@ function validateDriverOpts(value: unknown, path: string, types: ('string' | 'nu
 
 function validateIpam(value: unknown, path: string): ValidationError[] {
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'driver', ['string'], path, errors)
@@ -79,7 +79,7 @@ function validateIpam(value: unknown, path: string): ValidationError[] {
       errors.push(...(obj.config as unknown[]).flatMap((item, i) => validateIpamConfigBlock(item, `${configPath}[${i}]`)))
     }
   }
-  if (obj.options !== undefined) errors.push(...validateDriverOpts(obj.options, childPath(path, 'options'), ['string']))
+  if (obj.options !== undefined) {errors.push(...validateDriverOpts(obj.options, childPath(path, 'options'), ['string']))}
   errors.push(...checkAdditionalProperties(obj, ['driver', 'config', 'options'], path))
   return errors
 }
@@ -87,21 +87,21 @@ function validateIpam(value: unknown, path: string): ValidationError[] {
 const KNOWN_KEYS = ['name', 'driver', 'driver_opts', 'ipam', 'external', 'internal', 'enable_ipv4', 'enable_ipv6', 'attachable', 'labels']
 
 export function validateNetwork(value: unknown, path: string): ValidationError[] {
-  if (value === null) return []
+  if (value === null) {return []}
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'name', ['string'], path, errors)
   checkFieldType(obj, 'driver', ['string'], path, errors)
-  if (obj.driver_opts !== undefined) errors.push(...validateDriverOpts(obj.driver_opts, childPath(path, 'driver_opts')))
-  if (obj.ipam !== undefined) errors.push(...validateIpam(obj.ipam, childPath(path, 'ipam')))
-  if (obj.external !== undefined) errors.push(...validateExternal(obj.external, childPath(path, 'external'), true))
+  if (obj.driver_opts !== undefined) {errors.push(...validateDriverOpts(obj.driver_opts, childPath(path, 'driver_opts')))}
+  if (obj.ipam !== undefined) {errors.push(...validateIpam(obj.ipam, childPath(path, 'ipam')))}
+  if (obj.external !== undefined) {errors.push(...validateExternal(obj.external, childPath(path, 'external'), true))}
   checkFieldType(obj, 'internal', ['boolean', 'string'], path, errors)
   checkFieldType(obj, 'enable_ipv4', ['boolean', 'string'], path, errors)
   checkFieldType(obj, 'enable_ipv6', ['boolean', 'string'], path, errors)
   checkFieldType(obj, 'attachable', ['boolean', 'string'], path, errors)
-  if (obj.labels !== undefined) errors.push(...validateListOrDict(obj.labels, childPath(path, 'labels')))
+  if (obj.labels !== undefined) {errors.push(...validateListOrDict(obj.labels, childPath(path, 'labels')))}
   errors.push(...checkAdditionalProperties(obj, KNOWN_KEYS, path))
   return errors
 }

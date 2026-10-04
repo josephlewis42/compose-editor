@@ -3,8 +3,10 @@
 // helpers — those are exercised indirectly through every field they touch
 // on services/jobs/networks/etc below.
 
+/* eslint-disable no-magic-numbers */
+
 import { describe, expect, it } from 'vitest'
-import { parseComposeYaml, validateComposeFile, type ValidationError } from './index'
+import { type ValidationError, parseComposeYaml, validateComposeFile } from './index'
 
 function errorSet(errors: ValidationError[]): string[] {
   return errors.map((e) => `${e.type}:${e.path}`).sort()

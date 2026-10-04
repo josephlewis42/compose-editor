@@ -5,19 +5,32 @@
     "react/rules-of-hooks": "error",
     "react/only-export-components": ["warn", { "allowConstantExport": true }],
     "react/react-in-jsx-scope": "off",
-    "react/jsx-max-depth": ["warn", {"max": 4}],
+    "react/jsx-max-depth": ["warn", {"max": 8}],
     "react/no-array-index-key": "off",
     "eslint/id-length": "off",
     "eslint/no-ternary": "off",
     "eslint/func-style": "off",
-    "eslint/no-magic-numbers": ["error", {"ignore": [0, 1]}]
+    "eslint/no-magic-numbers": ["error", {"ignore": [-1, 0, 1]}],
+    // Allow multiple declarations for clarity.
+    "eslint/one-var": "off",
+    // Allow mult
+    "eslint/capitalized-comments": ["warn", "always", {"ignoreConsecutiveComments": true, "ignoreInlineComments": true}],
+    "eslint/max-statements": "off",
+    "eslint/sort-keys": "off",
+    // Sort imports doesn't have an option to distinguish between:
+    //  import foo from "bar" and 
+    //  import {foo} form "bar"
+    // It constantly wants to rearrange imports depending on whether you're importing a single
+    // item or multiple.
+    "eslint/sort-imports": "off",
+    "eslint/no-continue": "off",
   },
   "categories": {
     "correctness": "error",
     "suspicious": "error",
     "pedantic": "off",
     "perf": "error",
-    "style": "off"
+    "style": "warn"
   }
 
 }

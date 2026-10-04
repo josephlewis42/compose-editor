@@ -5,23 +5,23 @@ import { convertComposeSpec } from './wasm';
 import { parseComposeYaml } from './validator';
 
 describe('catalog', async () => {
-    const result = await loadCatalog();
+    const catalog = await loadCatalog();
 
     it('has more than one application', () => {
-        expect(result.applications.length).toBeGreaterThan(0)
+        expect(catalog.applications.length).toBeGreaterThan(0)
     })
 
     it('has unique application names', () => {
         const knownNames = new Set<string>();
 
-        for (const application of result.applications) {
+        for (const application of catalog.applications) {
             expect(knownNames).not.contains(application.name)
 
             knownNames.add(application.name)
         }
     })
 
-    describe.each(result.applications)('$slug', (application) => {
+    describe.each(catalog.applications)('$slug', (application) => {
 
         it('has valid metadata', () => {
             expect(application.slug, 'folder (slug) must be lowercase letters, numbers, and underscores').toMatch(/^[a-z0-9_]+$/)

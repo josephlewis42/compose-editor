@@ -17,6 +17,14 @@ test: proto templates wasm
 	go test -cover ./...
 	cd frontend; pnpm test
 
+.PHONY: lint
+lint: frontend
+	cd frontend; pnpm lint
+
+.PHONY: fix
+fix:
+	cd frontend; pnpm fix
+
 .PHONY: wasm
 wasm: frontend/src/gen proto
 	GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o frontend/src/gen/composeeditor.wasm pkg/browser/wasm.go

@@ -1,7 +1,7 @@
 // #/$defs/volume
 
-import { childPath, type ValidationError } from './errors'
-import { checkAdditionalProperties, checkFieldType, checkType, validateExternal, validateListOrDict, type External, type ListOrDict } from './primitives'
+import { type ValidationError, childPath } from './errors'
+import { type External, type ListOrDict, checkAdditionalProperties, checkFieldType, checkType, validateExternal, validateListOrDict } from './primitives'
 
 export interface Volume {
   name?: string
@@ -14,9 +14,9 @@ export interface Volume {
 const KNOWN_KEYS = ['name', 'driver', 'driver_opts', 'external', 'labels']
 
 export function validateVolume(value: unknown, path: string): ValidationError[] {
-  if (value === null) return []
+  if (value === null) {return []}
   const err = checkType(value, ['object'], path)
-  if (err) return [err]
+  if (err) {return [err]}
   const obj = value as Record<string, unknown>
   const errors: ValidationError[] = []
   checkFieldType(obj, 'name', ['string'], path, errors)
@@ -35,8 +35,8 @@ export function validateVolume(value: unknown, path: string): ValidationError[] 
       )
     }
   }
-  if (obj.external !== undefined) errors.push(...validateExternal(obj.external, childPath(path, 'external'), true))
-  if (obj.labels !== undefined) errors.push(...validateListOrDict(obj.labels, childPath(path, 'labels')))
+  if (obj.external !== undefined) {errors.push(...validateExternal(obj.external, childPath(path, 'external'), true))}
+  if (obj.labels !== undefined) {errors.push(...validateListOrDict(obj.labels, childPath(path, 'labels')))}
   errors.push(...checkAdditionalProperties(obj, KNOWN_KEYS, path))
   return errors
 }

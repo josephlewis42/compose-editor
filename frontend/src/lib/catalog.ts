@@ -4,7 +4,7 @@
 // instead of a hand-written JSON shape (see design/spec_format.md).
 
 import { fromBinary } from '@bufbuild/protobuf'
-import { CatalogSchema, type Catalog } from '@/gen/composeeditor/v1/spec_pb'
+import { type Catalog, CatalogSchema } from '@/gen/composeeditor/v1/spec_pb'
 import templatesURL from '@/gen/templates.binpb?inline'
 
 export type { FormElement } from '@/gen/composeeditor/v1/spec_pb'
