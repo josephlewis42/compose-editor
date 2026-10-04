@@ -13,7 +13,7 @@ import { LineCounter, parseDocument } from 'yaml'
 import { type ComposeFile, validateComposeFile } from './composeFile'
 import { resolvePosition } from './position'
 import type { ValidationError } from './errors'
-import { checkStyle } from './lint_style'
+import { checkStyle } from './lintStyle'
 import { checkPortability } from './lintPortability'
 
 export interface ParseResult {

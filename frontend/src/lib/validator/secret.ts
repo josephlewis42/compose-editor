@@ -28,8 +28,8 @@ export function validateSecret(value: unknown, path: string): ValidationError[] 
   if (obj.labels !== undefined) {errors.push(...validateListOrDict(obj.labels, childPath(path, 'labels')))}
   checkFieldType(obj, 'driver', ['string'], path, errors)
   if (obj.driver_opts !== undefined) {
-    const optsPath = childPath(path, 'driver_opts'),
-     optsErr = checkType(obj.driver_opts, ['object'], optsPath)
+    const optsPath = childPath(path, 'driver_opts')
+    const optsErr = checkType(obj.driver_opts, ['object'], optsPath)
     if (optsErr) {
       errors.push(optsErr)
     } else {

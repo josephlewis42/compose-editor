@@ -50,11 +50,11 @@ export function EditorPage({ app }: EditorPageProps) {
 }
 
 function EditorForm({ app }: { app: Application }) {
-  const [values, setValues] = useState<FormValues>({}),
-   [mobileTab, setMobileTab] = useState<'form' | 'output'>('form'),
-   { composeOutput, errors, warnings } = useComposePreview(app.template, values),
+  const [values, setValues] = useState<FormValues>({})
+  const [mobileTab, setMobileTab] = useState<'form' | 'output'>('form')
+  const { composeOutput, errors, warnings } = useComposePreview(app.template, values)
 
-   onUpdate = (patch: FormValues) => {
+  const onUpdate = (patch: FormValues) => {
     setValues((prev) => ({ ...prev, ...patch }))
   }
 
