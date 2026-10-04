@@ -22,30 +22,30 @@ export function Markdown({ children, className }: { children: string; className?
 
 function MdA({...props}: React.ClassAttributes<HTMLAnchorElement> & React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   return (
-    <a href={props.href} className="text-primary underline underline-offset-2" target="_blank" rel="noreferrer" />
+    <a {...props} className="text-primary underline underline-offset-2" target="_blank" rel="noreferrer" />
   )
 }
 
-function MdCode() {
+function MdCode({...props}: React.ClassAttributes<HTMLElement> & React.HTMLAttributes<HTMLElement>) {
   return (
-    <code className="rounded bg-base-200 px-1 py-0.5 font-mono text-[0.85em]" />
+    <code  {...props} className="rounded bg-base-200 px-1 py-0.5 font-mono text-[0.85em]" />
   )
 }
 
-function MdUl() {
+function MdUl({...props}: React.HTMLAttributes<HTMLElement>) {
   return (
-    <ul className="list-disc space-y-1 pl-5" />
+    <ul  {...props} className="list-disc space-y-1 pl-5" />
   )
 }
 
-function MdOl() {
+function MdOl({...props}: React.HTMLAttributes<HTMLElement>) {
   return (
-    <ol className="list-decimal space-y-1 pl-5" />
+    <ol {...props} className="list-decimal space-y-1 pl-5" />
   )
 }
 
-function MdP() {
+function MdP({...props}: React.HTMLAttributes<HTMLElement>) {
   return (
-    <p className="[&:not(:first-child)]:mt-2" />
+    <p {...props} className="[&:not(:first-child)]:mt-2" />
   )
 }
