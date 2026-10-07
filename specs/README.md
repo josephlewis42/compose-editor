@@ -65,30 +65,37 @@ form:
       value: hello-world:latest
 ```
 
-`composeeditor build specs/ out.json` renders template with no
-values as a sanity check and fails the build if any template fails to parse
-or execute, so a spec with a broken template can't reach the published
-catalog.
+The frontend loads every `specs/*/spec.yaml` directly. `make test` checks
+each spec: unknown or misplaced fields are rejected, form elements are
+validated, and the template is rendered with its default values and linted,
+so a broken spec can't reach the published catalog. While `pnpm dev` (or
+`tilt up`) is running, edits to a spec hot-reload in the editor.
 
 ## Debugging a spec
 
-`composeeditor render specs/ SLUG` renders a single spec's template to
+`frontend/scripts/render.ts SLUG` renders a single spec's template to
 stdout using its form defaults, e.g.:
 
 ```sh
-go run . render specs jellyfin
+make proto wasm  # once, to generate frontend/src/gen
+frontend/scripts/render.ts jellyfin
 ```
 
-Pass a JSON object as a third argument to override specific fields, useful
+Pass a JSON object as a second argument to override specific fields, useful
 for exercising non-default paths (e.g. a `oneof` tab, a `toggle_section`,
 or a multi-line `text` field) without clicking through the UI:
 
 ```sh
-go run . render specs jellyfin '{"http_port": 9999, "media_paths": "/movies\n/tv"}'
+frontend/scripts/render.ts jellyfin '{"http_port": 9999, "media_paths": "/movies\n/tv"}'
 ```
 
 Values not present in the JSON object keep the field's `default_value`.
 Pass `-` instead of a JSON object to read it from stdin.
+
+The rendered YAML is written to stdout; template warnings and errors go to
+stderr, and the exit code is non-zero if rendering fails. Invoke the script
+directly rather than through `pnpm`, which mangles backslash escapes like
+`\n` in arguments.
 
 ## Template language
 

@@ -6,8 +6,6 @@ require (
 	github.com/DataDog/datadog-agent/pkg/template v0.83.2
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/aperturerobotics/protobuf-go-lite v0.18.0
-	github.com/urfave/cli/v3 v3.0.0-beta1
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
