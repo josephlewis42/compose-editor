@@ -1,8 +1,41 @@
 import { describe, expect, it } from 'vitest'
-import { loadCatalog } from './catalog'
+import { loadCatalog, parseSpec } from './catalog'
 import { flattenForm } from './formUtil';
+import { defaultValues } from './render';
 import { convertComposeSpec } from './wasm';
 import { parseComposeYaml } from './validator';
+
+describe('parseSpec', () => {
+    it('decodes a spec and sets the slug', () => {
+        const application = parseSpec('hello', `
+name: Hello
+tags: [demo]
+form:
+- select:
+    keyname: image
+    default_value: hello-world:latest
+    options:
+    - title: hello-world:latest
+      value: hello-world:latest
+`)
+        expect(application.slug).toBe('hello')
+        expect(application.name).toBe('Hello')
+        expect(application.tags).toEqual(['demo'])
+        expect(application.form[0].element.case).toBe('select')
+    })
+
+    it('rejects unknown top-level fields', () => {
+        expect(() => parseSpec('hello', 'nmae: Hello')).toThrow(/couldn't load spec "hello".*nmae/)
+    })
+
+    it('rejects fields misplaced next to a form element', () => {
+        expect(() => parseSpec('hello', `
+form:
+- str:
+  keyname: misindented
+`)).toThrow(/keyname/)
+    })
+})
 
 describe('catalog', async () => {
     const catalog = await loadCatalog();
@@ -52,25 +85,16 @@ describe('catalog', async () => {
         })
 
         it('renders template with default values', async () => {
-            const defaultValues: Record<string, unknown> = {};
-            formElements
-                .forEach(fe => {
-                    const keyName = fe.keyName();
-                    if (keyName !== undefined) {
-                        defaultValues[keyName] = fe.defaultValue()
-                    }
-            });
-            
             const result = await convertComposeSpec({
                 template: application.template,
-                values: defaultValues,
+                values: defaultValues(application),
             })
 
             expect(result.compose_output.length).greaterThan(0)
             expect(result.errors.length, "expect no errors when rendering").equals(0)
             expect(result.warnings.length, "expect no warnings when rendering").equals(0)
 
-            console.log("## Values: ", defaultValues)
+            console.log("## Values: ", defaultValues(application))
             console.log("## Yaml:\n", result.compose_output)
             const parseResult = parseComposeYaml(result.compose_output)
             const errors = (parseResult.errors || []).

@@ -12,18 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Schema for the on-disk spec format described in specs/README.md. This is
-// the single source of truth for both the Go and TypeScript spec types
-// (see proto/README.md for how to regenerate them) and for the generated
-// per-field reference in specs/form_fields.md.
+// Schema for the on-disk spec format described in specs/README.md.
 syntax = "proto3";
 
 package composeeditor.v1;
 
 option go_package = "github.com/josephlewis42/compose-editor/pkg/proto/composeeditor/v1;composeeditorv1";
 
-// Catalog is the compiled output of `composeeditor build` (see
-// design/spec_format.md), served to the frontend as templates.binpb.
+// Catalog is every spec under specs/, loaded by the frontend from the
+// spec.yaml files (frontend/src/lib/catalog.ts).
 message Catalog {
   repeated Application applications = 1;
 }

@@ -14,7 +14,13 @@ export default defineConfig({
       '@': path.resolve(import.meta.dirname, './src'),
     },
   },
-  assetsInclude: ['**/*.binpb'],
+  server: {
+    fs: {
+      // Specs live outside the frontend root and are loaded via
+      // import.meta.glob in src/lib/catalog.ts.
+      allow: ['.', '../specs'],
+    },
+  },
   build: {
     rolldownOptions: {
       output: {

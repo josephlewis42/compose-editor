@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Messages exchanged with pkg/templateengine.Convert, both from the CLI and
-// across the JS<->WASM boundary (design/template_engine.md,
-// design/frontend.md#template-engine). The WASM build exchanges these
-// binary-encoded (proto.Marshal / toBinary), not as JSON.
+// Messages used across the JS<->WASM boundary to render the template and
+// get a response.
 syntax = "proto3";
 
 package composeeditor.v1;
